@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="TemplateBasedWizard">
+		<item key="project.template" value="bundleentry://427.fwk1823249157/template/emptyproject/"/>
+		<item key="nedfile.template" value="bundleentry://441.fwk1149307534/templates/emptynedfile/"/>
+	</section>
+	<section name="org.omnetpp.common.eventlog.EventLogFindTextDialog">
+		<item key="DIALOG_X_ORIGIN" value="0"/>
+		<item key="DIALOG_Y_ORIGIN" value="0"/>
+		<item key="DIALOG_WIDTH" value="564"/>
+		<item key="DIALOG_HEIGHT" value="270"/>
+		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
+	</section>
+</section>

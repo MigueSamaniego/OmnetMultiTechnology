@@ -1,0 +1,268 @@
+# Example simulation for integrating veins (http://veins.car2x.org/) with Simu5G
+# 
+# Requirements:
+#       You need to enable the feature "Simu5G Cars" for this simulation
+#       (Project->Properties->OMNeT++->Project Features)
+#
+#       You need to import the "veins" project and its subproject
+#       "veins_inet" in your workspace.
+[General]
+cmdenv-express-mode = true
+cmdenv-autoflush = true
+image-path = ../../images
+network = simulations.BusCosenza.cars.Highway
+
+
+##########################################################
+#            Simulation parameters                       #
+##########################################################
+debug-on-errors = true
+record-eventlog = false
+print-undisposed = false
+
+sim-time-limit = 2000s
+
+#**.sctp.**.scalar-recording = false
+#**.sctp.**.vector-recording = false
+**.scalar-recording = true
+**.vector-recording = true
+**.routingRecorder.enabled = false
+
+*.playgroundSizeX = 11015m
+*.playgroundSizeY = 19100m
+*.playgroundSizeZ = 50m
+
+##########################################################
+# Annotation parameters                                  #
+##########################################################
+*.annotations.draw = true
+
+
+##########################################################
+# Obstacle parameters                                    #
+##########################################################
+*.obstacles.obstacles = xmldoc("./config.xml", "//AnalogueModel[@type='SimpleObstacleShadowing']/obstacles")
+
+
+##########################################################
+#            VeinsManager parameters                     #
+##########################################################
+*.veinsManager.host = "localhost"       # if traci-launchd runs on localhost
+#*.veinsManager.host = "sumo"       # traci-launchd on different host/container
+*.veinsManager.moduleType = "src.node_bus.cars.BusGW"
+*.veinsManager.moduleName = "bus"
+*.veinsManager.launchConfig = xmldoc("cosenza.launchd.xml")
+*.veinsManager.updateInterval = 0.1s
+
+##########################################################
+#                      Mobility                          #
+##########################################################
+*.bus[*].mobility.typename = "src.node_bus.apps.VeinsInetMobility"
+
+
+############### IPv4 configurator LET #################
+*.configurator.config = xmldoc("./demo.xml")
+*.configurator.dumpAddresses = true
+*.configurator.dumpRoutes = true
+*.configurator.verbose = true
+
+#############################################################
+#	interface wifi BUS
+#############################################################
+*.bus[*].ipv4.configurator.typename = "HostAutoConfiguratorM"
+#*.bus[*].ipv4.configurator.interfaces = "cellular lo0 wlan0"
+*.bus[*].ipv4.configurator.interfaces = "cellular lo0 wlan0"
+*.bus[*].ipv4.configurator.addressBase = "10.0.0.1"
+*.bus[*].ipv4.configurator.netmask = "255.255.0.0"
+*.bus[*].ipv4.configurator.addressBaseWlan = "192.168.0.1"
+*.bus[*].ipv4.configurator.netmaskWlan  = "255.255.0.0"
+
+#############################################################
+#	interface wifi APP
+#############################################################
+*.ap[*].ipv4.configurator.typename = "HostAutoConfiguratorAP_M"
+
+
+
+##########################################################
+#              LTE specific parameters                   #
+##########################################################
+# Number of interfaces
+*.bus[*].numWlanInterfaces = 1
+# make a ping
+*.bus[*].numApps = 1
+
+#*.bus[*].app[0].typename = "DhcpClient"
+#*.bus[*].app[0].interface = "wlan0"
+
+#*.bus[*].app[0].typename = "PingApp"
+#*.bus[*].app[0].destAddr = "ap[0]"
+#*.bus[*].app[0].sendInterval = 3s
+#*.bus[*].app[0].startTime = 3s		# waiting 2 secons for asocietion
+#*.bus[*].app[0].printPing = true    # muestra el resultado
+#*.bus[*].app[0].count = -1			# infinite period
+
+#*.bus[*].app[0].typename = "org.car2x.veins.subprojects.veins_inet.VeinsInetSampleApplication"
+*.bus[*].app[0].typename = "src.node_bus.apps.AppBusDataCollection"
+*.bus[*].app[0].interface = "wlan0"
+
+
+# Ieee80211Interface
+*.bus[*].wlan[*].opMode = "n(mixed-2.4Ghz)"
+*.bus[*].wlan[*].radio.typename = "Ieee80211DimensionalRadio"
+#*.bus[*].wlan[0].radio.bandName = "5.9 GHz"
+*.bus[*].wlan[*].radio.bandName = "2.4 GHz"
+*.bus[*].wlan[*].radio.channelNumber = 3
+*.bus[*].wlan[*].radio.transmitter.power = 0.20mW
+*.bus[*].wlan[*].radio.receiver.sensitivity = -89dBm   # límite de recepción
+*.bus[*].wlan[*].radio.receiver.snirThreshold = 4dB    # mínimo SNIR
+*.bus[*].wlan[*].radio.bandwidth = 10 MHz
+*.bus[*].wlan[*].radio.antenna.mobility.typename = "AttachedMobility"
+*.bus[*].wlan[*].radio.antenna.mobility.mobilityModule = "^.^.^.^.mobility"
+*.bus[*].wlan[*].radio.antenna.mobility.offsetX = -2.5m
+*.bus[*].wlan[*].radio.antenna.mobility.offsetZ = 1.5m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinX = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxX = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinY = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxY = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinZ = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxZ = 0m
+
+*.bus[*].wlan[*].mgmt.typename = "Ieee80211MgmtSta"
+*.bus[*].wlan[*].mac.typename = "Ieee80211MacM"
+*.bus[*].wlan[*].agent.typename = "Ieee80211AgentSta"
+*.bus[*].wlan[*].agent.defaultSsid = "Spintel"
+*.bus[*].wlan[*].agent.activeScan = true
+*.bus[*].wlan[*].agent.channelsToScan = "3"
+
+
+###########################################################
+#			AP wifi 
+###########################################################
+# Ieee80211Interface
+*.ap[*].wlan[*].opMode = "n(mixed-2.4Ghz)"
+*.ap[*].wlan[*].radio.typename = "Ieee80211DimensionalRadio"
+#*.ap[*].wlan[0].radio.bandName = "5.9 GHz"
+*.ap[*].wlan[*].radio.bandName = "2.4 GHz"
+*.ap[*].wlan[*].radio.channelNumber = 3
+*.ap[*].wlan[*].radio.transmitter.power = 0.20mW
+*.ap[*].wlan[*].radio.receiver.sensitivity = -89dBm   # límite de recepción
+*.ap[*].wlan[*].radio.receiver.snirThreshold = 4dB    # mínimo SNIR
+*.ap[*].wlan[*].radio.bandwidth = 10 MHz
+*.ap[*].wlan[*].radio.antenna.mobility.typename = "AttachedMobility"
+*.ap[*].wlan[*].radio.antenna.mobility.mobilityModule = "^.^.^.^.mobility"
+*.ap[*].wlan[*].radio.antenna.mobility.offsetX = -2.5m
+*.ap[*].wlan[*].radio.antenna.mobility.offsetZ = 1.5m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinX = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxX = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinY = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxY = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinZ = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxZ = 0m
+
+*.ap[*].wlan[*].mgmt.typename = "Ieee80211MgmtAp"
+*.ap[*].wlan[*].mac.typename = "Ieee80211Mac"
+*.ap[*].wlan[*].agent.typename = ""
+*.ap[*].wlan[*].mgmt.ssid = "Spintel"
+*.ap[*].wlan[*].mgmt.beaconInterval = 0.1s  # cada 100 ms
+
+
+*.ap[*].mobility.typename = "StationaryMobility"
+*.ap[*].mobility.initFromDisplayString = false
+
+*.ap[*].numWlanInterfaces = 1
+*.ap[*].forwarding = true
+
+
+
+
+#*.ap[*].numApps = 1
+#*.ap[*].app[0].typename = "DhcpServer"
+#*.ap[*].app[0].interface = "wlan0"
+#*.ap[*].app[0].numReservedAddresses = 10
+#*.ap[*].app[0].maxNumClients = 50
+#*.ap[*].app[0].leaseTime = 3600s
+###############################################################
+#				positions AP
+###############################################################
+
+#*.ap[0].wlan[0].mgmt.ssid = "AP0_SSID"
+*.ap[0].mobility.initialX = 3522m
+*.ap[0].mobility.initialY = 5729m
+*.ap[0].mobility.initialZ = 3m
+
+#*.ap[1].wlan[0].mgmt.ssid = "AP1_SSID"
+*.ap[1].mobility.initialX = 5835m
+*.ap[1].mobility.initialY = 11468m
+*.ap[1].mobility.initialZ = 3m
+
+
+*.eNodeB1.mobility.initFromDisplayString = false
+*.eNodeB1.mobility.initialX = 3634m
+*.eNodeB1.mobility.initialY = 6811m
+*.eNodeB1.mobility.initialZ = 50m
+
+*.eNodeB2.mobility.initFromDisplayString = false
+*.eNodeB2.mobility.initialX = 6500m
+*.eNodeB2.mobility.initialY = 8662m
+*.eNodeB2.mobility.initialZ = 50m
+
+
+
+*.server.numApps = 1
+*.server.app[0].typename = "UdpSink"
+*.server.app[0].localPort = 3000
+
+############################################################
+# RADIO LINK
+############################################################
+**.wlan[*].radio.antenna.mobilityModule = "^.^.^.mobility"
+#*.channelControl.propagationModel = "RuralMacrocell"
+
+# Number of Resource Blocks
+**.numBands = 25 
+
+# Transmission Power
+**.ueTxPower = 26
+**.eapBTxPower = 46
+
+# Enable dynamic association of UEs (based on best SINR)
+*.bus[*].cellularNic.phy.dynamicCellAssociation = true
+**.bus[*].masterId = 1     # useless if dynamic association is disabled
+**.bus[*].macCellId = 1    # useless if dynamic association is disabled
+
+# eNodeB configuration
+**.eNodeB1.macCellId = 1
+**.eNodeB1.macNodeId = 1
+**.eNodeB2.macCellId = 2
+**.eNodeB2.macNodeId = 2 
+
+
+# Enable handover
+*.bus[*].cellularNic.phy.enableHandover = true
+*.eNodeB*.cellularNic.phy.enableHandover = true
+*.eNodeB*.cellularNic.phy.handoverLatency = 50ms
+*.eNodeB*.cellInfo.broadcastMessageInterval = 1s # eNB will sends broadcast triggers every second
+
+# X2 and SCTP configuration
+*.eNodeB*.numX2Apps = 1    # one x2App per peering eNodeB
+*.eNodeB*.x2App[*].server.localPort = 5000 + ancestorIndex(1) # Server ports (x2App[0]=5000, x2App[1]=5001, ...)
+*.eNodeB1.x2App[0].client.connectAddress = "eNodeB2%x2ppp0" 
+*.eNodeB2.x2App[0].client.connectAddress = "eNodeB1%x2ppp0" 
+**.sctp.nagleEnabled = false         # if true, transmission of small packets will be delayed on the X2
+**.sctp.enableHeartbeats = false
+
+
+# =======================
+#  range
+# =======================
+
+# === visualization WiFi ===
+*.visualizer.mediumVisualizer.displayCommunicationRanges = true
+*.visualizer.mediumVisualizer.displayInterferenceRanges = false
+
+*.radioMedium.pathLoss.typename = "LogNormalShadowing"
+*.radioMedium.backgroundNoise.power = -110dBm
+
+
+

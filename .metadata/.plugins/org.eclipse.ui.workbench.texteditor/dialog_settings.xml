@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.GotoLineAction$GotoLineDialog_dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="330"/>
+		<item key="DIALOG_Y_ORIGIN" value="167"/>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item key="selection" value="tolerateMaxDistViolation_"/>
+		<item key="wrap" value="true"/>
+		<item key="casesensitive" value="false"/>
+		<item key="wholeword" value="false"/>
+		<item key="incremental" value="false"/>
+		<item key="isRegEx" value="false"/>
+		<list key="findhistory">
+			<item value="tolerateMaxDistViolation_"/>
+			<item value="nicType"/>
+			<item value="RURAL_MACROCELL"/>
+			<item value="distancia 6"/>
+			<item value="5000"/>
+			<item value="ev"/>
+			<item value="scenario"/>
+			<item value="channelControl"/>
+			<item value="getSINR"/>
+			<item value="LteChannelModel"/>
+			<item value="error"/>
+			<item value="urban macrocel"/>
+			<item value="5"/>
+			<item value="50"/>
+			<item value="500"/>
+		</list>
+		<list key="replacehistory">
+			<item value="wlanAgent"/>
+			<item value="Ieee80211MacM"/>
+			<item value="AppBusDataCollection"/>
+			<item value="bus"/>
+			<item value="ap"/>
+			<item value="car"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="1119"/>
+		<item key="DIALOG_Y_ORIGIN" value="107"/>
+		<item key="DIALOG_WIDTH" value="482"/>
+		<item key="DIALOG_HEIGHT" value="409"/>
+		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
+	</section>
+</section>

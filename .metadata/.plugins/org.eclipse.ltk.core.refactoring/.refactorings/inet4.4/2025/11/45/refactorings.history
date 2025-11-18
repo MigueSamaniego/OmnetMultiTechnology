@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;inet4.4/src/inet/linklayer/ieee80211/mac/Ieee80211Mac2M.ned&apos; to &apos;Ieee80211MacM.ned&apos;" description="Rename resource &apos;Ieee80211Mac2M.ned&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/inet/linklayer/ieee80211/mac/Ieee80211Mac2M.ned" name="Ieee80211MacM.ned" stamp="1762353546585" updateReferences="true"/>
+</session>
