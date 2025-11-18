@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;BusCosenzaProject/src/nodes&apos; to &apos;node_bus&apos;" description="Rename resource &apos;nodes&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/nodes" name="node_bus" stamp="1760649452797" updateReferences="true"/>
+</session>

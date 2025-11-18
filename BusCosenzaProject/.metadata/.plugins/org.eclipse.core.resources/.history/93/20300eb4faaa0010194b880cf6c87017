@@ -1,0 +1,16 @@
+
+
+<!--
+<config>
+    <autoConfig>
+
+    	<interface hosts="server" names="eth[0]" />
+    	
+
+        <interface hosts="car[*]" names="wlan[0]" />
+
+
+        <interface hosts="car[*]" names="cellularNic" />
+    </autoConfig>
+</config>
+-->

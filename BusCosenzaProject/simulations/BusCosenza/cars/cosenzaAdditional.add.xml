@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-06-29 23:22:43 by Eclipse SUMO netedit Version 1.16.0
+-->
+
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <!-- StoppingPlaces -->
+	
+	
+	
+	<busStop id="Unical_Terminal" lane="120516823#2_0" startPos="0.00" endPos="4.33"/>
+	<busStop id="Unical_Terminal_Start" lane="120516823#2_0" startPos="20.00" endPos="50.33"/>
+	<busStop id="Via_Padre_Leon_Dehon_2_A" lane="264395685#0_0" startPos="10.00" endPos="14.33"/>
+	<busStop id="Quattromiglia_Via_Marconi_81_A" lane="85885668#2_0" startPos="70.33" endPos="74.33"/>
+	<busStop id="Via_Leonardo_Da_Vinci_42_A" lane="858257969#0_0" startPos="65.00" endPos="69.33"/>
+	<busStop id="Via_Gioacchino_Rossini_47_A" lane="30692864#0_0" startPos="20.00" endPos="24.33"/>
+	<busStop id="Via_Gioacchino_Rossini_60_A" lane="30692864#1_0" startPos="0.00" endPos="4.33"/>
+	<busStop id="Via_Gioacchino_Rossini_194_A" lane="518769723#1_0" startPos="10.00" endPos="14.33"/>
+	<busStop id="Via_Don_Minzoni_Campi_Da_Tennis_A" lane="154530424_0" startPos="20.00" endPos="24.33"/>
+	<busStop id="Via_Ciro_Menotti_A" lane="-692607636#2_0" startPos="50.00" endPos="54.33"/>
+	<busStop id="Via_Don_Giovanni_Minzoni_78_A" lane="154530428#1_0" startPos="50.00" endPos="54.33"/>
+	<busStop id="Via_Lenin_1c_A" lane="31143678#0_0" startPos="10.00" endPos="14.33"/>
+	<busStop id="Metropolis_A" lane="139420291#0_0" startPos="130.00" endPos="154.33"/>
+	<busStop id="Via_Genova_7_A" lane="42217704#0_0" startPos="130.00" endPos="134.33"/>
+	<busStop id="Via_Busento_16_A" lane="31143756_0" startPos="90.00" endPos="94.33"/>
+	<busStop id="Via_Crati_Parco_Robinson_A" lane="-120834661#1_0" startPos="5.00" endPos="9.33"/>
+	<busStop id="Viale_Cosmai_Farmacia_Russo_A" lane="46771353#0_0" startPos="55.00" endPos="59.33"/>
+	<busStop id="Viale_Cosmai_GDF_A" lane="46771353#2_0" startPos="85.00" endPos="89.33"/>
+	<busStop id="Viale_Sergio_Cosmai_Casermette_A" lane="46771353#3_0" startPos="400.00" endPos="404.33"/>
+	<busStop id="Viale_Paolo_Borsellino_71_A" lane="120834672#0_0" startPos="180.00" endPos="184.33"/>
+	<busStop id="Viale_Paolo_Borsellino_1_A" lane="120834672#1_0" startPos="130.00" endPos="134.33"/>
+	<busStop id="Viale_Falcone_11_A" lane="408004771#0_0" startPos="40.00" endPos="44.33"/>
+	<busStop id="Autostazione_Corsia_N7_Finish" lane="120698454_0" startPos="40.00" endPos="44.33"/>
+	
+	
+	<busStop id="Viale_Falcone_11_R" lane="-408004771#0_0" startPos="40.00" endPos="44.33"/>
+	<busStop id="Via_Borsellino_ex_Rettorato_R" lane="46840574#1_0" startPos="30.00" endPos="34.33"/>
+	<busStop id="Via_Borsellino_Staz_Serv_IP_R" lane="46840574#3_0" startPos="10.00" endPos="14.33"/>
+	<busStop id="Viale_Sergio_Cosmai_casermette_R" lane="120834673#1_0" startPos="20.00" endPos="24.33"/>
+	<busStop id="Viale_Sergio_Cosmai_casermette_2_R" lane="120834673#2_0" startPos="20.00" endPos="24.33"/>
+	<busStop id="Viale_Sergio_Cosmai_Guardia_di_Finanza_R" lane="120834673#3_0" startPos="10.00" endPos="14.33"/>
+	<busStop id="Viale_Sergio_Cosmai_74_R" lane="120834673#5_0" startPos="55.00" endPos="59.33"/>
+	<busStop id="Via_Crati_12_R" lane="31143757#1_0" startPos="25.00" endPos="29.33"/>
+	<busStop id="Via_Valle_del_Neto_7_R" lane="31143758_0" startPos="155.00" endPos="159.33"/>
+	<busStop id="Viale_Kennedy_114_R" lane="104969068#5_0" startPos="25.00" endPos="29.33"/>
+	<busStop id="Viale_Kennedy_166_R" lane="30504128#2_0" startPos="85.00" endPos="89.33"/>
+	<busStop id="Via_della_Resistenza_96_R" lane="30504128#4_0" startPos="55.00" endPos="59.33"/>
+	<busStop id="Via_della_Resistenza_132_R" lane="30504128#5_0" startPos="15.00" endPos="19.33"/>
+	<busStop id="Via_G_Verdi_110_R" lane="31143699#1_0" startPos="15.00" endPos="19.33"/>
+	<busStop id="Via_G_Verdi_170_R" lane="31143699#3_0" startPos="45.00" endPos="49.33"/>
+	<busStop id="Via_G_Verdi_220_R" lane="154532548#2_0" startPos="15.00" endPos="19.33"/>
+	<busStop id="Via_G_Verdi_248_R" lane="154532548#3_0" startPos="15.00" endPos="19.33"/>
+	<busStop id="Via_A_Volta_66_R" lane="858257967#1_0" startPos="0.00" endPos="3.00"/>
+	<busStop id="Via_Volta_Staz_Ferrov_R" lane="858257967#3_0" startPos="8.00" endPos="12.33"/>
+	<busStop id="Via_L_DaVinci_Poliambul_R" lane="30504132#1_0" startPos="30.00" endPos="34.33"/>
+	<busStop id="Villa_Giorcelli_R" lane="259896068_0" startPos="80.00" endPos="84.33"/>
+    <busStop id="Quattromiglia_Via_Marconi_81_R" lane="-85885668#2_0" startPos="25.00" endPos="29.33"/>
+	<busStop id="Via_A_Savinio_Pensilina_R" lane="-120516816#1_0" startPos="2.00" endPos="6.33"/>
+	
+	
+	
+	<busStop id="V_delle_Scienze_Cubo_1A_R" lane="45849800#0_0" startPos="10.00" endPos="14.33"/>
+	
+	<busStop id="Dip_Ing_Compl_Martensson" lane="45849800#19_0" startPos="0.00" endPos="4.33"/>
+	
+	<busStop id="Unical_Dipart_Dif_Scienza_E_Terra_R" lane="-45849800#7_0" startPos="0.00" endPos="4.33"/>
+	
+	<!-- Emissions_Data -->
+	
+	<!--edgeData id="detector1" type="emissions" period="600" file="emission/emission_output_period.xml" excludeEmpty="true"/-->
+	
+</additional>
+

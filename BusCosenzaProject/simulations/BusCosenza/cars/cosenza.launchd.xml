@@ -1,0 +1,7 @@
+<launch>
+  <copy file="cosenza.net.xml"/>
+  <copy file="cosenza.rou.xml"/>
+  <copy file="cosenza.poly.xml"/>
+  <copy file="cosenzaAdditional.add.xml"/>
+  <copy file="cosenza.sumocfg" type="config"/>
+</launch>
