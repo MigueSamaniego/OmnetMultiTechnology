@@ -49,10 +49,12 @@ OBJS = \
     $O/src/node_bus/apps/VeinsInetManagerForker.o \
     $O/src/node_bus/apps/VeinsInetMobility.o \
     $O/src/node_bus/apps/VeinsInetSampleApplication.o \
+    $O/src/node_bus/apps/AirPollutionMessage_m.o \
     $O/src/node_bus/apps/VeinsInetSampleMessage_m.o
 
 # Message files
 MSGFILES = \
+    src/node_bus/apps/AirPollutionMessage.msg \
     src/node_bus/apps/VeinsInetSampleMessage.msg
 
 # SM files

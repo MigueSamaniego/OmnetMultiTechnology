@@ -45,6 +45,8 @@ private:
     int coun_msg_sent = 0;
     omnetpp::cMessage* Control_Task_Timer = nullptr; // Usar omnetpp::cMessage
     omnetpp::cMessage* Control_GPS_Data = nullptr; // Usar omnetpp::cMessage
+    omnetpp::cMessage* Control_Data_Emission = nullptr; // Usar omnetpp::cMessage
+    omnetpp::cMessage* Control_Data_Vehicle = nullptr; // Usar omnetpp::cMessage
 
     SDCardBuffer sdcard;
     InputBuffer inputBuffer;
@@ -59,10 +61,22 @@ private:
 
     std::string buildDataString(const std::vector<double>& values);
 
+    int getBufferBytes(const std::vector<std::string>& buffer) const;
+
+    const double SDCARD_MAX_CAPACITY = 1250000.0; // maximun capacity of SDCard
+
+
     // observe variables in real time
     int sdcardCount = 0;
     int inputCount = 0;
     int outputCount = 0;
+
+    // buffer occupation
+    simsignal_t inputBufferSignal;
+    simsignal_t outputBufferSignal;
+    simsignal_t sdcardBufferSignal;
+
+    simsignal_t sdcardPercentSignal;
 
 protected:
     // ** MODIFICAR: Reemplazar el initialize simple por el de etapas **

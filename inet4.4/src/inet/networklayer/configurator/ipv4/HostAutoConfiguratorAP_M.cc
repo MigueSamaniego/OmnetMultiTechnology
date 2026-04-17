@@ -99,10 +99,10 @@ void HostAutoConfiguratorAP_M::setupNetworkLayer()
         if (!strcmp(ifname, "wlan0")) {
             myAddress = Ipv4Address(addressBase.getInt());
             EV_INFO << "interface cellular : " << myAddress << std::endl;
-        }else if (!strcmp(ifname, "ppp0")) {
+        }else if (!strcmp(ifname, "eth0")) {
             myAddress = Ipv4Address(addressBasePPP.getInt() + uint32_t(host->getId()));
             netmask = netmaskPPP;
-            EV_INFO << "interface PPP OK : " << myAddress << std::endl;
+            EV_INFO << "interface eth OK : " << myAddress << std::endl;
         }
 
         EV_INFO << "interface " << ifname << " gets " << myAddress.str() << "/" << netmask.str() << std::endl;

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-09-04 16:56:33.085059 by randomTrips.py v1_16_0+0000-94ec4c6cd72
+<configuration>
+    <end value="44000"/>
+    <length value="True"/>
+    <net-file value="cosenza.net.xml"/>
+    <route-file value="cosenza.rou.xml"/>
+    <validate value="True"/>
+</configuration>
+-->
+
+<!-- generated on 2023-09-04 16:55:39 by Eclipse SUMO duarouter Version 1.16.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="cosenza.net.xml"/>
+        <route-files value="trips.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="cosenza.rou.xml"/>
+        <alternatives-output value="NUL"/>
+    </output>
+
+    <time>
+        <begin value="0"/>
+        <end value="44000"/>
+    </time>
+
+    <report>
+        <no-warnings value="true"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    
+	<vType id="CONSORZIO_AUTOLINEE_DUE" vClass="bus" speedFactor="1.2" speedDev="0.2" color="red"/>
+	
+	<vType id="car_vip" vClass="vip" color="blue" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="13.88" speedFactor="1.65" speedDev="0.1"/>
+	<vType id="car_authority" vClass="authority" color="blue" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="10.00" speedFactor="1.65" speedDev="0.1"/>
+	<vType id="car_private" vClass="private" color="yellow" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="13.88" speedFactor="1.65" speedDev="0.1"/>
+	<vType id="car_passenger" vClass="passenger" color="blue" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="13.88" speedFactor="1.65" speedDev="0.1"/>
+	<vType id="car_hov" vClass="hov" color="blue" />
+	
+	<vType id="bus_Flixbus" vClass="coach" color="green" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="12.00" speedFactor="1.65" speedDev="0.1"/>
+	<vType id="long_bus" vClass="bus" color="green" />
+	
+	<vType id="Truck" vClass="truck" color="blue" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="10.00" speedFactor="1.65" speedDev="0.1"/>
+	<vType id="Truck_Trailer" vClass="trailer" color="gray" />
+	<vType id="Truck_SemiTrailer" vClass="truck" color="white"/>
+	
+	<vType id="Motorcycle" vClass="motorcycle" color="cyan" accel="6.0" decel="10.0" />
+	<vType id="Motorcycle_Moped" vClass="moped" color="magenta" accel="1.1" decel="7.0" />
+	
+	<vType id="Taxi" vClass="taxi" color="yellow" accel="2.6" decel="4.5" />
+	<vType id="Electric_vehicle" vClass="evehicle" color="0.502,0,0.502" accel="2.6" decel="4.5" /> <!-- purple -->
+	<vType id="Delivery_Car" vClass="delivery" color="orange" accel="2.6" decel="4.5" />
+	<vType id="Policia_Ambulancia" vClass="emergency" color="orange" accel="2.6" decel="4.5"/>
+	
+	
+	<vType id="Remolque_Maqui_Construccion" vClass="rail" color="black" />
+	
+	<!--vType id="aggressive_driver_passenger" vClass="passenger" color="blue" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="13.88" speedFactor="1.65" speedDev="0.1"/-->
+	
+
+	<route id="LINEA_N_138_RENDE-COSENZA_(Autostazione)" edges="120516824#0 120516823#0 
+																120516823#1 120516823#2 -1204295335#0 -1204295334 -1204295336 -1204295338 -1204295337 -31059667#3 -31059667#2 -31059667#1 -31059667#0 -264395293 264395294 31059664 264395685#0 
+																264395685#1 264395685#2 30504142#0 30504142#1 823101118 30924715 264392322 43950786 264392320 264392318 518769704 -518769706#2 -518769706#1 -518769706#0 44290352 30504136#4 30504136#5 30504136#6 85884159 85885668#0 85885668#1 85885668#2 
+																85885668#3 85885668#4 85885668#5 85885668#6 85885668#7 85885668#8 85885668#9 1204295339 401180412#0 401180412#1 401180412#2 858257969#0 858257969#1
+																418617956#0 418617956#1 418617956#2 418617956#3 128202085 316330978#0 316330978#1 316330978#2 316330978#3 316330978#4 316330978#5 316330978#6 316330978#7 30692867#0 30692867#1 121915311#0 121915311#1 154532557#1 121915310#0 121915310#1 121915310#2 121915310#3 30692864#0
+																30692864#1
+																30692864#2 30692864#3 30692864#4 30692864#5 30692864#6 518769723#0 518769723#1
+																518769723#2 518769723#3 518769723#4 31143676 154532521 31143677 154530424
+																154530429#0 1019663116 -31143686#2 -31143686#1 -31143692 31143689#3 31143689#4 31143689#0 -692607636#2
+																31143739#0 31143739#1 31143739#2 154530428#1
+																154530428#2 154530428#3 31143678#0
+																31143678#1 139420290 139420291#0
+																139420291#1 42217704#0 42217704#1 104969068#1 31143756
+																-120834661#2 -120834661#1 
+																-120834661#0 120834660 42219464#5 120834680 42219399 120834691#0 120834691#1 42219504#6 42219504#7 42219504#0 46771353#0
+																46771353#1 46771353#2
+																46771353#3
+																46771353#4 120834672#0
+																120834672#1
+																47043783 120802301 120802303 408004771#0
+																408004771#1 408004771#2 408004771#3 378002615#0 378002615#1 378002615#2 47043796#0 47043796#1 860788924 120698447#0 120698447#1 120698447#2 120698447#3 120698447#4 120698447#5 120698447#6 120698447#7 860788923#0 860788923#1 120698454
+																860788922#2 860788922#3 860788922#4 860788922#5 860788922#6 860788922#7 860788922#8 47043787#0 47043787#1 624378910 -378002615#2 -378002615#1 -378002615#0 -408004771#3 -408004771#2 -408004771#1 -408004771#0
+																-120802303 120802302#0 120802302#1 46840574#0 46840574#1
+																46840574#2 46840574#3 
+																120834673#0 120834673#1
+																120834673#2
+																120834673#3
+																120834673#4 120834673#5
+																120834673#6 42219504#2 42219504#3 42219504#4 42219505#0 42219505#1 120834683 42219414 42219464#1 42219464#2 42219464#3 42219384 120834661#0 120834661#1 120834661#2 31143757#0 31143757#1
+																31143757#2 31143758
+																104969068#4 104969068#5
+																104969068#6 104969068#7 104969068#8 30504128#0 30504128#1 30504128#2
+																30504128#3 30504128#4
+																30504128#5
+																30504128#6 30504129 31143698 31321516 270897216 31143699#0 31143699#1
+																31143699#2 31143699#3
+																154532557#3 154532557#4 154532557#5 154532548#0 154532548#1 154532548#2
+																154532548#3
+																154532548#4 307736165 858257968#0 858257968#1 858257968#2 307736166#0 307736166#1 307736166#2 858257967#0 858257967#1 858257967#2 858257967#3 30504131#0 30504131#1 30504131#2 30504131#3 30504131#4 30504131#5 30504131#6 30504131#7 229301728 30504132#1
+																30504132#2 30504132#3 418617965#0 418617965#1 259896068
+																858257966#1 858257966#2 173536825 -1204295339 -85885668#9 -85885668#8 -85885668#7 -85885668#6 -85885668#5 -85885668#4 -85885668#3 -85885668#2
+																-85885668#1 -85885668#0 85884163#0 85884163#1 30504136#1 30504136#2 30504140 518769706#0 518769706#1 518769706#2 828420353 43950783 -518769701 -30924715 -121383638 264392323 -518769703#1 -518769703#0 -120516816#9 -120516816#8 -120516816#7 -120516816#6 -120516816#5 -120516816#4 -120516816#3 -120516816#2 -120516816#1
+																-120516816#0 -1204295332#2 -1204295332#1 -1204295332#0 -1204295333 -1204295331 30924735 45849800#0
+																45849800#1 45849800#2 45849800#3 45849800#4 45849800#5 45849800#6 45849800#7 45849800#8 45849800#9 45849800#10 45849800#11 45849800#12 45849800#13 45849800#14 45849800#15 45849800#16 45849800#17 45849800#18 45849800#19
+																121823451 30924737#2 30924737#0 121823455 -45849800#19 -45849800#18 -45849800#17 -45849800#16 -45849800#15 -45849800#14 -45849800#13 -45849800#12 -45849800#11 -45849800#10 -45849800#9 -45849800#8 -45849800#7
+																-45849800#6 -45849800#5 -45849800#4 -45849800#3 -45849800#2 -45849800#1 -45849800#0 860834233 120516824#0" color="red">
+
+		<stop busStop="Unical_Terminal" duration="1.00"/>
+		<stop busStop="Unical_Terminal_Start" duration="1.00"/>
+		<stop busStop="Via_Padre_Leon_Dehon_2_A" duration="1.00"/>
+		<stop busStop="Quattromiglia_Via_Marconi_81_A" duration="1.00"/>
+		<stop busStop="Via_Leonardo_Da_Vinci_42_A" duration="1.00"/>
+		<stop busStop="Via_Gioacchino_Rossini_47_A" duration="1.00"/>
+		<stop busStop="Via_Gioacchino_Rossini_60_A" duration="1.00"/>
+		<stop busStop="Via_Gioacchino_Rossini_194_A" duration="1.00"/>
+		<stop busStop="Via_Don_Minzoni_Campi_Da_Tennis_A" duration="1.00"/>
+		<stop busStop="Via_Ciro_Menotti_A" duration="1.00"/>
+		<stop busStop="Via_Don_Giovanni_Minzoni_78_A" duration="1.00"/>
+		<stop busStop="Via_Lenin_1c_A" duration="1.00"/>
+		<stop busStop="Metropolis_A" duration="1.00"/>
+		<stop busStop="Via_Genova_7_A" duration="1.00"/>
+		<stop busStop="Via_Busento_16_A" duration="1.00"/>
+		<stop busStop="Via_Crati_Parco_Robinson_A" duration="1.00"/>
+		<stop busStop="Viale_Cosmai_Farmacia_Russo_A" duration="1.00"/>
+		<stop busStop="Viale_Cosmai_GDF_A" duration="1.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_Casermette_A" duration="1.00"/>
+		<stop busStop="Viale_Paolo_Borsellino_71_A" duration="1.00"/>
+		<stop busStop="Viale_Paolo_Borsellino_1_A" duration="1.00"/>
+		<stop busStop="Viale_Falcone_11_A" duration="1.00"/>
+		<stop busStop="Autostazione_Corsia_N7_Finish" duration="1.00"/>
+		
+
+		
+		<stop busStop="Viale_Falcone_11_R" duration="1.00"/>
+		<stop busStop="Via_Borsellino_ex_Rettorato_R" duration="1.00"/>
+		<stop busStop="Via_Borsellino_Staz_Serv_IP_R" duration="1.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_casermette_R" duration="1.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_casermette_2_R" duration="1.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_Guardia_di_Finanza_R" duration="1.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_74_R" duration="1.00"/>
+		<stop busStop="Via_Crati_12_R" duration="1.00"/>
+		<stop busStop="Via_Valle_del_Neto_7_R" duration="1.00"/>
+		<stop busStop="Viale_Kennedy_114_R" duration="1.00"/>
+		<stop busStop="Viale_Kennedy_166_R" duration="1.00"/>
+		<stop busStop="Via_della_Resistenza_96_R" duration="1.00"/>
+		<stop busStop="Via_della_Resistenza_132_R" duration="1.00"/>
+		<stop busStop="Via_G_Verdi_110_R" duration="1.00"/>
+		<stop busStop="Via_G_Verdi_170_R" duration="1.00"/>
+		<stop busStop="Via_G_Verdi_220_R" duration="1.00"/>
+		<stop busStop="Via_G_Verdi_248_R" duration="1.00"/>
+		<stop busStop="Via_A_Volta_66_R" duration="1.00"/>
+		<stop busStop="Via_Volta_Staz_Ferrov_R" duration="1.00"/>
+		<stop busStop="Via_L_DaVinci_Poliambul_R" duration="1.00"/>
+		<stop busStop="Villa_Giorcelli_R" duration="1.00"/>
+		<stop busStop="Quattromiglia_Via_Marconi_81_R" duration="1.00"/>
+		<stop busStop="Via_A_Savinio_Pensilina_R" duration="1.00"/>
+		<stop busStop="V_delle_Scienze_Cubo_1A_R" duration="1.00"/>
+		<stop busStop="Dip_Ing_Compl_Martensson" duration="1.00"/>
+		<stop busStop="Unical_Dipart_Dif_Scienza_E_Terra_R" duration="1.00"/>
+	
+
+
+
+	
+	
+    </route>
+	
+	
+	
+	
+	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="1000" period="900.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
+	
+	<!--
+	<vehicle id="bus2" type="CONSORZIO_AUTOLINEE_DUE" depart="10.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
+	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="1000" period="100.00"/probability="0.01" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
+	-->
+	
+	<!--trip id="cars" type="car_private" depart="3.0" from="1080748110" to="813233242#0"/-->
+	
+	
+	
+	
+	
+	
+	<flow id="cars_9" type="car_private" begin="100.00" end="150.00" period="5.00" from="30504132#1" to="-30504102"/>
+	
+	<!--
+	<flow id="cars_10" type="car_passenger" begin="2.00" end="100.00" probability="0.3" from="30504132#1" to="-30504102"/>
+	<flow id="cars_11" type="car_hov" begin="3.00" end="100.00" probability="0.2" from="30504132#1" to="1157743484#0"/>
+	<flow id="cars_12" type="car_authority" begin="4.00" end="100.00" probability="0.02" from="30504132#1" to="-30504102"/>
+	<flow id="moto_3" type="Motorcycle" begin="5.00" end="100.00" probability="0.1" from="30504132#1" to="-30504102"/>
+	<flow id="truck_3" type="Truck" begin="6.00" end="100.00" probability="0.1" from="30504132#1" to="-30504102"/>
+	
+	
+
+	<flow id="cars_5" type="car_private" begin="7.00" end="100.00" probability="0.3" from="-518769705" to="1157743484#3"/>
+	<flow id="cars_6" type="car_passenger" begin="8.00" end="100.00" probability="0.3" from="-518769705" to="184587892#1"/>
+	<flow id="cars_7" type="car_hov" begin="9.00" end="100.00" probability="0.2" from="-518769705" to="55654702#0"/>
+	<flow id="cars_8" type="car_authority" begin="10.00" end="100.00" probability="0.02" from="-518769705" to="85884156#3"/>
+	<flow id="moto_2" type="Motorcycle" begin="11.00" end="100.00" probability="0.1" from="-518769705" to="-184587890#2"/>
+	<flow id="truck_2" type="Truck" begin="12.00" end="100.00" probability="0.1" from="-518769705" to="128202086"/>
+	
+	<flow id="cars_1" type="car_private" begin="13.00" end="100.00" probability="0.3" from="1080748110" to="813233242#0"/>
+	<flow id="cars_2" type="car_passenger" begin="14.00" end="100.00" probability="0.3" from="1080748110" to="-30910976#4"/>
+	<flow id="cars_3" type="car_hov" begin="15.00" end="100.00" probability="0.2" from="1080748110" to="-30910976#4"/>
+	<flow id="cars_4" type="car_authority" begin="16.00" end="100.00" probability="0.02" from="1080748110" to="-30910976#4"/>
+	<flow id="moto_1" type="Motorcycle" begin="17.00" end="100.00" probability="0.1" from="1080748110" to="813233242#0"/>
+	<flow id="bus_1" type="bus_Flixbus" begin="18.00" end="100.00" probability="0.04" from="1080748110" to="55654702#0"/>
+	<flow id="truck_1" type="Truck" begin="19.00" end="100.00" probability="0.1" from="1080748110" to="1157242170"/>
+	
+	
+	<flow id="cars_14" type="car_passenger" begin="320.00" end="330.00" probability="0.5" from="85884155#1" to="184587893"/>
+	<flow id="cars_13" type="car_private" begin="370.00" end="400.00" probability="0.9" from="-121455014#0" to="-184587890#2"/>
+	
+	-->
+	
+	</routes>

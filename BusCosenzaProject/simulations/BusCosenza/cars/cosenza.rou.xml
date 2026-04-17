@@ -116,7 +116,7 @@
 																-45849800#6 -45849800#5 -45849800#4 -45849800#3 -45849800#2 -45849800#1 -45849800#0 860834233 120516824#0" color="red">
 
 		<stop busStop="Unical_Terminal" duration="1.00"/>
-		<stop busStop="Unical_Terminal_Start" duration="1.00"/>
+		<stop busStop="Unical_Terminal_Start" duration="10.00"/>
 		<stop busStop="Via_Padre_Leon_Dehon_2_A" duration="1.00"/>
 		<stop busStop="Quattromiglia_Via_Marconi_81_A" duration="1.00"/>
 		<stop busStop="Via_Leonardo_Da_Vinci_42_A" duration="1.00"/>

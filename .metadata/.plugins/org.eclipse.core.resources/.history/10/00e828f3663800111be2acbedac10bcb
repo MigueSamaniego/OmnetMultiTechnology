@@ -1,0 +1,31 @@
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see http://www.gnu.org/licenses/.
+// 
+
+package src.node_bus.cars;
+
+
+// Módulo para vehículos que solo son "tráfico visual"
+module NormalVehicle
+{
+    parameters:
+        @display("i=veins/node/car;is=vs");
+        string veinsmobilityType = default("src.node_bus.apps.VeinsInetMobility");
+    submodules:
+        // Solo movilidad, nada de nic ni appl
+        mobility: <veinsmobilityType> like inet.mobility.contract.IMobility {
+            parameters:
+                @display("p=130,172;i=block/cogwheel");
+        }
+}

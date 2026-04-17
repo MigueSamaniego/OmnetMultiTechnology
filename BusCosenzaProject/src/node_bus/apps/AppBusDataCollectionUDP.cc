@@ -1,5 +1,6 @@
 #include "AppBusDataCollectionUDP.h"
-#include "../apps/VeinsInetSampleMessage_m.h"
+//#include "../apps/VeinsInetSampleMessage_m.h"
+#include "../apps/AirPollutionMessage_m.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/packet/Packet.h"
 #include "inet/common/TagBase_m.h"
@@ -66,6 +67,18 @@ std::string AppBusDataCollectionUDP::buildDataString(const std::vector<double>& 
 // --------------------------------------------------------------]
 // --------------------------------------------------------------]
 
+
+int AppBusDataCollectionUDP::getBufferBytes(const std::vector<std::string>& buffer) const
+{
+    int total = 0;
+    for (const auto& s : buffer) {
+        total += s.size();
+    }
+    return total;
+}
+
+
+
 // *****************************************************************
 // IMPORTANTE: Definiciones necesarias para INET y OMNeT++
 // *****************************************************************
@@ -84,6 +97,8 @@ AppBusDataCollectionUDP::AppBusDataCollectionUDP()
     SignStateConnectAP = 0; // Usamos SignStateConnectAP como bandera de 'suscripción hecha'
     Control_Task_Timer = nullptr;
     ConnectionToAP = false;
+    Control_Data_Emission = nullptr;
+    Control_Data_Vehicle = nullptr;
 }
 
 AppBusDataCollectionUDP::~AppBusDataCollectionUDP()
@@ -99,6 +114,8 @@ void AppBusDataCollectionUDP::initialize(int stage)
     // CALL INIZIALITATION BASE
     veins::VeinsInetApplicationBase::initialize(stage);
 
+
+
     if (!initialized) {
         startTime = std::time(nullptr);
         initialized = true;
@@ -109,12 +126,21 @@ void AppBusDataCollectionUDP::initialize(int stage)
         //EV_INFO << "Inicializando AppBusDataCollectionUDP en stage " << stage << endl;
         stateAssociationSignalId = registerSignal("stateAssociationSignal");
 
+        // buffer occupation
+        inputBufferSignal = registerSignal("inputBufferSize");
+        outputBufferSignal = registerSignal("outputBufferSize");
+        sdcardBufferSignal = registerSignal("sdcardBufferSize");
+
+        sdcardPercentSignal = registerSignal("sdcardPercentSize"); // state occupation buffer
+
     }
 
     // look variables in real time
     WATCH(sdcardCount);
     WATCH(inputCount);
     WATCH(outputCount);
+
+
 
 }
 
@@ -225,6 +251,20 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
                 scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_GPS_Data); // the GW REQUIRE MORE TIME TO RECOVER INITIALITATION VARIABLES VALUES
             }
 
+            //********* Start Collection Data *******************************/
+            if(!Control_Data_Emission){
+
+                Control_Data_Emission = new cMessage("Data_Co2_No2_So2");
+                scheduleAt(simTime() + SimTime(5, SIMTIME_S), Control_Data_Emission);
+            }
+
+            //********* Start Get State Vehicle *****************************/
+            if(!Control_Data_Vehicle){
+
+                Control_Data_Vehicle = new cMessage("Data_Speed_Accel");
+                scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
+            }
+
             SignStateConnectAP = 3;
 
         }else if (SignStateConnectAP == 3) { // GW check diferents tasks (void loop)
@@ -247,13 +287,11 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
         /**************************************************/
 
 
-
-
         }
 
         // 2. Reprogramar el timer (si es que quieres que controlInterface() se siga ejecutando cada 1s)
         if (update_timer) {
-             scheduleAt(simTime() + SimTime(100, SIMTIME_MS), Control_Task_Timer);
+             scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Task_Timer);
         }
     }else if (msg == Control_GPS_Data) {    // gettin position GPS with error N(0,σ)
 
@@ -274,23 +312,116 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
         std::vector<double> gps = {lat, lon};
         std::string data = buildDataString(gps);
         // --------------------------------------------
-        // -------- OTHER TYPE SENSORS ----------------
-//        std::vector<double> sensor = {
-//            23.80, 31.30, 26.07, 1.10, 60.56,
-//            90.19, 1318, 17, 26, 1, 1,
-//            12.21, 133.88, 16380.00
-//        };
-//
-//        std::string data = buildDataString(sensor);
-        // --------------------------------------------
 
         if (inputBuffer.add(data)) {
+            // save buffer en SDCARD
             auto batch = inputBuffer.flush();
             sdcard.pushBatch(batch);
-        }
+
+        }//else{
+
+            // update the state of SDCARD % OCCUPATIONAL
+            double currentBytes = (double)sdcard.getCurrentBytes();
+            double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+
+            if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+            emit(sdcardPercentSignal, usagePercent);
+            emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+
+            EV_INFO << "SAVE ON sdcard" << endl;
+
+
+
+
+            emit(inputBufferSignal, inputBuffer.getCurrentBytes());
+           // }
+
+
 
         scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_GPS_Data);
 
+    } else if (msg == Control_Data_Emission) {
+
+
+        std::string vehicle = mobility->getExternalId();
+
+        // Emissions
+        double co2 = traciVehicle->getCO2Emissions();
+        double co = traciVehicle->getCOEmissions();
+        double nox = traciVehicle->getNOxEmissions();
+        double pmx = traciVehicle->getPMxEmissions();
+
+        // -------- OTHER TYPE SENSORS ----------------
+         std::vector<double> sensor = {
+             co2, co, nox,
+             pmx
+         };
+
+         std::string data = buildDataString(sensor);
+         // --------------------------------------------
+
+         if (inputBuffer.add(data)) {
+             // save buffer en SDCARD
+             auto batch = inputBuffer.flush();
+             sdcard.pushBatch(batch);
+         }//else{
+             // update the state of SDCARD % OCCUPATIONAL
+             double currentBytes = (double)sdcard.getCurrentBytes();
+             double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+
+             if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+             emit(sdcardPercentSignal, usagePercent);
+             emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+             EV_INFO << "SAVE ON sdcard" << endl;
+
+
+             emit(inputBufferSignal, inputBuffer.getCurrentBytes());
+            // }
+
+
+        scheduleAt(simTime() + SimTime(5, SIMTIME_S), Control_Data_Emission);
+
+    } else if (msg == Control_Data_Vehicle) {
+        std::string vehicle = mobility->getExternalId();
+
+        double speed = traciVehicle->getSpeed();
+        double accel = traciVehicle->getAcceleration();
+        double Decaccel = traciVehicle->getDeccel();
+        double fuel = traciVehicle->getFuelConsumption();
+        double time_trip = traciVehicle->getDistanceTravelled();
+
+
+        // -------- OTHER TYPE SENSORS ----------------
+         std::vector<double> sensor = {
+             speed, accel, Decaccel, fuel, time_trip
+         };
+
+         std::string data = buildDataString(sensor);
+         // --------------------------------------------
+
+         if (inputBuffer.add(data)) {
+             // save buffer en SDCARD
+             auto batch = inputBuffer.flush();
+             sdcard.pushBatch(batch);
+         }//else{
+             // update the state of SDCARD % OCCUPATIONAL
+             double currentBytes = (double)sdcard.getCurrentBytes();
+             double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+
+             if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+             emit(sdcardPercentSignal, usagePercent);
+             emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+             EV_INFO << "SAVE ON sdcard" << endl;
+
+
+         emit(inputBufferSignal, inputBuffer.getCurrentBytes());
+         //}
+
+
+        scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
     } else {
         // Llama al manejo de mensajes base para mensajes del framework (paquetes, etc.)
         veins::VeinsInetApplicationBase::handleMessage(msg);
@@ -336,44 +467,58 @@ void AppBusDataCollectionUDP::sendDataToCloud(){
 
         // ----- check if buffer OutPut is Empty -------
         // ----- otherwise recovery data from SDCard ---
+//        if (outputBuffer.isEmpty()) {
+//            auto batch = sdcard.popBatch(20);
+//            outputBuffer.load(batch);
+//        }
+        // -----
+
+        // -------------- fill buffer OUTPUT AGAIN -----------------
         if (outputBuffer.isEmpty()) {
+
             auto batch = sdcard.popBatch(20);
             outputBuffer.load(batch);
-        }
-        // -----
-        if (outputBuffer.hasData()) {
 
-            if(ConnectionToAP){
+        }
+
+        if(ConnectionToAP){
+
+
+            if (outputBuffer.hasData()) {
 
                 std::string data = outputBuffer.getOne();
 
-
-                auto payload = makeShared<VeinsInetSampleMessage>();
-                //payload->setChunkLength(B(100)); // send 100B
-                //payload->setRoadId(traciVehicle->getRoadId().c_str());
-                //payload->setRoadId(std::to_string(coun_msg_sent).c_str());
+                auto payload = makeShared<AirPollutionMessage>();
                 payload->setChunkLength(B(data.size())); // send X BYTES
-                payload->setRoadId(data.c_str());
+                payload->setRawPayload(data.c_str());
                 timestampPayload(payload);
 
                 auto packet = createPacket("accident_car_test_UDP");
-
 
                 packet->insertAtBack(payload);
 
                 // send msg using interface GW established
                 L3Address destAddr = L3AddressResolver().resolve("15.0.0.1"); // server address
                 socket.sendTo(packet.release(), destAddr, 3000);
-            }
 
+            }
 
         }
 
+        emit(outputBufferSignal, outputBuffer.getCurrentBytes());
 
+        double currentBytes = (double)sdcard.getCurrentBytes();
+        double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
 
+        if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
 
+        emit(sdcardPercentSignal, usagePercent);
+        emit(sdcardBufferSignal, sdcard.getCurrentBytes());
 
     }
+
+
+
 
 }
 
@@ -381,8 +526,9 @@ void AppBusDataCollectionUDP::interfaceAvailable(){
 
     if(ConnectionToAP){
         coun_msg_sent++;
+        wifi->setState(NetworkInterface::State::UP);
         celular->setState(NetworkInterface::State::DOWN);
-        //wifi->setState(NetworkInterface::State::UP);
+
 
         EV_INFO << "CELLULAR disable → Using interfaz WIFI" << endl;
 
@@ -410,6 +556,7 @@ void AppBusDataCollectionUDP::interfaceAvailable(){
 
     }else {
         celular->setState(NetworkInterface::State::UP);
+        wifi->setState(NetworkInterface::State::DOWN);
         EV_INFO << "WiFi disable → Using interfaz celular" << endl;
 
         auto rt = check_and_cast<Ipv4RoutingTable*>(getModuleByPath("^.ipv4.routingTable"));

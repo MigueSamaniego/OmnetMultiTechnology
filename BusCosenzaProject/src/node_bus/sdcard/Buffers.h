@@ -51,6 +51,18 @@ public:
     int size() const {
         return count;
     }
+
+    int getCurrentBytes() const {
+        int total = 0;
+
+        int idx = tail;
+        for (int i = 0; i < count; i++) {
+            total += buffer[idx].size();
+            idx = (idx + 1) % MAX;
+        }
+
+        return total;
+    }
 };
 
 class InputBuffer {
@@ -72,6 +84,14 @@ public:
 
     int size() const {
         return buffer.size();
+    }
+
+    int getCurrentBytes() const {
+        int total = 0;
+        for (const auto& s : buffer) {
+            total += s.size();
+        }
+        return total;
     }
 };
 
@@ -101,6 +121,14 @@ public:
 
     int size() const {
         return buffer.size();
+    }
+
+    int getCurrentBytes() const {
+        int total = 0;
+        for (const auto& s : buffer) {
+            total += s.size();
+        }
+        return total;
     }
 };
 

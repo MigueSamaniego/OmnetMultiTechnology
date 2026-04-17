@@ -27,6 +27,20 @@ import org.car2x.veins.subprojects.veins_inet.VeinsInetApplicationBase;
 simple AppBusDataCollectionUDP extends VeinsInetApplicationBase
 {
     parameters:
+        
+        @display("i=block/app");
+        // Declaración de señales
+        @signal[inputBufferSize](type="long");
+        @signal[outputBufferSize](type="long");
+        @signal[sdcardBufferSize](type="long");
+    	@signal[sdcardPercentSize](type="double");
+    	
+        // Configuración de estadísticas para que se graben como vectores
+        @statistic[inputBufferSize](title="Input Buffer Size"; source="inputBufferSize"; record=vector,last);
+        @statistic[outputBufferSize](title="Output Buffer Size"; source="outputBufferSize"; record=vector,last);
+        @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last);
+		@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
+        
         @class(AppBusDataCollectionUDP);
     gates:
 }

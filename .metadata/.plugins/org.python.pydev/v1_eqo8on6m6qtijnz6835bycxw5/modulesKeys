@@ -6258,6 +6258,7 @@ uaclient.entitlements.cc|/usr/lib/python3/dist-packages/uaclient/entitlements/cc
 uaclient.entitlements.cis|/usr/lib/python3/dist-packages/uaclient/entitlements/cis.py
 uaclient.entitlements.entitlement_status|/usr/lib/python3/dist-packages/uaclient/entitlements/entitlement_status.py
 uaclient.entitlements.esm|/usr/lib/python3/dist-packages/uaclient/entitlements/esm.py
+uaclient.entitlements.esm_legacy|/usr/lib/python3/dist-packages/uaclient/entitlements/esm_legacy.py
 uaclient.entitlements.fips|/usr/lib/python3/dist-packages/uaclient/entitlements/fips.py
 uaclient.entitlements.landscape|/usr/lib/python3/dist-packages/uaclient/entitlements/landscape.py
 uaclient.entitlements.livepatch|/usr/lib/python3/dist-packages/uaclient/entitlements/livepatch.py
