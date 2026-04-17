@@ -150,6 +150,7 @@ void AppBusDataCollection::handleMessage(cMessage *msg)
     if (msg == controlTimer) {
         EV_INFO << "MSG DE CONTROL ARRIVED: Ejecutando controlInterface()" << endl;
 
+        EV_INFO << "INFO: controlInterface: "<< ConnectionToAP << endl;
         // 1. Intentar suscribirse (si no se ha hecho) y ejecutar la lógica de control.
         controlInterface();
 

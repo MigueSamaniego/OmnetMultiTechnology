@@ -41,6 +41,8 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 # Object files for local .cc, .msg and .sm files
 OBJS = \
     $O/src/node_bus/apps/AppBusDataCollection.o \
+    $O/src/node_bus/apps/AppBusDataCollectionTCP.o \
+    $O/src/node_bus/apps/AppBusDataCollectionUDP.o \
     $O/src/node_bus/apps/VeinsInetApplicationBase.o \
     $O/src/node_bus/apps/VeinsInetManager.o \
     $O/src/node_bus/apps/VeinsInetManagerBase.o \

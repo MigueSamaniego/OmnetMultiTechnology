@@ -28,16 +28,24 @@
 
 #include "omnetpp.h" // useful to cListener y simsignal_t
 
-class VEINS_INET_API AppBusDataCollection : public veins::VeinsInetApplicationBase, public omnetpp::cListener {
+class VEINS_INET_API AppBusDataCollectionTCP : public veins::VeinsInetApplicationBase, public omnetpp::cListener {
 protected:
-    bool haveForwarded = false;
-    int ConnectionToAP = 0;
+    bool SignStateConnectAP = false;
+    bool ConnectionToAP = false;
+    bool ConnectionToAP_Pass = false;
 
     simsignal_t stateAssociationSignalId;
 
+
+
 private:
-    bool isBus;
-    omnetpp::cMessage* controlTimer = nullptr; // Usar omnetpp::cMessage
+    bool Vehicle_With_Interface = false;
+    int coun_msg_sent = 0;
+    omnetpp::cMessage* Control_Task_Timer = nullptr; // Usar omnetpp::cMessage
+
+    inet::IInterfaceTable* interfaceTable = nullptr;
+    inet::NetworkInterface* wifi = nullptr;
+    inet::NetworkInterface* celular = nullptr;
 
 protected:
     // ** MODIFICAR: Reemplazar el initialize simple por el de etapas **
@@ -49,6 +57,8 @@ protected:
     virtual bool stopApplication() override;
     virtual void processPacket(std::shared_ptr<inet::Packet> pk) override;
     virtual void controlInterface();
+    virtual void subscriptionSignalState();
+    virtual void interfaceAvailable();
     virtual void handleMessage(cMessage *msg) override;
 
     //virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
@@ -56,6 +66,6 @@ protected:
     //virtual void receiveSignal(cComponent *source, simsignal_t signalID, double d, cObject *details) override;
 
 public:
-    AppBusDataCollection();
-    ~AppBusDataCollection();
+    AppBusDataCollectionTCP();
+    ~AppBusDataCollectionTCP();
 };

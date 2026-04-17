@@ -19,6 +19,8 @@ import inet.node.ethernet.Eth10G;
 import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211RadioMedium;
 import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211DimensionalRadioMedium;
 
+import inet.node.ethernet.EthernetSwitch;
+
 import org.car2x.veins.modules.world.annotations.AnnotationManager;
 import org.car2x.veins.base.modules.BaseWorldUtility;
 import org.car2x.veins.visualizer.roads.RoadsCanvasVisualizer;
@@ -33,6 +35,7 @@ import simu5g.common.binder.Binder;
 import simu5g.nodes.eNodeB;
 //import simu5g.nodes.Ue;
 import src.node_bus.cars.BusGW;
+
 
 
 
@@ -106,6 +109,12 @@ network Highway
         router: Router {
             @display("p=561,135;i=device/smallrouter");
         }
+        
+        //# Ethernet Switch
+        switch: EthernetSwitch {
+            @display("p=622,165;i=device/switch");
+        }
+        
         pgw: PgwStandard {
             @display("p=462,136;is=l");
         }
@@ -123,6 +132,7 @@ network Highway
 
         //# submodule vector to store all cars - will be filled dynamically during simulations
         bus[0]: BusGW;
+        
         //# wireless AP
         ap[2]: StandardHost {
             @display("p=210,250;is=vs;i=veins/sign/yellowdiamond");
@@ -132,6 +142,7 @@ network Highway
     connections allowunconnected:
         server.pppg++ <--> Eth10G <--> router.pppg++;
         router.pppg++ <--> Eth10G <--> pgw.filterGate;
+        router.ethg++ <--> Eth10G <--> switch.ethg++;
         pgw.pppg++ <--> Eth10G <--> eNodeB1.ppp;
         pgw.pppg++ <--> Eth10G <--> eNodeB2.ppp;
         // new EnodeB
@@ -143,7 +154,12 @@ network Highway
         eNodeB1.x2++ <--> Eth10G <--> eNodeB3.x2++;
         eNodeB2.x2++ <--> Eth10G <--> eNodeB3.x2++;
 
-        router.pppg++ <--> Eth10G <--> ap[0].pppg++;
-        router.pppg++ <--> Eth10G <--> ap[1].pppg++;
+        //router.pppg++ <--> Eth10G <--> ap[0].pppg++;
+        //router.pppg++ <--> Eth10G <--> ap[1].pppg++;
+        
+        for i=0..1 {
+            ap[i].ethg++ <--> Eth10G <--> switch.ethg++;
+        }
+        
 }
 

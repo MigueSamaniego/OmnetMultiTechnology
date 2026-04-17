@@ -25,19 +25,44 @@
 #include "../apps/veins_inet.h"
 #include "../apps/VeinsInetApplicationBase.h"
 #include "inet/common/INETDefs.h"
+#include "inet/common/geometry/common/Coord.h"
+#include "../sdcard/Buffers.h"
 
 #include "omnetpp.h" // useful to cListener y simsignal_t
 
-class VEINS_INET_API AppBusDataCollection : public veins::VeinsInetApplicationBase, public omnetpp::cListener {
+class VEINS_INET_API AppBusDataCollectionUDP : public veins::VeinsInetApplicationBase, public omnetpp::cListener {
 protected:
-    bool haveForwarded = false;
-    int ConnectionToAP = 0;
+    uint8_t SignStateConnectAP = 0;
+    bool ConnectionToAP = false;
+    bool ConnectionToAP_Pass = false;
 
     simsignal_t stateAssociationSignalId;
 
+
+
 private:
-    bool isBus;
-    omnetpp::cMessage* controlTimer = nullptr; // Usar omnetpp::cMessage
+    bool Vehicle_With_Interface = false;
+    int coun_msg_sent = 0;
+    omnetpp::cMessage* Control_Task_Timer = nullptr; // Usar omnetpp::cMessage
+    omnetpp::cMessage* Control_GPS_Data = nullptr; // Usar omnetpp::cMessage
+
+    SDCardBuffer sdcard;
+    InputBuffer inputBuffer;
+    OutputBuffer outputBuffer;
+
+    inet::IInterfaceTable* interfaceTable = nullptr;
+    inet::NetworkInterface* wifi = nullptr;
+    inet::NetworkInterface* celular = nullptr;
+
+    std::time_t startTime;
+    static bool initialized;
+
+    std::string buildDataString(const std::vector<double>& values);
+
+    // observe variables in real time
+    int sdcardCount = 0;
+    int inputCount = 0;
+    int outputCount = 0;
 
 protected:
     // ** MODIFICAR: Reemplazar el initialize simple por el de etapas **
@@ -48,14 +73,17 @@ protected:
     virtual bool startApplication() override;
     virtual bool stopApplication() override;
     virtual void processPacket(std::shared_ptr<inet::Packet> pk) override;
-    virtual void controlInterface();
+    virtual void sendDataToCloud();
+    virtual void subscriptionSignalState();
+    virtual void interfaceAvailable();
     virtual void handleMessage(cMessage *msg) override;
+    virtual inet::Coord convertXYtoLatLon(inet::Coord pos);
 
     //virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
     virtual void receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) override;
     //virtual void receiveSignal(cComponent *source, simsignal_t signalID, double d, cObject *details) override;
 
 public:
-    AppBusDataCollection();
-    ~AppBusDataCollection();
+    AppBusDataCollectionUDP();
+    ~AppBusDataCollectionUDP();
 };
