@@ -25,7 +25,7 @@ simple HostAutoConfiguratorAP_M like IIpv4NodeConfigurator
         string addressBase = default("10.0.0.0");    // start of address range from which to automatically assign an address to the autoassignInterfaces
         string netmask = default("255.0.0.0");       // netmask of subnet in which to automatically assign an address to the autoassignInterfaces
         string addressBasePPP = default("15.0.0.0");    // start of address range from which to automatically assign an address to the autoassignInterfaces
-        string netmaskPPP = default("255.255.255.0");       // netmask of subnet in which to automatically assign an address to the autoassignInterfaces
+        string netmaskPPP = default("255.255.0.0");       // netmask of subnet in which to automatically assign an address to the autoassignInterfaces
         string mcastGroups = default("");         // list of IP addresses of multicast groups to join, separated by a single space characters
         @display("i=block/cogwheel");
 }

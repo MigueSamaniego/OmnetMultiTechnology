@@ -8,7 +8,7 @@
 	
 	
 	
-	<busStop id="Unical_Terminal" lane="120516823#2_0" startPos="0.00" endPos="4.33"/>
+	<busStop id="Unical_Terminal" lane="120516824#0_0" startPos="10.00" endPos="14.33"/>
 	<busStop id="Unical_Terminal_Start" lane="120516823#2_0" startPos="20.00" endPos="50.33"/>
 	<busStop id="Via_Padre_Leon_Dehon_2_A" lane="264395685#0_0" startPos="10.00" endPos="14.33"/>
 	<busStop id="Quattromiglia_Via_Marconi_81_A" lane="85885668#2_0" startPos="70.33" endPos="74.33"/>

@@ -1,0 +1,2423 @@
+file 141149 1776771182                                          
+version 3
+run Escenario_AP_6-0-20260421-13:32:01-8702
+attr configname Escenario_AP_6
+attr datetime 20260421-13:32:01
+attr datetimef 20260421-133201
+attr experiment Escenario_AP_6
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network simulations.BusCosenza.cars.Highway
+attr processid 8702
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config image-path ../../../images:../../../../inet4.4/images:../../../../simu5G/images:../../../../veins_inet/images:../../../../veins-veins-5.2/images
+config extends General
+config cmdenv-express-mode true
+config cmdenv-autoflush true
+config debug-on-errors true
+config record-eventlog false
+config print-undisposed false
+config sim-time-limit 3000s
+config **.bus[*].app[*].**.vector-recording true
+config **.bus[*].**.vector-recording true
+config **.bus[*].app[0].inputBufferSize:vector.vector-recording true
+config **.bus[*].app[0].outputBufferSize:vector.vector-recording true
+config **.bus[*].app[0].sdcardBufferSize:vector.vector-recording true
+config *.switch.numEthInterfaces 50
+config *.numAPs 6
+config *.ap[*].numEthInterfaces 1
+config *.ap[*].numWlanInterfaces 1
+config *.ap[0].mobility.initialX 3543.52m
+config *.ap[0].mobility.initialY 5712.03m
+config *.ap[0].mobility.initialZ 2m
+config *.ap[1].mobility.initialX 4600.01m
+config *.ap[1].mobility.initialY 7941.41m
+config *.ap[1].mobility.initialZ 2m
+config *.ap[2].mobility.initialX 5405.16m
+config *.ap[2].mobility.initialY 9641.98m
+config *.ap[2].mobility.initialZ 2m
+config *.ap[3].mobility.initialX 5850.89m
+config *.ap[3].mobility.initialY 11486.75m
+config *.ap[3].mobility.initialZ 2m
+config *.ap[4].mobility.initialX 5030.84m
+config *.ap[4].mobility.initialY 7846.02m
+config *.ap[4].mobility.initialZ 2m
+config *.ap[5].mobility.initialX 4813.20m
+config *.ap[5].mobility.initialY 5807.11m
+config *.ap[5].mobility.initialZ 2m
+config *.ap[*].wlan[*].radio.displayCommunicationRange true
+config cmdenv-express-mode true
+config cmdenv-autoflush true
+config image-path ../../images
+config network simulations.BusCosenza.cars.Highway
+config debug-on-errors true
+config record-eventlog false
+config print-undisposed false
+config sim-time-limit 3000s
+config **.scalar-recording true
+config **.vector-recording true
+config **.app.*.vector-recording true
+config **.routingRecorder.enabled false
+config **.app[*].inputBufferSize.result-recording-modes +vector
+config **.app[*].outputBufferSize.result-recording-modes +vector
+config **.app[*].sdcardBufferSize.result-recording-modes +vector
+config *.playgroundSizeX 10989m
+config *.playgroundSizeY 19063m
+config *.playgroundSizeZ 50m
+config *.annotations.draw true
+config *.obstacles.obstacles "xmldoc(\"./config.xml\", \"//AnalogueModel[@type='SimpleObstacleShadowing']/obstacles\")"
+config *.veinsManager.host "\"localhost\""
+config *.veinsManager.moduleType "\"src.node_bus.cars.BusGW\""
+config *.veinsManager.moduleName "\"bus\""
+config *.veinsManager.launchConfig "xmldoc(\"cosenza.launchd.xml\")"
+config *.veinsManager.updateInterval 0.1s
+config *.bus[*].mobility.typename src.node_bus.apps.VeinsInetMobility
+config *.configurator.config "xmldoc(\"./demo.xml\")"
+config *.configurator.dumpAddresses true
+config *.configurator.dumpRoutes true
+config *.configurator.verbose true
+config *.bus[*].ipv4.configurator.typename HostAutoConfiguratorM
+config *.bus[*].ipv4.configurator.interfaces "\"cellular lo0 wlan0\""
+config *.bus[*].ipv4.configurator.addressBase "\"10.0.0.1\""
+config *.bus[*].ipv4.configurator.netmask "\"255.255.0.0\""
+config *.bus[*].ipv4.configurator.addressBaseWlan "\"192.168.0.1\""
+config *.bus[*].ipv4.configurator.netmaskWlan "\"255.255.0.0\""
+config *.ap[*].ipv4.configurator.typename HostAutoConfiguratorAP_M
+config *.ap[*].ipv4.configurator.interfaces "\"wlan0 eth0\""
+config *.ap[*].ipv4.configurator.addressBase "\"192.168.0.1\""
+config *.ap[*].ipv4.configurator.netmask "\"255.255.0.0\""
+config *.ap[*].ipv4.configurator.addressBasePPP "\"15.0.0.1\""
+config *.ap[*].ipv4.configurator.netmaskPPP "\"255.255.255.0\""
+config *.bus[*].numWlanInterfaces 1
+config *.bus[*].numApps 1
+config *.bus[*].app[0].typename src.node_bus.apps.AppBusDataCollectionUDP
+config *.bus[*].app[0].interface "\"wlan0\""
+config *.bus[*].wlan[*].opMode "\"n(mixed-2.4Ghz)\""
+config *.bus[*].wlan[*].radio.typename Ieee80211DimensionalRadio
+config *.bus[*].wlan[*].radio.bandName "\"2.4 GHz\""
+config *.bus[*].wlan[*].radio.channelNumber 3
+config *.bus[*].wlan[*].radio.transmitter.power 0.20mW
+config *.bus[*].wlan[*].radio.receiver.sensitivity -89dBm
+config *.bus[*].wlan[*].radio.receiver.snirThreshold 4dB
+config *.bus[*].wlan[*].radio.bandwidth "10 MHz"
+config *.bus[*].wlan[*].radio.antenna.mobility.typename AttachedMobility
+config *.bus[*].wlan[*].radio.antenna.mobility.mobilityModule "\"^.^.^.^.mobility\""
+config *.bus[*].wlan[*].radio.antenna.mobility.offsetX -2.5m
+config *.bus[*].wlan[*].radio.antenna.mobility.offsetZ 1.5m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinX 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxX 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinY 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxY 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinZ 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxZ 0m
+config *.bus[*].wlan[*].mgmt.typename Ieee80211MgmtSta
+config *.bus[*].wlan[*].mac.typename Ieee80211MacM
+config *.bus[*].wlan[*].agent.typename Ieee80211AgentSta
+config *.bus[*].wlan[*].agent.defaultSsid "\"Spintel\""
+config *.bus[*].wlan[*].agent.activeScan true
+config *.bus[*].wlan[*].agent.channelsToScan "\"3\""
+config *.bus[*].cellularNic.channelModel[*].tolerateMaxDistViolation true
+config *.ap[*].wlan[*].opMode "\"n(mixed-2.4Ghz)\""
+config *.ap[*].wlan[*].radio.typename Ieee80211DimensionalRadio
+config *.ap[*].wlan[*].radio.bandName "\"2.4 GHz\""
+config *.ap[*].wlan[*].radio.channelNumber 3
+config *.ap[*].wlan[*].radio.transmitter.power 0.20mW
+config *.ap[*].wlan[*].radio.receiver.sensitivity -89dBm
+config *.ap[*].wlan[*].radio.receiver.snirThreshold 4dB
+config *.ap[*].wlan[*].radio.bandwidth "10 MHz"
+config *.ap[*].wlan[*].radio.antenna.mobility.typename AttachedMobility
+config *.ap[*].wlan[*].radio.antenna.mobility.mobilityModule "\"^.^.^.^.mobility\""
+config *.ap[*].wlan[*].radio.antenna.mobility.offsetX -2.5m
+config *.ap[*].wlan[*].radio.antenna.mobility.offsetZ 1.5m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinX 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxX 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinY 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxY 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinZ 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxZ 0m
+config *.ap[*].wlan[*].mgmt.typename Ieee80211MgmtAp
+config *.ap[*].wlan[*].mac.typename Ieee80211Mac
+config *.ap[*].wlan[*].agent.typename ""
+config *.ap[*].wlan[*].mgmt.ssid "\"Spintel\""
+config *.ap[*].wlan[*].mgmt.beaconInterval 0.1s
+config *.ap[*].mobility.typename StationaryMobility
+config *.ap[*].mobility.initFromDisplayString false
+config *.ap[*].numWlanInterfaces 1
+config *.ap[*].forwarding true
+config *.numAPs 2
+config *.ap[0].mobility.initialX 3543.52m
+config *.ap[0].mobility.initialY 5712.03m
+config *.ap[0].mobility.initialZ 2m
+config *.ap[1].mobility.initialX 5850.89m
+config *.ap[1].mobility.initialY 11486.75m
+config *.ap[1].mobility.initialZ 2m
+config *.eNodeB1.mobility.initFromDisplayString false
+config *.eNodeB1.mobility.initialX 3634m
+config *.eNodeB1.mobility.initialY 6300m
+config *.eNodeB1.mobility.initialZ 20m
+config *.eNodeB2.mobility.initFromDisplayString false
+config *.eNodeB2.mobility.initialX 6500m
+config *.eNodeB2.mobility.initialY 8662m
+config *.eNodeB2.mobility.initialZ 20m
+config *.eNodeB3.mobility.initFromDisplayString false
+config *.eNodeB3.mobility.initialX 4000m
+config *.eNodeB3.mobility.initialY 10562m
+config *.eNodeB3.mobility.initialZ 20m
+config *.server.numApps 1
+config *.server.app[0].typename UdpSink
+config *.server.app[0].localPort 3000
+config **.wlan[*].radio.antenna.mobilityModule "\"^.^.^.mobility\""
+config **.numBands 25
+config **.ueTxPower 26
+config **.eapBTxPower 46
+config *.bus[*].cellularNic.phy.dynamicCellAssociation true
+config **.bus[*].masterId 1
+config **.bus[*].macCellId 1
+config **.eNodeB1.macCellId 1
+config **.eNodeB1.macNodeId 1
+config **.eNodeB2.macCellId 2
+config **.eNodeB2.macNodeId 2
+config **.eNodeB3.macCellId 3
+config **.eNodeB3.macNodeId 3
+config *.bus[*].cellularNic.phy.enableHandover true
+config *.eNodeB*.cellularNic.phy.enableHandover true
+config *.eNodeB*.cellularNic.phy.handoverLatency 50ms
+config *.eNodeB*.cellInfo.broadcastMessageInterval 1s
+config *.eNodeB*.numX2Apps 2
+config *.eNodeB*.x2App[*].server.localPort "5000 + ancestorIndex(1)"
+config *.eNodeB1.x2App[0].client.connectAddress "\"eNodeB2%x2ppp0\""
+config *.eNodeB1.x2App[1].client.connectAddress "\"eNodeB3%x2ppp0\""
+config *.eNodeB2.x2App[0].client.connectAddress "\"eNodeB1%x2ppp0\""
+config *.eNodeB2.x2App[1].client.connectAddress "\"eNodeB3%x2ppp0\""
+config *.eNodeB3.x2App[0].client.connectAddress "\"eNodeB1%x2ppp0\""
+config *.eNodeB3.x2App[1].client.connectAddress "\"eNodeB2%x2ppp0\""
+config **.sctp.nagleEnabled false
+config **.sctp.enableHeartbeats true
+config *.visualizer.mediumVisualizer.displayCommunicationRanges true
+config *.visualizer.mediumVisualizer.displayInterferenceRanges false
+config *.channelControl.propagationModel "\"RuralMacrocell\""
+config *.radioMedium.pathLoss.typename LogNormalShadowing
+config *.radioMedium.backgroundNoise.power -110dBm
+
+vector 0 Highway.server.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 1 Highway.server.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 2 Highway.server.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 3 Highway.server.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 4 Highway.router.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 5 Highway.router.ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 6 Highway.pgw.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 7 Highway.pgw.ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 8 Highway.pgw.ppp[2].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 9 Highway.pgw.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 10 Highway.pgw.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 11 Highway.pgw.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 12 Highway.pgw.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 13 Highway.eNodeB1.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 14 Highway.eNodeB1.x2ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 15 Highway.eNodeB1.x2ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 16 Highway.eNodeB1.pppMEHostIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 17 Highway.eNodeB1.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 18 Highway.eNodeB1.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 19 Highway.eNodeB1.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 20 Highway.eNodeB2.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 21 Highway.eNodeB2.x2ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 22 Highway.eNodeB2.x2ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 23 Highway.eNodeB2.pppMEHostIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 24 Highway.eNodeB2.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 25 Highway.eNodeB2.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 26 Highway.eNodeB2.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 27 Highway.eNodeB3.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 28 Highway.eNodeB3.x2ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 29 Highway.eNodeB3.x2ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 30 Highway.eNodeB3.pppMEHostIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 31 Highway.eNodeB3.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 32 Highway.eNodeB3.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 33 Highway.eNodeB3.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 34 Highway.ap[0].wlan[0].mac.dcf frameSequenceActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
+attr title "frame sequence active"
+vector 35 Highway.ap[0].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
+attr title "queue length"
+vector 36 Highway.ap[0].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(backoffStarted)-count(backoffStopped))
+attr title "backoff active"
+vector 37 Highway.ap[0].udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 38 Highway.ap[0].udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 39 Highway.ap[0].udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 40 Highway.ap[1].wlan[0].mac.dcf frameSequenceActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
+attr title "frame sequence active"
+vector 41 Highway.ap[1].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
+attr title "queue length"
+vector 42 Highway.ap[1].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(backoffStarted)-count(backoffStopped))
+attr title "backoff active"
+vector 43 Highway.ap[1].udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 44 Highway.ap[1].udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 45 Highway.ap[1].udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 46 Highway.ap[2].wlan[0].mac.dcf frameSequenceActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
+attr title "frame sequence active"
+vector 47 Highway.ap[2].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
+attr title "queue length"
+vector 48 Highway.ap[2].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(backoffStarted)-count(backoffStopped))
+attr title "backoff active"
+vector 49 Highway.ap[2].udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 50 Highway.ap[2].udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 51 Highway.ap[2].udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 52 Highway.ap[3].wlan[0].mac.dcf frameSequenceActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
+attr title "frame sequence active"
+vector 53 Highway.ap[3].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
+attr title "queue length"
+vector 54 Highway.ap[3].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(backoffStarted)-count(backoffStopped))
+attr title "backoff active"
+vector 55 Highway.ap[3].udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 56 Highway.ap[3].udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 57 Highway.ap[3].udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 58 Highway.ap[4].wlan[0].mac.dcf frameSequenceActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
+attr title "frame sequence active"
+vector 59 Highway.ap[4].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
+attr title "queue length"
+vector 60 Highway.ap[4].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(backoffStarted)-count(backoffStopped))
+attr title "backoff active"
+vector 61 Highway.ap[4].udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 62 Highway.ap[4].udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 63 Highway.ap[4].udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 64 Highway.ap[5].wlan[0].mac.dcf frameSequenceActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
+attr title "frame sequence active"
+vector 65 Highway.ap[5].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
+attr title "queue length"
+vector 66 Highway.ap[5].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(backoffStarted)-count(backoffStopped))
+attr title "backoff active"
+vector 67 Highway.ap[5].udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 68 Highway.ap[5].udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 69 Highway.ap[5].udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 70 Highway.ap[0].wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioModeChanged
+attr title "Radio mode"
+vector 71 Highway.ap[0].wlan[0].radio radioChannel:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioChannelChanged
+attr title "Radio channel"
+vector 72 Highway.ap[1].wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioModeChanged
+attr title "Radio mode"
+vector 73 Highway.ap[1].wlan[0].radio radioChannel:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioChannelChanged
+attr title "Radio channel"
+vector 74 Highway.ap[2].wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioModeChanged
+attr title "Radio mode"
+vector 75 Highway.ap[2].wlan[0].radio radioChannel:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioChannelChanged
+attr title "Radio channel"
+vector 76 Highway.ap[3].wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioModeChanged
+attr title "Radio mode"
+vector 77 Highway.ap[3].wlan[0].radio radioChannel:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioChannelChanged
+attr title "Radio channel"
+vector 78 Highway.ap[4].wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioModeChanged
+attr title "Radio mode"
+vector 79 Highway.ap[4].wlan[0].radio radioChannel:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioChannelChanged
+attr title "Radio channel"
+vector 80 Highway.ap[5].wlan[0].radio radioMode:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioModeChanged
+attr title "Radio mode"
+vector 81 Highway.ap[5].wlan[0].radio radioChannel:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source radioChannelChanged
+attr title "Radio channel"
+vector 82 Highway.ap[0].wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source receptionStateChanged
+attr title "Radio reception state"
+vector 83 Highway.ap[0].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
+attr enum IDLE,DEFER,IFS_AND_BACKOFF
+attr interpolationmode none
+attr recordingmode vector
+attr title "contention state changed"
+attr type enum
+vector 84 Highway.ap[1].wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source receptionStateChanged
+attr title "Radio reception state"
+vector 85 Highway.ap[1].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
+attr enum IDLE,DEFER,IFS_AND_BACKOFF
+attr interpolationmode none
+attr recordingmode vector
+attr title "contention state changed"
+attr type enum
+vector 86 Highway.ap[2].wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source receptionStateChanged
+attr title "Radio reception state"
+vector 87 Highway.ap[2].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
+attr enum IDLE,DEFER,IFS_AND_BACKOFF
+attr interpolationmode none
+attr recordingmode vector
+attr title "contention state changed"
+attr type enum
+vector 88 Highway.ap[3].wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source receptionStateChanged
+attr title "Radio reception state"
+vector 89 Highway.ap[3].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
+attr enum IDLE,DEFER,IFS_AND_BACKOFF
+attr interpolationmode none
+attr recordingmode vector
+attr title "contention state changed"
+attr type enum
+vector 90 Highway.ap[4].wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source receptionStateChanged
+attr title "Radio reception state"
+vector 91 Highway.ap[4].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
+attr enum IDLE,DEFER,IFS_AND_BACKOFF
+attr interpolationmode none
+attr recordingmode vector
+attr title "contention state changed"
+attr type enum
+vector 92 Highway.ap[5].wlan[0].radio receptionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source receptionStateChanged
+attr title "Radio reception state"
+vector 93 Highway.ap[5].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
+attr enum IDLE,DEFER,IFS_AND_BACKOFF
+attr interpolationmode none
+attr recordingmode vector
+attr title "contention state changed"
+attr type enum
+vector 94 Highway.ap[0].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "contention window"
+vector 95 Highway.ap[1].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "contention window"
+vector 96 Highway.ap[2].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "contention window"
+vector 97 Highway.ap[3].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "contention window"
+vector 98 Highway.ap[4].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "contention window"
+vector 99 Highway.ap[5].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "contention window"
+vector 100 Highway.eNodeB1.sctp "Throughput of Association 39" ETV
+vector 101 Highway.eNodeB1.sctp "Throughput of Association 40" ETV
+vector 102 Highway.eNodeB2.sctp "Throughput of Association 41" ETV
+vector 103 Highway.eNodeB2.sctp "Throughput of Association 42" ETV
+vector 104 Highway.eNodeB3.sctp "Throughput of Association 43" ETV
+vector 105 Highway.eNodeB3.sctp "Throughput of Association 44" ETV
+vector 106 Highway.eNodeB1.sctp "Throughput of Association 5" ETV
+vector 107 Highway.eNodeB1.sctp "Fast Recovery State 5:15.6.0.2" ETV
+vector 108 Highway.eNodeB1.sctp "Throughput of Association 6" ETV
+vector 109 Highway.eNodeB1.sctp "Fast Recovery State 6:15.7.0.2" ETV
+vector 110 Highway.eNodeB2.sctp "Throughput of Association 10" ETV
+vector 111 Highway.eNodeB2.sctp "Fast Recovery State 10:15.6.0.1" ETV
+vector 112 Highway.eNodeB2.sctp "Throughput of Association 11" ETV
+vector 113 Highway.eNodeB2.sctp "Fast Recovery State 11:15.7.0.2" ETV
+vector 114 Highway.eNodeB3.sctp "Throughput of Association 15" ETV
+vector 115 Highway.eNodeB3.sctp "Fast Recovery State 15:15.6.0.1" ETV
+vector 116 Highway.eNodeB3.sctp "Throughput of Association 16" ETV
+vector 117 Highway.eNodeB3.sctp "Fast Recovery State 16:15.6.0.2" ETV
+vector 118 Highway.eNodeB1.x2ppp[0].queue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 119 Highway.eNodeB1.x2ppp[0].queue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 120 Highway.eNodeB1.x2ppp[0].queue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 121 Highway.eNodeB1.x2ppp[0].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 122 Highway.eNodeB1.x2ppp[0].queue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 123 Highway.eNodeB1.x2ppp[0].queue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 124 Highway.eNodeB1.x2ppp[1].queue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 125 Highway.eNodeB1.x2ppp[1].queue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 126 Highway.eNodeB1.x2ppp[1].queue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 127 Highway.eNodeB1.x2ppp[1].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 128 Highway.eNodeB1.x2ppp[1].queue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 129 Highway.eNodeB1.x2ppp[1].queue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 130 Highway.eNodeB2.x2ppp[0].queue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 131 Highway.eNodeB2.x2ppp[0].queue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 132 Highway.eNodeB2.x2ppp[0].queue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 133 Highway.eNodeB2.x2ppp[0].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 134 Highway.eNodeB2.x2ppp[0].queue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 135 Highway.eNodeB2.x2ppp[0].queue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 136 Highway.eNodeB2.x2ppp[1].queue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 137 Highway.eNodeB2.x2ppp[1].queue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 138 Highway.eNodeB2.x2ppp[1].queue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 139 Highway.eNodeB2.x2ppp[1].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 140 Highway.eNodeB2.x2ppp[1].queue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 141 Highway.eNodeB2.x2ppp[1].queue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 142 Highway.eNodeB3.x2ppp[0].queue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 143 Highway.eNodeB3.x2ppp[0].queue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 144 Highway.eNodeB3.x2ppp[0].queue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 145 Highway.eNodeB3.x2ppp[0].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 146 Highway.eNodeB3.x2ppp[0].queue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 147 Highway.eNodeB3.x2ppp[0].queue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 148 Highway.eNodeB3.x2ppp[1].queue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 149 Highway.eNodeB3.x2ppp[1].queue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 150 Highway.eNodeB3.x2ppp[1].queue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 151 Highway.eNodeB3.x2ppp[1].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToLower
+attr title "packets transmitted, packetBytes"
+vector 152 Highway.eNodeB3.x2ppp[1].queue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 153 Highway.eNodeB3.x2ppp[1].queue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 154 Highway.eNodeB2.x2ppp[0].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 155 Highway.eNodeB2.x2ppp[0].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 156 Highway.eNodeB3.x2ppp[0].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 157 Highway.eNodeB3.x2ppp[0].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 158 Highway.eNodeB1.x2ppp[0].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 159 Highway.eNodeB1.x2ppp[0].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 160 Highway.eNodeB3.x2ppp[1].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 161 Highway.eNodeB3.x2ppp[1].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 162 Highway.eNodeB1.x2ppp[1].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 163 Highway.eNodeB1.x2ppp[1].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 164 Highway.eNodeB2.x2ppp[1].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source rxPkOk
+attr title "packets received OK, packetBytes"
+vector 165 Highway.eNodeB2.x2ppp[1].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source packetSentToUpper
+attr title "packets passed to higher layer, packetBytes"
+vector 166 Highway.eNodeB2.sctp "Throughput of Association 41" ETV
+vector 167 Highway.eNodeB2.sctp "Peer Rwnd 41" ETV
+vector 168 Highway.eNodeB2.sctp "Fast Recovery State 3500:15.3.0.2" ETV
+vector 169 Highway.eNodeB2.sctp "Fast Recovery State 3500:15.6.0.1" ETV
+vector 170 Highway.eNodeB2.sctp "Fast Recovery State 3500:15.7.0.1" ETV
+vector 171 Highway.eNodeB2.sctp "Fast Recovery State 3500:15.8.0.1" ETV
+vector 172 Highway.eNodeB3.sctp "Throughput of Association 43" ETV
+vector 173 Highway.eNodeB3.sctp "Peer Rwnd 43" ETV
+vector 174 Highway.eNodeB3.sctp "Fast Recovery State 3501:15.3.0.2" ETV
+vector 175 Highway.eNodeB3.sctp "Fast Recovery State 3501:15.6.0.1" ETV
+vector 176 Highway.eNodeB3.sctp "Fast Recovery State 3501:15.7.0.1" ETV
+vector 177 Highway.eNodeB3.sctp "Fast Recovery State 3501:15.8.0.1" ETV
+vector 178 Highway.eNodeB1.sctp "Throughput of Association 39" ETV
+vector 179 Highway.eNodeB1.sctp "Peer Rwnd 39" ETV
+vector 180 Highway.eNodeB1.sctp "Fast Recovery State 3502:15.4.0.2" ETV
+vector 181 Highway.eNodeB1.sctp "Fast Recovery State 3502:15.6.0.2" ETV
+vector 182 Highway.eNodeB1.sctp "Fast Recovery State 3502:15.9.0.1" ETV
+vector 183 Highway.eNodeB1.sctp "Fast Recovery State 3502:15.10.0.1" ETV
+vector 184 Highway.eNodeB3.sctp "Throughput of Association 44" ETV
+vector 185 Highway.eNodeB3.sctp "Peer Rwnd 44" ETV
+vector 186 Highway.eNodeB3.sctp "Fast Recovery State 3503:15.4.0.2" ETV
+vector 187 Highway.eNodeB3.sctp "Fast Recovery State 3503:15.6.0.2" ETV
+vector 188 Highway.eNodeB3.sctp "Fast Recovery State 3503:15.9.0.1" ETV
+vector 189 Highway.eNodeB3.sctp "Fast Recovery State 3503:15.10.0.1" ETV
+vector 190 Highway.eNodeB1.sctp "Throughput of Association 40" ETV
+vector 191 Highway.eNodeB1.sctp "Peer Rwnd 40" ETV
+vector 192 Highway.eNodeB1.sctp "Fast Recovery State 3504:15.5.0.2" ETV
+vector 193 Highway.eNodeB1.sctp "Fast Recovery State 3504:15.7.0.2" ETV
+vector 194 Highway.eNodeB1.sctp "Fast Recovery State 3504:15.9.0.2" ETV
+vector 195 Highway.eNodeB1.sctp "Fast Recovery State 3504:15.11.0.1" ETV
+vector 196 Highway.eNodeB2.sctp "Throughput of Association 42" ETV
+vector 197 Highway.eNodeB2.sctp "Peer Rwnd 42" ETV
+vector 198 Highway.eNodeB2.sctp "Fast Recovery State 3505:15.5.0.2" ETV
+vector 199 Highway.eNodeB2.sctp "Fast Recovery State 3505:15.7.0.2" ETV
+vector 200 Highway.eNodeB2.sctp "Fast Recovery State 3505:15.9.0.2" ETV
+vector 201 Highway.eNodeB2.sctp "Fast Recovery State 3505:15.11.0.1" ETV
+vector 202 Highway.eNodeB1.sctp "Peer Rwnd 5" ETV
+vector 203 Highway.eNodeB1.sctp "Fast Recovery State 5:15.4.0.2" ETV
+vector 204 Highway.eNodeB1.sctp "Fast Recovery State 5:15.9.0.1" ETV
+vector 205 Highway.eNodeB1.sctp "Fast Recovery State 5:15.10.0.1" ETV
+vector 206 Highway.eNodeB1.sctp "Peer Rwnd 6" ETV
+vector 207 Highway.eNodeB1.sctp "Fast Recovery State 6:15.5.0.2" ETV
+vector 208 Highway.eNodeB1.sctp "Fast Recovery State 6:15.9.0.2" ETV
+vector 209 Highway.eNodeB1.sctp "Fast Recovery State 6:15.11.0.1" ETV
+vector 210 Highway.eNodeB2.sctp "Peer Rwnd 10" ETV
+vector 211 Highway.eNodeB2.sctp "Fast Recovery State 10:15.3.0.2" ETV
+vector 212 Highway.eNodeB2.sctp "Fast Recovery State 10:15.7.0.1" ETV
+vector 213 Highway.eNodeB2.sctp "Fast Recovery State 10:15.8.0.1" ETV
+vector 214 Highway.eNodeB2.sctp "Peer Rwnd 11" ETV
+vector 215 Highway.eNodeB2.sctp "Fast Recovery State 11:15.5.0.2" ETV
+vector 216 Highway.eNodeB2.sctp "Fast Recovery State 11:15.9.0.2" ETV
+vector 217 Highway.eNodeB2.sctp "Fast Recovery State 11:15.11.0.1" ETV
+vector 218 Highway.eNodeB3.sctp "Peer Rwnd 15" ETV
+vector 219 Highway.eNodeB3.sctp "Fast Recovery State 15:15.3.0.2" ETV
+vector 220 Highway.eNodeB3.sctp "Fast Recovery State 15:15.7.0.1" ETV
+vector 221 Highway.eNodeB3.sctp "Fast Recovery State 15:15.8.0.1" ETV
+vector 222 Highway.eNodeB3.sctp "Peer Rwnd 16" ETV
+vector 223 Highway.eNodeB3.sctp "Fast Recovery State 16:15.4.0.2" ETV
+vector 224 Highway.eNodeB3.sctp "Fast Recovery State 16:15.9.0.1" ETV
+vector 225 Highway.eNodeB3.sctp "Fast Recovery State 16:15.10.0.1" ETV
+vector 226 Highway.eNodeB2.sctp "Slow Start Threshold 3500:15.3.0.2" ETV
+vector 227 Highway.eNodeB2.sctp "Congestion Window 3500:15.3.0.2" ETV
+vector 228 Highway.eNodeB2.sctp "Bandwidth 3500:15.3.0.2" ETV
+vector 229 Highway.eNodeB2.sctp "HB Sent 3500:15.3.0.2" ETV
+vector 230 Highway.eNodeB2.sctp "RTO 3500:15.3.0.2" ETV
+vector 231 Highway.eNodeB2.sctp "Slow Start Threshold 3500:15.6.0.1" ETV
+vector 232 Highway.eNodeB2.sctp "Congestion Window 3500:15.6.0.1" ETV
+vector 233 Highway.eNodeB2.sctp "Bandwidth 3500:15.6.0.1" ETV
+vector 234 Highway.eNodeB2.sctp "RTO 3500:15.6.0.1" ETV
+vector 235 Highway.eNodeB2.sctp "Slow Start Threshold 3500:15.7.0.1" ETV
+vector 236 Highway.eNodeB2.sctp "Congestion Window 3500:15.7.0.1" ETV
+vector 237 Highway.eNodeB2.sctp "Bandwidth 3500:15.7.0.1" ETV
+vector 238 Highway.eNodeB2.sctp "HB Sent 3500:15.7.0.1" ETV
+vector 239 Highway.eNodeB2.sctp "RTO 3500:15.7.0.1" ETV
+vector 240 Highway.eNodeB2.sctp "Slow Start Threshold 3500:15.8.0.1" ETV
+vector 241 Highway.eNodeB2.sctp "Congestion Window 3500:15.8.0.1" ETV
+vector 242 Highway.eNodeB2.sctp "Bandwidth 3500:15.8.0.1" ETV
+vector 243 Highway.eNodeB2.sctp "HB Sent 3500:15.8.0.1" ETV
+vector 244 Highway.eNodeB2.sctp "RTO 3500:15.8.0.1" ETV
+vector 245 Highway.eNodeB3.sctp "Slow Start Threshold 3501:15.3.0.2" ETV
+vector 246 Highway.eNodeB3.sctp "Congestion Window 3501:15.3.0.2" ETV
+vector 247 Highway.eNodeB3.sctp "Bandwidth 3501:15.3.0.2" ETV
+vector 248 Highway.eNodeB3.sctp "HB Sent 3501:15.3.0.2" ETV
+vector 249 Highway.eNodeB3.sctp "RTO 3501:15.3.0.2" ETV
+vector 250 Highway.eNodeB3.sctp "Slow Start Threshold 3501:15.6.0.1" ETV
+vector 251 Highway.eNodeB3.sctp "Congestion Window 3501:15.6.0.1" ETV
+vector 252 Highway.eNodeB3.sctp "Bandwidth 3501:15.6.0.1" ETV
+vector 253 Highway.eNodeB3.sctp "HB Sent 3501:15.6.0.1" ETV
+vector 254 Highway.eNodeB3.sctp "RTO 3501:15.6.0.1" ETV
+vector 255 Highway.eNodeB3.sctp "Slow Start Threshold 3501:15.7.0.1" ETV
+vector 256 Highway.eNodeB3.sctp "Congestion Window 3501:15.7.0.1" ETV
+vector 257 Highway.eNodeB3.sctp "Bandwidth 3501:15.7.0.1" ETV
+vector 258 Highway.eNodeB3.sctp "RTO 3501:15.7.0.1" ETV
+vector 259 Highway.eNodeB3.sctp "Slow Start Threshold 3501:15.8.0.1" ETV
+vector 260 Highway.eNodeB3.sctp "Congestion Window 3501:15.8.0.1" ETV
+vector 261 Highway.eNodeB3.sctp "Bandwidth 3501:15.8.0.1" ETV
+vector 262 Highway.eNodeB3.sctp "HB Sent 3501:15.8.0.1" ETV
+vector 263 Highway.eNodeB3.sctp "RTO 3501:15.8.0.1" ETV
+vector 264 Highway.eNodeB1.sctp "Slow Start Threshold 3502:15.4.0.2" ETV
+vector 265 Highway.eNodeB1.sctp "Congestion Window 3502:15.4.0.2" ETV
+vector 266 Highway.eNodeB1.sctp "Bandwidth 3502:15.4.0.2" ETV
+vector 267 Highway.eNodeB1.sctp "HB Sent 3502:15.4.0.2" ETV
+vector 268 Highway.eNodeB1.sctp "RTO 3502:15.4.0.2" ETV
+vector 269 Highway.eNodeB1.sctp "Slow Start Threshold 3502:15.6.0.2" ETV
+vector 270 Highway.eNodeB1.sctp "Congestion Window 3502:15.6.0.2" ETV
+vector 271 Highway.eNodeB1.sctp "Bandwidth 3502:15.6.0.2" ETV
+vector 272 Highway.eNodeB1.sctp "RTO 3502:15.6.0.2" ETV
+vector 273 Highway.eNodeB1.sctp "Slow Start Threshold 3502:15.9.0.1" ETV
+vector 274 Highway.eNodeB1.sctp "Congestion Window 3502:15.9.0.1" ETV
+vector 275 Highway.eNodeB1.sctp "Bandwidth 3502:15.9.0.1" ETV
+vector 276 Highway.eNodeB1.sctp "HB Sent 3502:15.9.0.1" ETV
+vector 277 Highway.eNodeB1.sctp "RTO 3502:15.9.0.1" ETV
+vector 278 Highway.eNodeB1.sctp "Slow Start Threshold 3502:15.10.0.1" ETV
+vector 279 Highway.eNodeB1.sctp "Congestion Window 3502:15.10.0.1" ETV
+vector 280 Highway.eNodeB1.sctp "Bandwidth 3502:15.10.0.1" ETV
+vector 281 Highway.eNodeB1.sctp "HB Sent 3502:15.10.0.1" ETV
+vector 282 Highway.eNodeB1.sctp "RTO 3502:15.10.0.1" ETV
+vector 283 Highway.eNodeB3.sctp "Slow Start Threshold 3503:15.4.0.2" ETV
+vector 284 Highway.eNodeB3.sctp "Congestion Window 3503:15.4.0.2" ETV
+vector 285 Highway.eNodeB3.sctp "Bandwidth 3503:15.4.0.2" ETV
+vector 286 Highway.eNodeB3.sctp "HB Sent 3503:15.4.0.2" ETV
+vector 287 Highway.eNodeB3.sctp "RTO 3503:15.4.0.2" ETV
+vector 288 Highway.eNodeB3.sctp "Slow Start Threshold 3503:15.6.0.2" ETV
+vector 289 Highway.eNodeB3.sctp "Congestion Window 3503:15.6.0.2" ETV
+vector 290 Highway.eNodeB3.sctp "Bandwidth 3503:15.6.0.2" ETV
+vector 291 Highway.eNodeB3.sctp "HB Sent 3503:15.6.0.2" ETV
+vector 292 Highway.eNodeB3.sctp "RTO 3503:15.6.0.2" ETV
+vector 293 Highway.eNodeB3.sctp "Slow Start Threshold 3503:15.9.0.1" ETV
+vector 294 Highway.eNodeB3.sctp "Congestion Window 3503:15.9.0.1" ETV
+vector 295 Highway.eNodeB3.sctp "Bandwidth 3503:15.9.0.1" ETV
+vector 296 Highway.eNodeB3.sctp "RTO 3503:15.9.0.1" ETV
+vector 297 Highway.eNodeB3.sctp "Slow Start Threshold 3503:15.10.0.1" ETV
+vector 298 Highway.eNodeB3.sctp "Congestion Window 3503:15.10.0.1" ETV
+vector 299 Highway.eNodeB3.sctp "Bandwidth 3503:15.10.0.1" ETV
+vector 300 Highway.eNodeB3.sctp "HB Sent 3503:15.10.0.1" ETV
+vector 301 Highway.eNodeB3.sctp "RTO 3503:15.10.0.1" ETV
+vector 302 Highway.eNodeB1.sctp "Slow Start Threshold 3504:15.5.0.2" ETV
+vector 303 Highway.eNodeB1.sctp "Congestion Window 3504:15.5.0.2" ETV
+vector 304 Highway.eNodeB1.sctp "Bandwidth 3504:15.5.0.2" ETV
+vector 305 Highway.eNodeB1.sctp "HB Sent 3504:15.5.0.2" ETV
+vector 306 Highway.eNodeB1.sctp "RTO 3504:15.5.0.2" ETV
+vector 307 Highway.eNodeB1.sctp "Slow Start Threshold 3504:15.7.0.2" ETV
+vector 308 Highway.eNodeB1.sctp "Congestion Window 3504:15.7.0.2" ETV
+vector 309 Highway.eNodeB1.sctp "Bandwidth 3504:15.7.0.2" ETV
+vector 310 Highway.eNodeB1.sctp "RTO 3504:15.7.0.2" ETV
+vector 311 Highway.eNodeB1.sctp "Slow Start Threshold 3504:15.9.0.2" ETV
+vector 312 Highway.eNodeB1.sctp "Congestion Window 3504:15.9.0.2" ETV
+vector 313 Highway.eNodeB1.sctp "Bandwidth 3504:15.9.0.2" ETV
+vector 314 Highway.eNodeB1.sctp "HB Sent 3504:15.9.0.2" ETV
+vector 315 Highway.eNodeB1.sctp "RTO 3504:15.9.0.2" ETV
+vector 316 Highway.eNodeB1.sctp "Slow Start Threshold 3504:15.11.0.1" ETV
+vector 317 Highway.eNodeB1.sctp "Congestion Window 3504:15.11.0.1" ETV
+vector 318 Highway.eNodeB1.sctp "Bandwidth 3504:15.11.0.1" ETV
+vector 319 Highway.eNodeB1.sctp "HB Sent 3504:15.11.0.1" ETV
+vector 320 Highway.eNodeB1.sctp "RTO 3504:15.11.0.1" ETV
+vector 321 Highway.eNodeB2.sctp "Slow Start Threshold 3505:15.5.0.2" ETV
+vector 322 Highway.eNodeB2.sctp "Congestion Window 3505:15.5.0.2" ETV
+vector 323 Highway.eNodeB2.sctp "Bandwidth 3505:15.5.0.2" ETV
+vector 324 Highway.eNodeB2.sctp "HB Sent 3505:15.5.0.2" ETV
+vector 325 Highway.eNodeB2.sctp "RTO 3505:15.5.0.2" ETV
+vector 326 Highway.eNodeB2.sctp "Slow Start Threshold 3505:15.7.0.2" ETV
+vector 327 Highway.eNodeB2.sctp "Congestion Window 3505:15.7.0.2" ETV
+vector 328 Highway.eNodeB2.sctp "Bandwidth 3505:15.7.0.2" ETV
+vector 329 Highway.eNodeB2.sctp "HB Sent 3505:15.7.0.2" ETV
+vector 330 Highway.eNodeB2.sctp "RTO 3505:15.7.0.2" ETV
+vector 331 Highway.eNodeB2.sctp "Slow Start Threshold 3505:15.9.0.2" ETV
+vector 332 Highway.eNodeB2.sctp "Congestion Window 3505:15.9.0.2" ETV
+vector 333 Highway.eNodeB2.sctp "Bandwidth 3505:15.9.0.2" ETV
+vector 334 Highway.eNodeB2.sctp "RTO 3505:15.9.0.2" ETV
+vector 335 Highway.eNodeB2.sctp "Slow Start Threshold 3505:15.11.0.1" ETV
+vector 336 Highway.eNodeB2.sctp "Congestion Window 3505:15.11.0.1" ETV
+vector 337 Highway.eNodeB2.sctp "Bandwidth 3505:15.11.0.1" ETV
+vector 338 Highway.eNodeB2.sctp "HB Sent 3505:15.11.0.1" ETV
+vector 339 Highway.eNodeB2.sctp "RTO 3505:15.11.0.1" ETV
+vector 340 Highway.eNodeB1.sctp "HB ACK Sent 5:15.6.0.2" ETV
+vector 341 Highway.eNodeB1.sctp "HB Received 5:15.6.0.2" ETV
+vector 342 Highway.eNodeB1.sctp "HB ACK Sent 6:15.7.0.2" ETV
+vector 343 Highway.eNodeB1.sctp "HB Received 6:15.7.0.2" ETV
+vector 344 Highway.eNodeB2.sctp "HB ACK Sent 10:15.6.0.1" ETV
+vector 345 Highway.eNodeB2.sctp "HB Received 10:15.6.0.1" ETV
+vector 346 Highway.eNodeB2.sctp "HB ACK Sent 11:15.9.0.2" ETV
+vector 347 Highway.eNodeB2.sctp "HB Received 11:15.9.0.2" ETV
+vector 348 Highway.eNodeB3.sctp "HB ACK Sent 15:15.7.0.1" ETV
+vector 349 Highway.eNodeB3.sctp "HB Received 15:15.7.0.1" ETV
+vector 350 Highway.eNodeB3.sctp "HB ACK Sent 16:15.9.0.1" ETV
+vector 351 Highway.eNodeB3.sctp "HB Received 16:15.9.0.1" ETV
+vector 352 Highway.eNodeB1.sctp "Slow Start Threshold 5:15.4.0.2" ETV
+vector 353 Highway.eNodeB1.sctp "Congestion Window 5:15.4.0.2" ETV
+vector 354 Highway.eNodeB1.sctp "Bandwidth 5:15.4.0.2" ETV
+vector 355 Highway.eNodeB1.sctp "HB Sent 5:15.4.0.2" ETV
+vector 356 Highway.eNodeB1.sctp "RTO 5:15.4.0.2" ETV
+vector 357 Highway.eNodeB1.sctp "Slow Start Threshold 5:15.6.0.2" ETV
+vector 358 Highway.eNodeB1.sctp "Congestion Window 5:15.6.0.2" ETV
+vector 359 Highway.eNodeB1.sctp "Bandwidth 5:15.6.0.2" ETV
+vector 360 Highway.eNodeB1.sctp "RTO 5:15.6.0.2" ETV
+vector 361 Highway.eNodeB1.sctp "Slow Start Threshold 5:15.9.0.1" ETV
+vector 362 Highway.eNodeB1.sctp "Congestion Window 5:15.9.0.1" ETV
+vector 363 Highway.eNodeB1.sctp "Bandwidth 5:15.9.0.1" ETV
+vector 364 Highway.eNodeB1.sctp "HB Sent 5:15.9.0.1" ETV
+vector 365 Highway.eNodeB1.sctp "RTO 5:15.9.0.1" ETV
+vector 366 Highway.eNodeB1.sctp "Slow Start Threshold 5:15.10.0.1" ETV
+vector 367 Highway.eNodeB1.sctp "Congestion Window 5:15.10.0.1" ETV
+vector 368 Highway.eNodeB1.sctp "Bandwidth 5:15.10.0.1" ETV
+vector 369 Highway.eNodeB1.sctp "HB Sent 5:15.10.0.1" ETV
+vector 370 Highway.eNodeB1.sctp "RTO 5:15.10.0.1" ETV
+vector 371 Highway.eNodeB1.sctp "Slow Start Threshold 6:15.5.0.2" ETV
+vector 372 Highway.eNodeB1.sctp "Congestion Window 6:15.5.0.2" ETV
+vector 373 Highway.eNodeB1.sctp "Bandwidth 6:15.5.0.2" ETV
+vector 374 Highway.eNodeB1.sctp "HB Sent 6:15.5.0.2" ETV
+vector 375 Highway.eNodeB1.sctp "RTO 6:15.5.0.2" ETV
+vector 376 Highway.eNodeB1.sctp "Slow Start Threshold 6:15.7.0.2" ETV
+vector 377 Highway.eNodeB1.sctp "Congestion Window 6:15.7.0.2" ETV
+vector 378 Highway.eNodeB1.sctp "Bandwidth 6:15.7.0.2" ETV
+vector 379 Highway.eNodeB1.sctp "RTO 6:15.7.0.2" ETV
+vector 380 Highway.eNodeB1.sctp "Slow Start Threshold 6:15.9.0.2" ETV
+vector 381 Highway.eNodeB1.sctp "Congestion Window 6:15.9.0.2" ETV
+vector 382 Highway.eNodeB1.sctp "Bandwidth 6:15.9.0.2" ETV
+vector 383 Highway.eNodeB1.sctp "HB Sent 6:15.9.0.2" ETV
+vector 384 Highway.eNodeB1.sctp "RTO 6:15.9.0.2" ETV
+vector 385 Highway.eNodeB1.sctp "Slow Start Threshold 6:15.11.0.1" ETV
+vector 386 Highway.eNodeB1.sctp "Congestion Window 6:15.11.0.1" ETV
+vector 387 Highway.eNodeB1.sctp "Bandwidth 6:15.11.0.1" ETV
+vector 388 Highway.eNodeB1.sctp "HB Sent 6:15.11.0.1" ETV
+vector 389 Highway.eNodeB1.sctp "RTO 6:15.11.0.1" ETV
+vector 390 Highway.eNodeB2.sctp "Slow Start Threshold 10:15.3.0.2" ETV
+vector 391 Highway.eNodeB2.sctp "Congestion Window 10:15.3.0.2" ETV
+vector 392 Highway.eNodeB2.sctp "Bandwidth 10:15.3.0.2" ETV
+vector 393 Highway.eNodeB2.sctp "HB Sent 10:15.3.0.2" ETV
+vector 394 Highway.eNodeB2.sctp "RTO 10:15.3.0.2" ETV
+vector 395 Highway.eNodeB2.sctp "Slow Start Threshold 10:15.6.0.1" ETV
+vector 396 Highway.eNodeB2.sctp "Congestion Window 10:15.6.0.1" ETV
+vector 397 Highway.eNodeB2.sctp "Bandwidth 10:15.6.0.1" ETV
+vector 398 Highway.eNodeB2.sctp "RTO 10:15.6.0.1" ETV
+vector 399 Highway.eNodeB2.sctp "Slow Start Threshold 10:15.7.0.1" ETV
+vector 400 Highway.eNodeB2.sctp "Congestion Window 10:15.7.0.1" ETV
+vector 401 Highway.eNodeB2.sctp "Bandwidth 10:15.7.0.1" ETV
+vector 402 Highway.eNodeB2.sctp "HB Sent 10:15.7.0.1" ETV
+vector 403 Highway.eNodeB2.sctp "RTO 10:15.7.0.1" ETV
+vector 404 Highway.eNodeB2.sctp "Slow Start Threshold 10:15.8.0.1" ETV
+vector 405 Highway.eNodeB2.sctp "Congestion Window 10:15.8.0.1" ETV
+vector 406 Highway.eNodeB2.sctp "Bandwidth 10:15.8.0.1" ETV
+vector 407 Highway.eNodeB2.sctp "HB Sent 10:15.8.0.1" ETV
+vector 408 Highway.eNodeB2.sctp "RTO 10:15.8.0.1" ETV
+vector 409 Highway.eNodeB2.sctp "Slow Start Threshold 11:15.5.0.2" ETV
+vector 410 Highway.eNodeB2.sctp "Congestion Window 11:15.5.0.2" ETV
+vector 411 Highway.eNodeB2.sctp "Bandwidth 11:15.5.0.2" ETV
+vector 412 Highway.eNodeB2.sctp "HB Sent 11:15.5.0.2" ETV
+vector 413 Highway.eNodeB2.sctp "RTO 11:15.5.0.2" ETV
+vector 414 Highway.eNodeB2.sctp "Slow Start Threshold 11:15.7.0.2" ETV
+vector 415 Highway.eNodeB2.sctp "Congestion Window 11:15.7.0.2" ETV
+vector 416 Highway.eNodeB2.sctp "Bandwidth 11:15.7.0.2" ETV
+vector 417 Highway.eNodeB2.sctp "HB Sent 11:15.7.0.2" ETV
+vector 418 Highway.eNodeB2.sctp "RTO 11:15.7.0.2" ETV
+vector 419 Highway.eNodeB2.sctp "Slow Start Threshold 11:15.9.0.2" ETV
+vector 420 Highway.eNodeB2.sctp "Congestion Window 11:15.9.0.2" ETV
+vector 421 Highway.eNodeB2.sctp "Bandwidth 11:15.9.0.2" ETV
+vector 422 Highway.eNodeB2.sctp "RTO 11:15.9.0.2" ETV
+vector 423 Highway.eNodeB2.sctp "Slow Start Threshold 11:15.11.0.1" ETV
+vector 424 Highway.eNodeB2.sctp "Congestion Window 11:15.11.0.1" ETV
+vector 425 Highway.eNodeB2.sctp "Bandwidth 11:15.11.0.1" ETV
+vector 426 Highway.eNodeB2.sctp "HB Sent 11:15.11.0.1" ETV
+vector 427 Highway.eNodeB2.sctp "RTO 11:15.11.0.1" ETV
+vector 428 Highway.eNodeB3.sctp "Slow Start Threshold 15:15.3.0.2" ETV
+vector 429 Highway.eNodeB3.sctp "Congestion Window 15:15.3.0.2" ETV
+vector 430 Highway.eNodeB3.sctp "Bandwidth 15:15.3.0.2" ETV
+vector 431 Highway.eNodeB3.sctp "HB Sent 15:15.3.0.2" ETV
+vector 432 Highway.eNodeB3.sctp "RTO 15:15.3.0.2" ETV
+vector 433 Highway.eNodeB3.sctp "Slow Start Threshold 15:15.6.0.1" ETV
+vector 434 Highway.eNodeB3.sctp "Congestion Window 15:15.6.0.1" ETV
+vector 435 Highway.eNodeB3.sctp "Bandwidth 15:15.6.0.1" ETV
+vector 436 Highway.eNodeB3.sctp "HB Sent 15:15.6.0.1" ETV
+vector 437 Highway.eNodeB3.sctp "RTO 15:15.6.0.1" ETV
+vector 438 Highway.eNodeB3.sctp "Slow Start Threshold 15:15.7.0.1" ETV
+vector 439 Highway.eNodeB3.sctp "Congestion Window 15:15.7.0.1" ETV
+vector 440 Highway.eNodeB3.sctp "Bandwidth 15:15.7.0.1" ETV
+vector 441 Highway.eNodeB3.sctp "RTO 15:15.7.0.1" ETV
+vector 442 Highway.eNodeB3.sctp "Slow Start Threshold 15:15.8.0.1" ETV
+vector 443 Highway.eNodeB3.sctp "Congestion Window 15:15.8.0.1" ETV
+vector 444 Highway.eNodeB3.sctp "Bandwidth 15:15.8.0.1" ETV
+vector 445 Highway.eNodeB3.sctp "HB Sent 15:15.8.0.1" ETV
+vector 446 Highway.eNodeB3.sctp "RTO 15:15.8.0.1" ETV
+vector 447 Highway.eNodeB3.sctp "Slow Start Threshold 16:15.4.0.2" ETV
+vector 448 Highway.eNodeB3.sctp "Congestion Window 16:15.4.0.2" ETV
+vector 449 Highway.eNodeB3.sctp "Bandwidth 16:15.4.0.2" ETV
+vector 450 Highway.eNodeB3.sctp "HB Sent 16:15.4.0.2" ETV
+vector 451 Highway.eNodeB3.sctp "RTO 16:15.4.0.2" ETV
+vector 452 Highway.eNodeB3.sctp "Slow Start Threshold 16:15.6.0.2" ETV
+vector 453 Highway.eNodeB3.sctp "Congestion Window 16:15.6.0.2" ETV
+vector 454 Highway.eNodeB3.sctp "Bandwidth 16:15.6.0.2" ETV
+vector 455 Highway.eNodeB3.sctp "HB Sent 16:15.6.0.2" ETV
+vector 456 Highway.eNodeB3.sctp "RTO 16:15.6.0.2" ETV
+vector 457 Highway.eNodeB3.sctp "Slow Start Threshold 16:15.9.0.1" ETV
+vector 458 Highway.eNodeB3.sctp "Congestion Window 16:15.9.0.1" ETV
+vector 459 Highway.eNodeB3.sctp "Bandwidth 16:15.9.0.1" ETV
+vector 460 Highway.eNodeB3.sctp "RTO 16:15.9.0.1" ETV
+vector 461 Highway.eNodeB3.sctp "Slow Start Threshold 16:15.10.0.1" ETV
+vector 462 Highway.eNodeB3.sctp "Congestion Window 16:15.10.0.1" ETV
+vector 463 Highway.eNodeB3.sctp "Bandwidth 16:15.10.0.1" ETV
+vector 464 Highway.eNodeB3.sctp "HB Sent 16:15.10.0.1" ETV
+vector 465 Highway.eNodeB3.sctp "RTO 16:15.10.0.1" ETV
+vector 466 Highway.eNodeB1.sctp "HB ACK Received 3502:15.6.0.2" ETV
+vector 467 Highway.eNodeB1.sctp "RTT 3502:15.6.0.2" ETV
+vector 468 Highway.eNodeB1.sctp "HB ACK Received 3504:15.7.0.2" ETV
+vector 469 Highway.eNodeB1.sctp "RTT 3504:15.7.0.2" ETV
+vector 470 Highway.eNodeB2.sctp "HB ACK Received 3500:15.6.0.1" ETV
+vector 471 Highway.eNodeB2.sctp "RTT 3500:15.6.0.1" ETV
+vector 472 Highway.eNodeB2.sctp "HB ACK Received 3505:15.9.0.2" ETV
+vector 473 Highway.eNodeB2.sctp "RTT 3505:15.9.0.2" ETV
+vector 474 Highway.eNodeB3.sctp "HB ACK Received 3501:15.7.0.1" ETV
+vector 475 Highway.eNodeB3.sctp "RTT 3501:15.7.0.1" ETV
+vector 476 Highway.eNodeB3.sctp "HB ACK Received 3503:15.9.0.1" ETV
+vector 477 Highway.eNodeB3.sctp "RTT 3503:15.9.0.1" ETV
+vector 478 Highway.eNodeB1.sctp "HB ACK Sent 3502:15.6.0.2" ETV
+vector 479 Highway.eNodeB1.sctp "HB Received 3502:15.6.0.2" ETV
+vector 480 Highway.eNodeB1.sctp "HB ACK Sent 3504:15.7.0.2" ETV
+vector 481 Highway.eNodeB1.sctp "HB Received 3504:15.7.0.2" ETV
+vector 482 Highway.eNodeB2.sctp "HB ACK Sent 3500:15.6.0.1" ETV
+vector 483 Highway.eNodeB2.sctp "HB Received 3500:15.6.0.1" ETV
+vector 484 Highway.eNodeB2.sctp "HB ACK Sent 3505:15.9.0.2" ETV
+vector 485 Highway.eNodeB2.sctp "HB Received 3505:15.9.0.2" ETV
+vector 486 Highway.eNodeB3.sctp "HB ACK Sent 3501:15.7.0.1" ETV
+vector 487 Highway.eNodeB3.sctp "HB Received 3501:15.7.0.1" ETV
+vector 488 Highway.eNodeB3.sctp "HB ACK Sent 3503:15.9.0.1" ETV
+vector 489 Highway.eNodeB3.sctp "HB Received 3503:15.9.0.1" ETV
+vector 490 Highway.eNodeB1.sctp "HB ACK Received 5:15.6.0.2" ETV
+vector 491 Highway.eNodeB1.sctp "RTT 5:15.6.0.2" ETV
+vector 492 Highway.eNodeB1.sctp "HB ACK Received 6:15.7.0.2" ETV
+vector 493 Highway.eNodeB1.sctp "RTT 6:15.7.0.2" ETV
+vector 494 Highway.eNodeB2.sctp "HB ACK Received 10:15.6.0.1" ETV
+vector 495 Highway.eNodeB2.sctp "RTT 10:15.6.0.1" ETV
+vector 496 Highway.eNodeB2.sctp "HB ACK Received 11:15.9.0.2" ETV
+vector 497 Highway.eNodeB2.sctp "RTT 11:15.9.0.2" ETV
+vector 498 Highway.eNodeB3.sctp "HB ACK Received 15:15.7.0.1" ETV
+vector 499 Highway.eNodeB3.sctp "RTT 15:15.7.0.1" ETV
+vector 500 Highway.eNodeB3.sctp "HB ACK Received 16:15.9.0.1" ETV
+vector 501 Highway.eNodeB3.sctp "RTT 16:15.9.0.1" ETV
+vector 502 Highway.eNodeB1.cellularNic.mac avgServedBlocksUl:vector ETV
+attr recordingmode vector
+attr source avgServedBlocksUl
+attr title "Avg Served Blocks Ul"
+attr unit blocks
+vector 503 Highway.eNodeB1.cellularNic.mac avgServedBlocksDl:vector ETV
+attr recordingmode vector
+attr source avgServedBlocksDl
+attr title "Avg Served Blocks Dl"
+attr unit blocks
+vector 504 Highway.eNodeB2.cellularNic.mac avgServedBlocksUl:vector ETV
+attr recordingmode vector
+attr source avgServedBlocksUl
+attr title "Avg Served Blocks Ul"
+attr unit blocks
+vector 505 Highway.eNodeB2.cellularNic.mac avgServedBlocksDl:vector ETV
+attr recordingmode vector
+attr source avgServedBlocksDl
+attr title "Avg Served Blocks Dl"
+attr unit blocks
+vector 506 Highway.eNodeB3.cellularNic.mac avgServedBlocksUl:vector ETV
+attr recordingmode vector
+attr source avgServedBlocksUl
+attr title "Avg Served Blocks Ul"
+attr unit blocks
+vector 507 Highway.eNodeB3.cellularNic.mac avgServedBlocksDl:vector ETV
+attr recordingmode vector
+attr source avgServedBlocksDl
+attr title "Avg Served Blocks Dl"
+attr unit blocks
+vector 508 Highway.ap[3].wlan[0].mac.dcf.channelAccess.pendingQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 509 Highway.ap[3].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 510 Highway.ap[3].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 511 Highway.ap[3].wlan[0].mac.dcf.channelAccess.contention backoffPeriodGenerated:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "backoff periods"
+vector 512 Highway.ap[3].wlan[0].mac.dcf.channelAccess.pendingQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 513 Highway.ap[3].wlan[0].mac.dcf.channelAccess.pendingQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 514 Highway.ap[3].wlan[0].mac.dcf datarateSelected:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "datarates selected"
+vector 515 Highway.ap[3].wlan[0].mac packetSentToLower:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent to lower layer, packetBytes"
+vector 516 Highway.ap[3].wlan[0].radio transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "Radio transmission state"
+vector 517 Highway.ap[3].wlan[0].mac.dcf packetSentToPeer:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent, packetBytes"
+vector 518 Highway.ap[3].wlan[0].mac.dcf packetSentToPeerMulticast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Multicast(packetSentToPeer)
+attr title "packets sent: multicast, packetBytes"
+vector 519 Highway.ap[3].wlan[0].mac.dcf packetSentToPeerBroadcast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Broadcast(packetSentToPeer)
+attr title "packets sent: broadcast , packetBytes"
+vector 520 Highway.ap[3].wlan[0].mac.dcf packetSentToPeerWithoutRetry:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211NotRetry(packetSentToPeer)
+attr title "packets sent: without retry, packetBytes"
+vector 521 Highway.ap[3].wlan[0].mac.dcf.channelAccess.inProgressFrames queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetDequeued)
+attr title "queueing times"
+vector 522 Highway.ap[5].wlan[0].mac.dcf.channelAccess.pendingQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 523 Highway.ap[5].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 524 Highway.ap[5].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 525 Highway.ap[5].wlan[0].mac.dcf.channelAccess.contention backoffPeriodGenerated:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "backoff periods"
+vector 526 Highway.ap[5].wlan[0].mac.dcf.channelAccess.pendingQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 527 Highway.ap[5].wlan[0].mac.dcf.channelAccess.pendingQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 528 Highway.ap[5].wlan[0].mac.dcf datarateSelected:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "datarates selected"
+vector 529 Highway.ap[5].wlan[0].mac packetSentToLower:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent to lower layer, packetBytes"
+vector 530 Highway.ap[5].wlan[0].radio transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "Radio transmission state"
+vector 531 Highway.ap[5].wlan[0].mac.dcf packetSentToPeer:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent, packetBytes"
+vector 532 Highway.ap[5].wlan[0].mac.dcf packetSentToPeerMulticast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Multicast(packetSentToPeer)
+attr title "packets sent: multicast, packetBytes"
+vector 533 Highway.ap[5].wlan[0].mac.dcf packetSentToPeerBroadcast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Broadcast(packetSentToPeer)
+attr title "packets sent: broadcast , packetBytes"
+vector 534 Highway.ap[5].wlan[0].mac.dcf packetSentToPeerWithoutRetry:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211NotRetry(packetSentToPeer)
+attr title "packets sent: without retry, packetBytes"
+vector 535 Highway.ap[5].wlan[0].mac.dcf.channelAccess.inProgressFrames queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetDequeued)
+attr title "queueing times"
+vector 536 Highway.ap[0].wlan[0].mac.dcf.channelAccess.pendingQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 537 Highway.ap[0].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 538 Highway.ap[0].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 539 Highway.ap[0].wlan[0].mac.dcf.channelAccess.contention backoffPeriodGenerated:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "backoff periods"
+vector 540 Highway.ap[0].wlan[0].mac.dcf.channelAccess.pendingQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 541 Highway.ap[0].wlan[0].mac.dcf.channelAccess.pendingQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 542 Highway.ap[0].wlan[0].mac.dcf datarateSelected:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "datarates selected"
+vector 543 Highway.ap[0].wlan[0].mac packetSentToLower:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent to lower layer, packetBytes"
+vector 544 Highway.ap[0].wlan[0].radio transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "Radio transmission state"
+vector 545 Highway.ap[0].wlan[0].mac.dcf packetSentToPeer:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent, packetBytes"
+vector 546 Highway.ap[0].wlan[0].mac.dcf packetSentToPeerMulticast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Multicast(packetSentToPeer)
+attr title "packets sent: multicast, packetBytes"
+vector 547 Highway.ap[0].wlan[0].mac.dcf packetSentToPeerBroadcast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Broadcast(packetSentToPeer)
+attr title "packets sent: broadcast , packetBytes"
+vector 548 Highway.ap[0].wlan[0].mac.dcf packetSentToPeerWithoutRetry:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211NotRetry(packetSentToPeer)
+attr title "packets sent: without retry, packetBytes"
+vector 549 Highway.ap[0].wlan[0].mac.dcf.channelAccess.inProgressFrames queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetDequeued)
+attr title "queueing times"
+vector 550 Highway.ap[4].wlan[0].mac.dcf.channelAccess.pendingQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 551 Highway.ap[4].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 552 Highway.ap[4].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 553 Highway.ap[4].wlan[0].mac.dcf.channelAccess.contention backoffPeriodGenerated:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "backoff periods"
+vector 554 Highway.ap[4].wlan[0].mac.dcf.channelAccess.pendingQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 555 Highway.ap[4].wlan[0].mac.dcf.channelAccess.pendingQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 556 Highway.ap[4].wlan[0].mac.dcf datarateSelected:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "datarates selected"
+vector 557 Highway.ap[4].wlan[0].mac packetSentToLower:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent to lower layer, packetBytes"
+vector 558 Highway.ap[4].wlan[0].radio transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "Radio transmission state"
+vector 559 Highway.ap[4].wlan[0].mac.dcf packetSentToPeer:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent, packetBytes"
+vector 560 Highway.ap[4].wlan[0].mac.dcf packetSentToPeerMulticast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Multicast(packetSentToPeer)
+attr title "packets sent: multicast, packetBytes"
+vector 561 Highway.ap[4].wlan[0].mac.dcf packetSentToPeerBroadcast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Broadcast(packetSentToPeer)
+attr title "packets sent: broadcast , packetBytes"
+vector 562 Highway.ap[4].wlan[0].mac.dcf packetSentToPeerWithoutRetry:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211NotRetry(packetSentToPeer)
+attr title "packets sent: without retry, packetBytes"
+vector 563 Highway.ap[4].wlan[0].mac.dcf.channelAccess.inProgressFrames queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetDequeued)
+attr title "queueing times"
+vector 564 Highway.ap[2].wlan[0].mac.dcf.channelAccess.pendingQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 565 Highway.ap[2].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 566 Highway.ap[2].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 567 Highway.ap[2].wlan[0].mac.dcf.channelAccess.contention backoffPeriodGenerated:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "backoff periods"
+vector 568 Highway.ap[2].wlan[0].mac.dcf.channelAccess.pendingQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 569 Highway.ap[2].wlan[0].mac.dcf.channelAccess.pendingQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 570 Highway.ap[2].wlan[0].mac.dcf datarateSelected:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "datarates selected"
+vector 571 Highway.ap[2].wlan[0].mac packetSentToLower:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent to lower layer, packetBytes"
+vector 572 Highway.ap[2].wlan[0].radio transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "Radio transmission state"
+vector 573 Highway.ap[2].wlan[0].mac.dcf packetSentToPeer:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent, packetBytes"
+vector 574 Highway.ap[2].wlan[0].mac.dcf packetSentToPeerMulticast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Multicast(packetSentToPeer)
+attr title "packets sent: multicast, packetBytes"
+vector 575 Highway.ap[2].wlan[0].mac.dcf packetSentToPeerBroadcast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Broadcast(packetSentToPeer)
+attr title "packets sent: broadcast , packetBytes"
+vector 576 Highway.ap[2].wlan[0].mac.dcf packetSentToPeerWithoutRetry:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211NotRetry(packetSentToPeer)
+attr title "packets sent: without retry, packetBytes"
+vector 577 Highway.ap[2].wlan[0].mac.dcf.channelAccess.inProgressFrames queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetDequeued)
+attr title "queueing times"
+vector 578 Highway.ap[1].wlan[0].mac.dcf.channelAccess.pendingQueue incomingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPushStarted)
+attr title "incoming packet lengths"
+attr unit b
+vector 579 Highway.ap[1].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
+attr title "queue length"
+attr unit pk
+vector 580 Highway.ap[1].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
+attr title "queue bit length"
+attr unit b
+vector 581 Highway.ap[1].wlan[0].mac.dcf.channelAccess.contention backoffPeriodGenerated:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "backoff periods"
+vector 582 Highway.ap[1].wlan[0].mac.dcf.channelAccess.pendingQueue queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetPulled)
+attr title "queueing times"
+attr unit s
+vector 583 Highway.ap[1].wlan[0].mac.dcf.channelAccess.pendingQueue outgoingPacketLengths:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source packetLength(packetPulled)
+attr title "outgoing packet lengths"
+attr unit b
+vector 584 Highway.ap[1].wlan[0].mac.dcf datarateSelected:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "datarates selected"
+vector 585 Highway.ap[1].wlan[0].mac packetSentToLower:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent to lower layer, packetBytes"
+vector 586 Highway.ap[1].wlan[0].radio transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "Radio transmission state"
+vector 587 Highway.ap[1].wlan[0].mac.dcf packetSentToPeer:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr title "packets sent, packetBytes"
+vector 588 Highway.ap[1].wlan[0].mac.dcf packetSentToPeerMulticast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Multicast(packetSentToPeer)
+attr title "packets sent: multicast, packetBytes"
+vector 589 Highway.ap[1].wlan[0].mac.dcf packetSentToPeerBroadcast:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211Broadcast(packetSentToPeer)
+attr title "packets sent: broadcast , packetBytes"
+vector 590 Highway.ap[1].wlan[0].mac.dcf packetSentToPeerWithoutRetry:vector(packetBytes) ETV
+attr interpolationmode none
+attr recordingmode vector(packetBytes)
+attr source ieee80211NotRetry(packetSentToPeer)
+attr title "packets sent: without retry, packetBytes"
+vector 591 Highway.ap[1].wlan[0].mac.dcf.channelAccess.inProgressFrames queueingTime:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source queueingTime(packetDequeued)
+attr title "queueing times"
+0	87846 8 0 0 0 0 1 0 0 0 0
+1	87854 8 0 0 0 0 1 0 0 0 0
+2	87862 8 0 0 0 0 1 0 0 0 0
+3	87870 8 0 0 0 0 1 0 0 0 0
+4	87878 8 0 0 0 0 1 0 0 0 0
+5	87886 8 0 0 0 0 1 0 0 0 0
+6	87894 8 0 0 0 0 1 0 0 0 0
+7	87902 8 0 0 0 0 1 0 0 0 0
+8	87910 8 0 0 0 0 1 0 0 0 0
+9	87918 8 0 0 0 0 1 0 0 0 0
+10	87926 9 0 0 0 0 1 0 0 0 0
+11	87935 9 0 0 0 0 1 0 0 0 0
+12	87944 9 0 0 0 0 1 0 0 0 0
+13	87953 9 0 0 0 0 1 0 0 0 0
+14	87962 700 0 626 0 0.0000010332 33 0 1 16 16
+15	88662 700 0 628 0 0.0000010332 33 0 1 16 16
+16	89362 9 0 0 0 0 1 0 0 0 0
+17	89371 9 0 0 0 0 1 0 0 0 0
+18	89380 9 0 0 0 0 1 0 0 0 0
+19	89389 9 0 0 0 0 1 0 0 0 0
+20	89398 9 0 0 0 0 1 0 0 0 0
+21	89407 700 0 624 0 0.0000010332 33 0 1 16 16
+22	90107 700 0 629 0 0.0000010332 33 0 1 16 16
+23	90807 9 0 0 0 0 1 0 0 0 0
+24	90816 9 0 0 0 0 1 0 0 0 0
+25	90825 9 0 0 0 0 1 0 0 0 0
+26	90834 9 0 0 0 0 1 0 0 0 0
+27	90843 9 0 0 0 0 1 0 0 0 0
+28	90852 700 0 625 0 0.0000010332 33 0 1 16 16
+29	91552 700 0 627 0 0.0000010332 33 0 1 16 16
+30	92252 9 0 0 0 0 1 0 0 0 0
+31	92261 9 0 0 0 0 1 0 0 0 0
+32	92270 9 0 0 0 0 1 0 0 0 0
+33	92279 9 0 0 0 0 1 0 0 0 0
+34	92288 66 0 864 0 0.025096058348 4 0 1 1 1
+35	92354 66 0 864 0 0.025096058348 4 0 1 1 1
+36	92420 66 0 855 0 0.025052058348 4 0 1 1 1
+37	92486 9 0 0 0 0 1 0 0 0 0
+38	92495 9 0 0 0 0 1 0 0 0 0
+39	92504 9 0 0 0 0 1 0 0 0 0
+40	92513 66 0 1324 0 0.09265813808 4 0 1 1 1
+41	92579 66 0 1324 0 0.09265813808 4 0 1 1 1
+42	92645 66 0 1315 0 0.09261413808 4 0 1 1 1
+43	92711 9 0 0 0 0 1 0 0 0 0
+44	92720 9 0 0 0 0 1 0 0 0 0
+45	92729 9 0 0 0 0 1 0 0 0 0
+46	92738 68 0 1113 0 0.060548301917 4 0 1 1 1
+47	92806 68 0 1113 0 0.060548301917 4 0 1 1 1
+48	92874 68 0 1104 0 0.060504301917 4 0 1 1 1
+49	92942 9 0 0 0 0 1 0 0 0 0
+50	92951 9 0 0 0 0 1 0 0 0 0
+51	92960 9 0 0 0 0 1 0 0 0 0
+52	92969 66 0 707 0 0.005900740754 4 0 1 1 1
+53	93035 66 0 707 0 0.005900740754 4 0 1 1 1
+54	93101 66 0 698 0 0.005856740754 4 0 1 1 1
+55	93167 9 0 0 0 0 1 0 0 0 0
+56	93176 9 0 0 0 0 1 0 0 0 0
+57	93185 9 0 0 0 0 1 0 0 0 0
+58	93194 66 0 912 0 0.030334481076 4 0 1 1 1
+59	93260 66 0 912 0 0.030334481076 4 0 1 1 1
+60	93326 66 0 903 0 0.030290481076 4 0 1 1 1
+61	93392 9 0 0 0 0 1 0 0 0 0
+62	93401 9 0 0 0 0 1 0 0 0 0
+63	93410 9 0 0 0 0 1 0 0 0 0
+64	93419 66 0 828 0 0.022037996995 4 0 1 1 1
+65	93485 66 0 828 0 0.022037996995 4 0 1 1 1
+66	93551 66 0 813 0 0.021993996995 4 0 1 1 1
+67	93617 9 0 0 0 0 1 0 0 0 0
+68	93626 9 0 0 0 0 1 0 0 0 0
+69	93635 9 0 0 0 0 1 0 0 0 0
+70	93644 75 0 865 0 0.025096058348 5 0 3 7 17
+71	93719 9 0 0 0 0 1 3 3 3 9
+72	93728 75 0 1325 0 0.09265813808 5 0 3 7 17
+73	93803 9 0 0 0 0 1 3 3 3 9
+74	93812 77 0 1114 0 0.060548301917 5 0 3 7 17
+75	93889 9 0 0 0 0 1 3 3 3 9
+76	93898 75 0 708 0 0.005900740754 5 0 3 7 17
+77	93973 9 0 0 0 0 1 3 3 3 9
+78	93982 75 0 913 0 0.030334481076 5 0 3 7 17
+79	94057 9 0 0 0 0 1 3 3 3 9
+80	94066 75 0 829 0 0.022037996995 5 0 3 7 17
+81	94141 9 0 0 0 0 1 3 3 3 9
+82	94150 57 0 865 0 0.025096058348 3 0 1 2 2
+83	94207 210 0 865 0 0.025096058348 10 0 2 4 8
+84	94417 57 0 1325 0 0.09265813808 3 0 1 2 2
+85	94474 210 0 1325 0 0.09265813808 10 0 2 4 8
+86	94684 59 0 1114 0 0.060548301917 3 0 1 2 2
+87	94743 218 0 1114 0 0.060548301917 10 0 2 4 8
+88	94961 57 0 708 0 0.005900740754 3 0 1 2 2
+89	95018 210 0 708 0 0.005900740754 10 0 2 4 8
+90	95228 57 0 913 0 0.030334481076 3 0 1 2 2
+91	95285 210 0 913 0 0.030334481076 10 0 2 4 8
+92	95495 57 0 829 0 0.022037996995 3 0 1 2 2
+93	95552 210 0 829 0 0.022037996995 10 0 2 4 8
+94	95762 10 0 0 0 0 1 15 15 15 225
+95	95772 10 0 0 0 0 1 15 15 15 225
+96	95782 10 0 0 0 0 1 15 15 15 225
+97	95792 10 0 0 0 0 1 15 15 15 225
+98	95802 10 0 0 0 0 1 15 15 15 225
+99	95812 10 0 0 0 0 1 15 15 15 225
+100	95822 11 18 18 0 0 1 0 0 0 0
+101	95833 11 21 21 0 0 1 0 0 0 0
+102	95844 11 26 26 0 0 1 0 0 0 0
+103	95855 11 29 29 0 0 1 0 0 0 0
+104	95866 11 34 34 0 0 1 0 0 0 0
+105	95877 11 37 37 0 0 1 0 0 0 0
+106	95888 11 40 40 0 0 1 0 0 0 0
+107	95899 11 40 40 0 0 1 0 0 0 0
+108	95910 11 41 41 0 0 1 0 0 0 0
+109	95921 11 41 41 0 0 1 0 0 0 0
+110	95932 11 42 42 0 0 1 0 0 0 0
+111	95943 11 42 42 0 0 1 0 0 0 0
+112	95954 11 43 43 0 0 1 0 0 0 0
+113	95965 11 43 43 0 0 1 0 0 0 0
+114	95976 11 44 44 0 0 1 0 0 0 0
+115	95987 11 44 44 0 0 1 0 0 0 0
+116	95998 11 45 45 0 0 1 0 0 0 0
+117	96009 11 45 45 0 0 1 0 0 0 0
+118	96020 389 66 594 0 0.0000009512 16 288 1376 7936 5148672
+119	96409 433 66 602 0 0.0000009892 16 0 1.7e-07 9.732e-07 9.866128e-14
+120	96842 389 66 602 0 0.0000009892 16 288 1376 7936 5148672
+121	97231 374 66 602 0 0.0000009892 16 43 179 1104 95120
+122	97605 632 66 602 0 0.0000009892 28 0 4 36 80
+123	98237 676 66 602 0 0.0000009892 28 0 1536 13440 11243520
+124	98913 389 67 595 0 0.0000009512 16 288 1376 7936 5148672
+125	99302 433 67 604 0 0.0000009892 16 0 1.7e-07 9.732e-07 9.866128e-14
+126	99735 389 67 604 0 0.0000009892 16 288 1376 7936 5148672
+127	100124 374 67 604 0 0.0000009892 16 43 179 1104 95120
+128	100498 632 67 604 0 0.0000009892 28 0 4 36 80
+129	101130 676 67 604 0 0.0000009892 28 0 1536 13440 11243520
+130	101806 389 68 596 0 0.0000009512 16 288 1376 7936 5148672
+131	102195 433 68 600 0 0.0000009892 16 0 1.7e-07 9.732e-07 9.866128e-14
+132	102628 389 68 600 0 0.0000009892 16 288 1376 7936 5148672
+133	103017 374 68 600 0 0.0000009892 16 43 179 1104 95120
+134	103391 632 68 600 0 0.0000009892 28 0 4 36 80
+135	104023 676 68 600 0 0.0000009892 28 0 1536 13440 11243520
+136	104699 389 69 597 0 0.0000009512 16 288 1376 7936 5148672
+137	105088 433 69 605 0 0.0000009892 16 0 1.7e-07 9.732e-07 9.866128e-14
+138	105521 389 69 605 0 0.0000009892 16 288 1376 7936 5148672
+139	105910 374 69 605 0 0.0000009892 16 43 179 1104 95120
+140	106284 632 69 605 0 0.0000009892 28 0 4 36 80
+141	106916 676 69 605 0 0.0000009892 28 0 1536 13440 11243520
+142	107592 389 70 598 0 0.0000009512 16 288 1376 7936 5148672
+143	107981 433 70 601 0 0.0000009892 16 0 1.7e-07 9.732e-07 9.866128e-14
+144	108414 389 70 601 0 0.0000009892 16 288 1376 7936 5148672
+145	108803 374 70 601 0 0.0000009892 16 43 179 1104 95120
+146	109177 632 70 601 0 0.0000009892 28 0 4 36 80
+147	109809 676 70 601 0 0.0000009892 28 0 1536 13440 11243520
+148	110485 389 71 599 0 0.0000009512 16 288 1376 7936 5148672
+149	110874 433 71 603 0 0.0000009892 16 0 1.7e-07 9.732e-07 9.866128e-14
+150	111307 389 71 603 0 0.0000009892 16 288 1376 7936 5148672
+151	111696 374 71 603 0 0.0000009892 16 43 179 1104 95120
+152	112070 632 71 603 0 0.0000009892 28 0 4 36 80
+153	112702 676 71 603 0 0.0000009892 28 0 1536 13440 11243520
+154	113378 385 84 650 0.0000001292 0.0000010832 16 43 179 1104 95120
+155	113763 385 84 650 0.0000001292 0.0000010832 16 36 172 992 80448
+156	114148 385 85 652 0.0000001292 0.0000010832 16 43 179 1104 95120
+157	114533 385 85 652 0.0000001292 0.0000010832 16 36 172 992 80448
+158	114918 385 86 648 0.0000001292 0.0000010832 16 43 179 1104 95120
+159	115303 385 86 648 0.0000001292 0.0000010832 16 36 172 992 80448
+160	115688 385 87 653 0.0000001292 0.0000010832 16 43 179 1104 95120
+161	116073 385 87 653 0.0000001292 0.0000010832 16 36 172 992 80448
+162	116458 385 88 649 0.0000001292 0.0000010832 16 43 179 1104 95120
+163	116843 385 88 649 0.0000001292 0.0000010832 16 36 172 992 80448
+164	117228 385 89 651 0.0000001292 0.0000010832 16 43 179 1104 95120
+165	117613 385 89 651 0.0000001292 0.0000010832 16 36 172 992 80448
+166	117998 22 96 96 0.0000001292 0.0000001292 1 0 0 0 0
+167	118020 26 96 96 0.0000001292 0.0000001292 1 65535 65535 65535 4294836225
+168	118046 22 96 96 0.0000001292 0.0000001292 1 0 0 0 0
+169	118068 22 96 96 0.0000001292 0.0000001292 1 0 0 0 0
+170	118090 22 96 96 0.0000001292 0.0000001292 1 0 0 0 0
+171	118112 22 96 96 0.0000001292 0.0000001292 1 0 0 0 0
+172	118134 22 97 97 0.0000001292 0.0000001292 1 0 0 0 0
+173	118156 26 97 97 0.0000001292 0.0000001292 1 65535 65535 65535 4294836225
+174	118182 22 97 97 0.0000001292 0.0000001292 1 0 0 0 0
+175	118204 22 97 97 0.0000001292 0.0000001292 1 0 0 0 0
+176	118226 22 97 97 0.0000001292 0.0000001292 1 0 0 0 0
+177	118248 22 97 97 0.0000001292 0.0000001292 1 0 0 0 0
+178	118270 22 98 98 0.0000001292 0.0000001292 1 0 0 0 0
+179	118292 26 98 98 0.0000001292 0.0000001292 1 65535 65535 65535 4294836225
+180	118318 22 98 98 0.0000001292 0.0000001292 1 0 0 0 0
+181	118340 22 98 98 0.0000001292 0.0000001292 1 0 0 0 0
+182	118362 22 98 98 0.0000001292 0.0000001292 1 0 0 0 0
+183	118384 22 98 98 0.0000001292 0.0000001292 1 0 0 0 0
+184	118406 22 99 99 0.0000001292 0.0000001292 1 0 0 0 0
+185	118428 26 99 99 0.0000001292 0.0000001292 1 65535 65535 65535 4294836225
+186	118454 22 99 99 0.0000001292 0.0000001292 1 0 0 0 0
+187	118476 22 99 99 0.0000001292 0.0000001292 1 0 0 0 0
+188	118498 22 99 99 0.0000001292 0.0000001292 1 0 0 0 0
+189	118520 22 99 99 0.0000001292 0.0000001292 1 0 0 0 0
+190	118542 23 100 100 0.0000001292 0.0000001292 1 0 0 0 0
+191	118565 27 100 100 0.0000001292 0.0000001292 1 65535 65535 65535 4294836225
+192	118592 23 100 100 0.0000001292 0.0000001292 1 0 0 0 0
+193	118615 23 100 100 0.0000001292 0.0000001292 1 0 0 0 0
+194	118638 23 100 100 0.0000001292 0.0000001292 1 0 0 0 0
+195	118661 23 100 100 0.0000001292 0.0000001292 1 0 0 0 0
+196	118684 23 101 101 0.0000001292 0.0000001292 1 0 0 0 0
+197	118707 27 101 101 0.0000001292 0.0000001292 1 65535 65535 65535 4294836225
+198	118734 23 101 101 0.0000001292 0.0000001292 1 0 0 0 0
+199	118757 23 101 101 0.0000001292 0.0000001292 1 0 0 0 0
+200	118780 23 101 101 0.0000001292 0.0000001292 1 0 0 0 0
+201	118803 23 101 101 0.0000001292 0.0000001292 1 0 0 0 0
+202	118826 27 132 132 0.0000003224 0.0000003224 1 65535 65535 65535 4294836225
+203	118853 23 132 132 0.0000003224 0.0000003224 1 0 0 0 0
+204	118876 23 132 132 0.0000003224 0.0000003224 1 0 0 0 0
+205	118899 23 132 132 0.0000003224 0.0000003224 1 0 0 0 0
+206	118922 27 133 133 0.0000003224 0.0000003224 1 65535 65535 65535 4294836225
+207	118949 23 133 133 0.0000003224 0.0000003224 1 0 0 0 0
+208	118972 23 133 133 0.0000003224 0.0000003224 1 0 0 0 0
+209	118995 23 133 133 0.0000003224 0.0000003224 1 0 0 0 0
+210	119018 27 134 134 0.0000003224 0.0000003224 1 65535 65535 65535 4294836225
+211	119045 23 134 134 0.0000003224 0.0000003224 1 0 0 0 0
+212	119068 23 134 134 0.0000003224 0.0000003224 1 0 0 0 0
+213	119091 23 134 134 0.0000003224 0.0000003224 1 0 0 0 0
+214	119114 27 135 135 0.0000003224 0.0000003224 1 65535 65535 65535 4294836225
+215	119141 23 135 135 0.0000003224 0.0000003224 1 0 0 0 0
+216	119164 23 135 135 0.0000003224 0.0000003224 1 0 0 0 0
+217	119187 23 135 135 0.0000003224 0.0000003224 1 0 0 0 0
+218	119210 27 136 136 0.0000003224 0.0000003224 1 65535 65535 65535 4294836225
+219	119237 23 136 136 0.0000003224 0.0000003224 1 0 0 0 0
+220	119260 23 136 136 0.0000003224 0.0000003224 1 0 0 0 0
+221	119283 23 136 136 0.0000003224 0.0000003224 1 0 0 0 0
+222	119306 27 137 137 0.0000003224 0.0000003224 1 65535 65535 65535 4294836225
+223	119333 23 137 137 0.0000003224 0.0000003224 1 0 0 0 0
+224	119356 23 137 137 0.0000003224 0.0000003224 1 0 0 0 0
+225	119379 23 137 137 0.0000003224 0.0000003224 1 0 0 0 0
+226	119402 27 168 168 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+227	119429 26 168 168 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+228	119455 28 168 168 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+229	119483 23 168 168 0.0000004708 0.0000004708 1 1 1 1 1
+230	119506 23 168 168 0.0000004708 0.0000004708 1 3 3 3 9
+231	119529 27 168 168 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+232	119556 26 168 168 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+233	119582 28 168 168 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+234	119610 46 168 440 0.0000004708 0.0000007312 2 1 3 4 10
+235	119656 27 168 168 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+236	119683 26 168 168 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+237	119709 28 168 168 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+238	119737 23 168 168 0.0000004708 0.0000004708 1 1 1 1 1
+239	119760 23 168 168 0.0000004708 0.0000004708 1 3 3 3 9
+240	119783 27 168 168 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+241	119810 26 168 168 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+242	119836 28 168 168 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+243	119864 23 168 168 0.0000004708 0.0000004708 1 1 1 1 1
+244	119887 23 168 168 0.0000004708 0.0000004708 1 3 3 3 9
+245	119910 27 169 169 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+246	119937 26 169 169 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+247	119963 28 169 169 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+248	119991 23 169 169 0.0000004708 0.0000004708 1 1 1 1 1
+249	120014 23 169 169 0.0000004708 0.0000004708 1 3 3 3 9
+250	120037 27 169 169 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+251	120064 26 169 169 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+252	120090 28 169 169 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+253	120118 23 169 169 0.0000004708 0.0000004708 1 1 1 1 1
+254	120141 23 169 169 0.0000004708 0.0000004708 1 3 3 3 9
+255	120164 27 169 169 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+256	120191 26 169 169 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+257	120217 28 169 169 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+258	120245 46 169 442 0.0000004708 0.0000007312 2 1 3 4 10
+259	120291 27 169 169 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+260	120318 26 169 169 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+261	120344 28 169 169 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+262	120372 23 169 169 0.0000004708 0.0000004708 1 1 1 1 1
+263	120395 23 169 169 0.0000004708 0.0000004708 1 3 3 3 9
+264	120418 27 170 170 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+265	120445 26 170 170 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+266	120471 28 170 170 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+267	120499 23 170 170 0.0000004708 0.0000004708 1 1 1 1 1
+268	120522 23 170 170 0.0000004708 0.0000004708 1 3 3 3 9
+269	120545 27 170 170 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+270	120572 26 170 170 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+271	120598 28 170 170 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+272	120626 46 170 438 0.0000004708 0.0000007312 2 1 3 4 10
+273	120672 27 170 170 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+274	120699 26 170 170 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+275	120725 28 170 170 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+276	120753 23 170 170 0.0000004708 0.0000004708 1 1 1 1 1
+277	120776 23 170 170 0.0000004708 0.0000004708 1 3 3 3 9
+278	120799 27 170 170 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+279	120826 26 170 170 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+280	120852 28 170 170 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+281	120880 23 170 170 0.0000004708 0.0000004708 1 1 1 1 1
+282	120903 23 170 170 0.0000004708 0.0000004708 1 3 3 3 9
+283	120926 27 171 171 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+284	120953 26 171 171 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+285	120979 28 171 171 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+286	121007 23 171 171 0.0000004708 0.0000004708 1 1 1 1 1
+287	121030 23 171 171 0.0000004708 0.0000004708 1 3 3 3 9
+288	121053 27 171 171 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+289	121080 26 171 171 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+290	121106 28 171 171 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+291	121134 23 171 171 0.0000004708 0.0000004708 1 1 1 1 1
+292	121157 23 171 171 0.0000004708 0.0000004708 1 3 3 3 9
+293	121180 27 171 171 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+294	121207 26 171 171 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+295	121233 28 171 171 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+296	121261 46 171 443 0.0000004708 0.0000007312 2 1 3 4 10
+297	121307 27 171 171 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+298	121334 26 171 171 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+299	121360 28 171 171 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+300	121388 23 171 171 0.0000004708 0.0000004708 1 1 1 1 1
+301	121411 23 171 171 0.0000004708 0.0000004708 1 3 3 3 9
+302	121434 27 172 172 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+303	121461 26 172 172 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+304	121487 28 172 172 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+305	121515 23 172 172 0.0000004708 0.0000004708 1 1 1 1 1
+306	121538 23 172 172 0.0000004708 0.0000004708 1 3 3 3 9
+307	121561 27 172 172 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+308	121588 26 172 172 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+309	121614 28 172 172 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+310	121642 46 172 439 0.0000004708 0.0000007312 2 1 3 4 10
+311	121688 27 172 172 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+312	121715 26 172 172 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+313	121741 28 172 172 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+314	121769 23 172 172 0.0000004708 0.0000004708 1 1 1 1 1
+315	121792 23 172 172 0.0000004708 0.0000004708 1 3 3 3 9
+316	121815 27 172 172 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+317	121842 26 172 172 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+318	121868 28 172 172 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+319	121896 23 172 172 0.0000004708 0.0000004708 1 1 1 1 1
+320	121919 23 172 172 0.0000004708 0.0000004708 1 3 3 3 9
+321	121942 27 173 173 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+322	121969 26 173 173 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+323	121995 28 173 173 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+324	122023 23 173 173 0.0000004708 0.0000004708 1 1 1 1 1
+325	122046 23 173 173 0.0000004708 0.0000004708 1 3 3 3 9
+326	122069 27 173 173 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+327	122096 26 173 173 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+328	122122 28 173 173 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+329	122150 23 173 173 0.0000004708 0.0000004708 1 1 1 1 1
+330	122173 23 173 173 0.0000004708 0.0000004708 1 3 3 3 9
+331	122196 27 173 173 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+332	122223 26 173 173 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+333	122249 28 173 173 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+334	122277 46 173 441 0.0000004708 0.0000007312 2 1 3 4 10
+335	122323 27 173 173 0.0000004708 0.0000004708 1 65535 65535 65535 4294836225
+336	122350 26 173 173 0.0000004708 0.0000004708 1 8940 8940 8940 79923600
+337	122376 28 173 173 0.0000004708 0.0000004708 1 0.3725 0.3725 0.3725 0.13875625
+338	122404 23 173 173 0.0000004708 0.0000004708 1 1 1 1 1
+339	122427 23 173 173 0.0000004708 0.0000004708 1 3 3 3 9
+340	122450 69 264 336 0.0000005648 0.0000006528 3 1 3 6 14
+341	122519 69 264 336 0.0000005648 0.0000006528 3 1 3 6 14
+342	122588 69 265 337 0.0000005648 0.0000006528 3 1 3 6 14
+343	122657 69 265 337 0.0000005648 0.0000006528 3 1 3 6 14
+344	122726 69 266 338 0.0000005648 0.0000006528 3 1 3 6 14
+345	122795 69 266 338 0.0000005648 0.0000006528 3 1 3 6 14
+346	122864 69 267 339 0.0000005648 0.0000006528 3 1 3 6 14
+347	122933 69 267 339 0.0000005648 0.0000006528 3 1 3 6 14
+348	123002 69 268 340 0.0000005648 0.0000006528 3 1 3 6 14
+349	123071 69 268 340 0.0000005648 0.0000006528 3 1 3 6 14
+350	123140 69 269 341 0.0000005648 0.0000006528 3 1 3 6 14
+351	123209 69 269 341 0.0000005648 0.0000006528 3 1 3 6 14
+352	123278 27 372 372 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+353	123305 26 372 372 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+354	123331 28 372 372 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+355	123359 23 372 372 0.0000006872 0.0000006872 1 1 1 1 1
+356	123382 23 372 372 0.0000006872 0.0000006872 1 3 3 3 9
+357	123405 27 372 372 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+358	123432 26 372 372 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+359	123458 28 372 372 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+360	123486 46 372 618 0.0000006872 0.0000009952 2 1 3 4 10
+361	123532 27 372 372 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+362	123559 26 372 372 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+363	123585 28 372 372 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+364	123613 23 372 372 0.0000006872 0.0000006872 1 1 1 1 1
+365	123636 23 372 372 0.0000006872 0.0000006872 1 3 3 3 9
+366	123659 27 372 372 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+367	123686 26 372 372 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+368	123712 28 372 372 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+369	123740 23 372 372 0.0000006872 0.0000006872 1 1 1 1 1
+370	123763 23 372 372 0.0000006872 0.0000006872 1 3 3 3 9
+371	123786 27 373 373 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+372	123813 26 373 373 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+373	123839 28 373 373 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+374	123867 23 373 373 0.0000006872 0.0000006872 1 1 1 1 1
+375	123890 23 373 373 0.0000006872 0.0000006872 1 3 3 3 9
+376	123913 27 373 373 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+377	123940 26 373 373 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+378	123966 28 373 373 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+379	123994 46 373 619 0.0000006872 0.0000009952 2 1 3 4 10
+380	124040 27 373 373 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+381	124067 26 373 373 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+382	124093 28 373 373 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+383	124121 23 373 373 0.0000006872 0.0000006872 1 1 1 1 1
+384	124144 23 373 373 0.0000006872 0.0000006872 1 3 3 3 9
+385	124167 27 373 373 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+386	124194 26 373 373 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+387	124220 28 373 373 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+388	124248 23 373 373 0.0000006872 0.0000006872 1 1 1 1 1
+389	124271 23 373 373 0.0000006872 0.0000006872 1 3 3 3 9
+390	124294 27 374 374 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+391	124321 26 374 374 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+392	124347 28 374 374 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+393	124375 23 374 374 0.0000006872 0.0000006872 1 1 1 1 1
+394	124398 23 374 374 0.0000006872 0.0000006872 1 3 3 3 9
+395	124421 27 374 374 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+396	124448 26 374 374 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+397	124474 28 374 374 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+398	124502 46 374 620 0.0000006872 0.0000009952 2 1 3 4 10
+399	124548 27 374 374 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+400	124575 26 374 374 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+401	124601 28 374 374 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+402	124629 23 374 374 0.0000006872 0.0000006872 1 1 1 1 1
+403	124652 23 374 374 0.0000006872 0.0000006872 1 3 3 3 9
+404	124675 27 374 374 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+405	124702 26 374 374 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+406	124728 28 374 374 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+407	124756 23 374 374 0.0000006872 0.0000006872 1 1 1 1 1
+408	124779 23 374 374 0.0000006872 0.0000006872 1 3 3 3 9
+409	124802 27 375 375 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+410	124829 26 375 375 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+411	124855 28 375 375 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+412	124883 23 375 375 0.0000006872 0.0000006872 1 1 1 1 1
+413	124906 23 375 375 0.0000006872 0.0000006872 1 3 3 3 9
+414	124929 27 375 375 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+415	124956 26 375 375 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+416	124982 28 375 375 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+417	125010 23 375 375 0.0000006872 0.0000006872 1 1 1 1 1
+418	125033 23 375 375 0.0000006872 0.0000006872 1 3 3 3 9
+419	125056 27 375 375 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+420	125083 26 375 375 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+421	125109 28 375 375 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+422	125137 46 375 621 0.0000006872 0.0000009952 2 1 3 4 10
+423	125183 27 375 375 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+424	125210 26 375 375 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+425	125236 28 375 375 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+426	125264 23 375 375 0.0000006872 0.0000006872 1 1 1 1 1
+427	125287 23 375 375 0.0000006872 0.0000006872 1 3 3 3 9
+428	125310 27 376 376 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+429	125337 26 376 376 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+430	125363 28 376 376 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+431	125391 23 376 376 0.0000006872 0.0000006872 1 1 1 1 1
+432	125414 23 376 376 0.0000006872 0.0000006872 1 3 3 3 9
+433	125437 27 376 376 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+434	125464 26 376 376 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+435	125490 28 376 376 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+436	125518 23 376 376 0.0000006872 0.0000006872 1 1 1 1 1
+437	125541 23 376 376 0.0000006872 0.0000006872 1 3 3 3 9
+438	125564 27 376 376 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+439	125591 26 376 376 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+440	125617 28 376 376 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+441	125645 46 376 622 0.0000006872 0.0000009952 2 1 3 4 10
+442	125691 27 376 376 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+443	125718 26 376 376 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+444	125744 28 376 376 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+445	125772 23 376 376 0.0000006872 0.0000006872 1 1 1 1 1
+446	125795 23 376 376 0.0000006872 0.0000006872 1 3 3 3 9
+447	125818 27 377 377 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+448	125845 26 377 377 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+449	125871 28 377 377 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+450	125899 23 377 377 0.0000006872 0.0000006872 1 1 1 1 1
+451	125922 23 377 377 0.0000006872 0.0000006872 1 3 3 3 9
+452	125945 27 377 377 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+453	125972 26 377 377 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+454	125998 28 377 377 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+455	126026 23 377 377 0.0000006872 0.0000006872 1 1 1 1 1
+456	126049 23 377 377 0.0000006872 0.0000006872 1 3 3 3 9
+457	126072 27 377 377 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+458	126099 26 377 377 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+459	126125 28 377 377 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+460	126153 46 377 623 0.0000006872 0.0000009952 2 1 3 4 10
+461	126199 27 377 377 0.0000006872 0.0000006872 1 65535 65535 65535 4294836225
+462	126226 26 377 377 0.0000006872 0.0000006872 1 8940 8940 8940 79923600
+463	126252 28 377 377 0.0000006872 0.0000006872 1 0.3725 0.3725 0.3725 0.13875625
+464	126280 23 377 377 0.0000006872 0.0000006872 1 1 1 1 1
+465	126303 23 377 377 0.0000006872 0.0000006872 1 3 3 3 9
+466	126326 69 438 486 0.0000007312 0.0000008192 3 1 3 6 14
+467	126395 31 438 438 0.0000007312 0.0000007312 1 2.604e-07 2.604e-07 2.604e-07 6.780816e-14
+468	126426 69 439 487 0.0000007312 0.0000008192 3 1 3 6 14
+469	126495 31 439 439 0.0000007312 0.0000007312 1 2.604e-07 2.604e-07 2.604e-07 6.780816e-14
+470	126526 69 440 488 0.0000007312 0.0000008192 3 1 3 6 14
+471	126595 31 440 440 0.0000007312 0.0000007312 1 2.604e-07 2.604e-07 2.604e-07 6.780816e-14
+472	126626 69 441 489 0.0000007312 0.0000008192 3 1 3 6 14
+473	126695 31 441 441 0.0000007312 0.0000007312 1 2.604e-07 2.604e-07 2.604e-07 6.780816e-14
+474	126726 69 442 490 0.0000007312 0.0000008192 3 1 3 6 14
+475	126795 31 442 442 0.0000007312 0.0000007312 1 2.604e-07 2.604e-07 2.604e-07 6.780816e-14
+476	126826 69 443 491 0.0000007312 0.0000008192 3 1 3 6 14
+477	126895 31 443 443 0.0000007312 0.0000007312 1 2.604e-07 2.604e-07 2.604e-07 6.780816e-14
+478	126926 69 510 582 0.0000008632 0.0000009512 3 1 3 6 14
+479	126995 69 510 582 0.0000008632 0.0000009512 3 1 3 6 14
+480	127064 69 511 583 0.0000008632 0.0000009512 3 1 3 6 14
+481	127133 69 511 583 0.0000008632 0.0000009512 3 1 3 6 14
+482	127202 69 512 584 0.0000008632 0.0000009512 3 1 3 6 14
+483	127271 69 512 584 0.0000008632 0.0000009512 3 1 3 6 14
+484	127340 69 513 585 0.0000008632 0.0000009512 3 1 3 6 14
+485	127409 69 513 585 0.0000008632 0.0000009512 3 1 3 6 14
+486	127478 69 514 586 0.0000008632 0.0000009512 3 1 3 6 14
+487	127547 69 514 586 0.0000008632 0.0000009512 3 1 3 6 14
+488	127616 69 515 587 0.0000008632 0.0000009512 3 1 3 6 14
+489	127685 69 515 587 0.0000008632 0.0000009512 3 1 3 6 14
+490	127754 69 618 660 0.0000009952 0.0000010832 3 1 3 6 14
+491	127823 30 618 618 0.0000009952 0.0000009952 1 3.08e-07 3.08e-07 3.08e-07 9.4864e-14
+492	127853 69 619 661 0.0000009952 0.0000010832 3 1 3 6 14
+493	127922 30 619 619 0.0000009952 0.0000009952 1 3.08e-07 3.08e-07 3.08e-07 9.4864e-14
+494	127952 69 620 662 0.0000009952 0.0000010832 3 1 3 6 14
+495	128021 30 620 620 0.0000009952 0.0000009952 1 3.08e-07 3.08e-07 3.08e-07 9.4864e-14
+496	128051 69 621 663 0.0000009952 0.0000010832 3 1 3 6 14
+497	128120 30 621 621 0.0000009952 0.0000009952 1 3.08e-07 3.08e-07 3.08e-07 9.4864e-14
+498	128150 69 622 664 0.0000009952 0.0000010832 3 1 3 6 14
+499	128219 30 622 622 0.0000009952 0.0000009952 1 3.08e-07 3.08e-07 3.08e-07 9.4864e-14
+500	128249 69 623 665 0.0000009952 0.0000010832 3 1 3 6 14
+501	128318 30 623 623 0.0000009952 0.0000009952 1 3.08e-07 3.08e-07 3.08e-07 9.4864e-14
+502	128348 1631 666 1367 0.001 0.099 99 0 0 0 0
+503	129979 1631 666 1367 0.001 0.099 99 0 0 0 0
+504	131610 1631 667 1368 0.001 0.099 99 0 0 0 0
+505	133241 1631 667 1368 0.001 0.099 99 0 0 0 0
+506	134872 1631 668 1369 0.001 0.099 99 0 0 0 0
+507	136503 1631 668 1369 0.001 0.099 99 0 0 0 0
+508	138134 27 697 697 0.005856740754 0.005856740754 1 408 408 408 166464
+509	138161 50 697 699 0.005856740754 0.005856740754 2 0 1 1 1
+510	138211 52 697 699 0.005856740754 0.005856740754 2 0 408 408 166464
+511	138263 25 697 697 0.005856740754 0.005856740754 1 1 1 1 1
+512	138288 25 699 699 0.005856740754 0.005856740754 1 0 0 0 0
+513	138313 27 699 699 0.005856740754 0.005856740754 1 408 408 408 166464
+514	138340 32 699 699 0.005856740754 0.005856740754 1 65000000 65000000 65000000 4.225e+15
+515	138372 26 699 699 0.005856740754 0.005856740754 1 51 51 51 2601
+516	138398 100 700 708 0.005856740754 0.005900740754 4 0 2 4 6
+517	138498 26 707 707 0.005900740754 0.005900740754 1 51 51 51 2601
+518	138524 26 707 707 0.005900740754 0.005900740754 1 51 51 51 2601
+519	138550 26 707 707 0.005900740754 0.005900740754 1 51 51 51 2601
+520	138576 26 707 707 0.005900740754 0.005900740754 1 51 51 51 2601
+521	138602 31 707 707 0.005900740754 0.005900740754 1 4.4e-05 4.4e-05 4.4e-05 1.936e-09
+522	138633 27 812 812 0.021993996995 0.021993996995 1 408 408 408 166464
+523	138660 50 812 814 0.021993996995 0.021993996995 2 0 1 1 1
+524	138710 52 812 814 0.021993996995 0.021993996995 2 0 408 408 166464
+525	138762 25 812 812 0.021993996995 0.021993996995 1 9 9 9 81
+526	138787 25 814 814 0.021993996995 0.021993996995 1 0 0 0 0
+527	138812 27 814 814 0.021993996995 0.021993996995 1 408 408 408 166464
+528	138839 32 814 814 0.021993996995 0.021993996995 1 65000000 65000000 65000000 4.225e+15
+529	138871 26 814 814 0.021993996995 0.021993996995 1 51 51 51 2601
+530	138897 100 815 829 0.021993996995 0.022037996995 4 0 2 4 6
+531	138997 26 828 828 0.022037996995 0.022037996995 1 51 51 51 2601
+532	139023 26 828 828 0.022037996995 0.022037996995 1 51 51 51 2601
+533	139049 26 828 828 0.022037996995 0.022037996995 1 51 51 51 2601
+534	139075 26 828 828 0.022037996995 0.022037996995 1 51 51 51 2601
+535	139101 31 828 828 0.022037996995 0.022037996995 1 4.4e-05 4.4e-05 4.4e-05 1.936e-09
+536	139132 27 854 854 0.025052058348 0.025052058348 1 408 408 408 166464
+537	139159 50 854 856 0.025052058348 0.025052058348 2 0 1 1 1
+538	139209 52 854 856 0.025052058348 0.025052058348 2 0 408 408 166464
+539	139261 25 854 854 0.025052058348 0.025052058348 1 7 7 7 49
+540	139286 25 856 856 0.025052058348 0.025052058348 1 0 0 0 0
+541	139311 27 856 856 0.025052058348 0.025052058348 1 408 408 408 166464
+542	139338 32 856 856 0.025052058348 0.025052058348 1 65000000 65000000 65000000 4.225e+15
+543	139370 26 856 856 0.025052058348 0.025052058348 1 51 51 51 2601
+544	139396 100 857 865 0.025052058348 0.025096058348 4 0 2 4 6
+545	139496 26 864 864 0.025096058348 0.025096058348 1 51 51 51 2601
+546	139522 26 864 864 0.025096058348 0.025096058348 1 51 51 51 2601
+547	139548 26 864 864 0.025096058348 0.025096058348 1 51 51 51 2601
+548	139574 26 864 864 0.025096058348 0.025096058348 1 51 51 51 2601
+549	139600 31 864 864 0.025096058348 0.025096058348 1 4.4e-05 4.4e-05 4.4e-05 1.936e-09
+550	139631 27 902 902 0.030290481076 0.030290481076 1 408 408 408 166464
+551	139658 50 902 904 0.030290481076 0.030290481076 2 0 1 1 1
+552	139708 52 902 904 0.030290481076 0.030290481076 2 0 408 408 166464
+553	139760 26 902 902 0.030290481076 0.030290481076 1 10 10 10 100
+554	139786 25 904 904 0.030290481076 0.030290481076 1 0 0 0 0
+555	139811 27 904 904 0.030290481076 0.030290481076 1 408 408 408 166464
+556	139838 32 904 904 0.030290481076 0.030290481076 1 65000000 65000000 65000000 4.225e+15
+557	139870 26 904 904 0.030290481076 0.030290481076 1 51 51 51 2601
+558	139896 100 905 913 0.030290481076 0.030334481076 4 0 2 4 6
+559	139996 26 912 912 0.030334481076 0.030334481076 1 51 51 51 2601
+560	140022 26 912 912 0.030334481076 0.030334481076 1 51 51 51 2601
+561	140048 26 912 912 0.030334481076 0.030334481076 1 51 51 51 2601
+562	140074 26 912 912 0.030334481076 0.030334481076 1 51 51 51 2601
+563	140100 31 912 912 0.030334481076 0.030334481076 1 4.4e-05 4.4e-05 4.4e-05 1.936e-09
+564	140131 28 1103 1103 0.060504301917 0.060504301917 1 408 408 408 166464
+565	140159 52 1103 1105 0.060504301917 0.060504301917 2 0 1 1 1
+566	140211 54 1103 1105 0.060504301917 0.060504301917 2 0 408 408 166464
+567	140265 26 1103 1103 0.060504301917 0.060504301917 1 2 2 2 4
+568	140291 26 1105 1105 0.060504301917 0.060504301917 1 0 0 0 0
+569	140317 28 1105 1105 0.060504301917 0.060504301917 1 408 408 408 166464
+570	140345 33 1105 1105 0.060504301917 0.060504301917 1 65000000 65000000 65000000 4.225e+15
+571	140378 27 1105 1105 0.060504301917 0.060504301917 1 51 51 51 2601
+572	140405 104 1106 1114 0.060504301917 0.060548301917 4 0 2 4 6
+573	140509 27 1113 1113 0.060548301917 0.060548301917 1 51 51 51 2601
+574	140536 27 1113 1113 0.060548301917 0.060548301917 1 51 51 51 2601
+575	140563 27 1113 1113 0.060548301917 0.060548301917 1 51 51 51 2601
+576	140590 27 1113 1113 0.060548301917 0.060548301917 1 51 51 51 2601
+577	140617 32 1113 1113 0.060548301917 0.060548301917 1 4.4e-05 4.4e-05 4.4e-05 1.936e-09
+578	140649 27 1314 1314 0.09261413808 0.09261413808 1 408 408 408 166464
+579	140676 50 1314 1316 0.09261413808 0.09261413808 2 0 1 1 1
+580	140726 52 1314 1316 0.09261413808 0.09261413808 2 0 408 408 166464
+581	140778 25 1314 1314 0.09261413808 0.09261413808 1 6 6 6 36
+582	140803 25 1316 1316 0.09261413808 0.09261413808 1 0 0 0 0
+583	140828 27 1316 1316 0.09261413808 0.09261413808 1 408 408 408 166464
+584	140855 32 1316 1316 0.09261413808 0.09261413808 1 65000000 65000000 65000000 4.225e+15
+585	140887 26 1316 1316 0.09261413808 0.09261413808 1 51 51 51 2601
+586	140913 100 1317 1325 0.09261413808 0.09265813808 4 0 2 4 6
+587	141013 26 1324 1324 0.09265813808 0.09265813808 1 51 51 51 2601
+588	141039 26 1324 1324 0.09265813808 0.09265813808 1 51 51 51 2601
+589	141065 26 1324 1324 0.09265813808 0.09265813808 1 51 51 51 2601
+590	141091 26 1324 1324 0.09265813808 0.09265813808 1 51 51 51 2601
+591	141117 31 1324 1324 0.09265813808 0.09265813808 1 4.4e-05 4.4e-05 4.4e-05 1.936e-09
+

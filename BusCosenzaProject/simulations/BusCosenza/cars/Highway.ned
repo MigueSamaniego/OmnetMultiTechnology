@@ -44,6 +44,9 @@ import org.car2x.veins.subprojects.veins_inet.VeinsInetManager;
 network Highway
 {
     parameters:
+        
+        int numAPs = default(1);  // number of AP in simulation
+        
         double playgroundSizeX @unit(m); // x size of the area the nodes are in (in meters)
         double playgroundSizeY @unit(m); // y size of the area the nodes are in (in meters)
         double playgroundSizeZ @unit(m); // z size of the area the nodes are in (in meters)
@@ -134,7 +137,7 @@ network Highway
         bus[0]: BusGW;
         
         //# wireless AP
-        ap[2]: StandardHost {
+        ap[numAPs]: StandardHost {
             @display("p=210,250;is=vs;i=veins/sign/yellowdiamond");
         }
 
@@ -157,7 +160,7 @@ network Highway
         //router.pppg++ <--> Eth10G <--> ap[0].pppg++;
         //router.pppg++ <--> Eth10G <--> ap[1].pppg++;
         
-        for i=0..1 {
+        for i=0..numAPs-1 {
             ap[i].ethg++ <--> Eth10G <--> switch.ethg++;
         }
         

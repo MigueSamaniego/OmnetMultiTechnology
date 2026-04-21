@@ -5,30 +5,32 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="sendDataToCloud"/>
+		<item key="selection" value="10.00"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="10.00"/>
+			<item value="0.00"/>
+			<item value="sdcardBufferSize"/>
+			<item value="timeWiFiStateON"/>
+			<item value="packetSendUDPSignal"/>
+			<item value="coun_msg_sent"/>
+			<item value="inputBufferSignal"/>
+			<item value="1.00"/>
+			<item value="HostAutoConfiguratorAP_M"/>
+			<item value="inet::HostAutoConfiguratorAP_M"/>
+			<item value="timeWiFiWorking"/>
+			<item value="sdcardPercentSignal"/>
 			<item value="sendDataToCloud"/>
 			<item value="EV_INFO"/>
 			<item value="Control_Data_Emission"/>
-			<item value="Control_GPS_Data"/>
-			<item value="sdcardPercentSignal"/>
-			<item value="sdcardBufferSize"/>
-			<item value="sdcardBufferSignal"/>
-			<item value="inputBufferSignal"/>
-			<item value="EV_INFO &lt;&lt; &quot;EMITTING"/>
-			<item value="emit("/>
-			<item value="convertXYtoLatLon"/>
-			<item value="VeinsInetSampleMessage"/>
-			<item value="VeinsInetSampleMessage_m"/>
-			<item value="INFO: controlInterface"/>
-			<item value="SignStateConnectAP"/>
 		</list>
 		<list key="replacehistory">
+			<item value="0.00"/>
+			<item value="10.00"/>
 			<item value="AppBusDataCollectionUDP"/>
 			<item value="AppBusDataCollectionTCP"/>
 			<item value="Control_Task_Timer"/>
@@ -42,12 +44,11 @@
 			<item value="AppBusDataCollection"/>
 			<item value="bus"/>
 			<item value="ap"/>
-			<item value="car"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1119"/>
-		<item key="DIALOG_Y_ORIGIN" value="230"/>
+		<item key="DIALOG_X_ORIGIN" value="1250"/>
+		<item key="DIALOG_Y_ORIGIN" value="192"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

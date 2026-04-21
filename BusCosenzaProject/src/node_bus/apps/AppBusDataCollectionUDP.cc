@@ -19,7 +19,7 @@
 #include "inet/networklayer/ipv4/Ipv4RoutingTable.h"
 
 #include <iomanip> // for print more decimals
-#include <random>  // for random function
+//#include <random>  // for random function
 #include <string>
 #include <vector>
 
@@ -93,12 +93,13 @@ Define_Module(AppBusDataCollectionUDP);
 
 AppBusDataCollectionUDP::AppBusDataCollectionUDP()
 {
-    // Inicializar la bandera de suscripción
-    SignStateConnectAP = 0; // Usamos SignStateConnectAP como bandera de 'suscripción hecha'
+    // Begin flags
+    SignStateConnectAP = 0;
     Control_Task_Timer = nullptr;
     ConnectionToAP = false;
     Control_Data_Emission = nullptr;
     Control_Data_Vehicle = nullptr;
+
 }
 
 AppBusDataCollectionUDP::~AppBusDataCollectionUDP()
@@ -133,12 +134,18 @@ void AppBusDataCollectionUDP::initialize(int stage)
 
         sdcardPercentSignal = registerSignal("sdcardPercentSize"); // state occupation buffer
 
+
+        timeWiFiWorking = registerSignal("timeWiFiStateON");    // time from connection
+        timeWiFiTransfer = registerSignal("timeWiFiTransferOK"); // time of transmission
+
+        //packetSendUDPSignal = registerSignal("numMsgUDPSend"); // count packets sent
+
     }
 
     // look variables in real time
-    WATCH(sdcardCount);
-    WATCH(inputCount);
-    WATCH(outputCount);
+    //WATCH(sdcardCount);
+    //WATCH(inputCount);
+    //WATCH(outputCount);
 
 
 
@@ -207,9 +214,9 @@ void AppBusDataCollectionUDP::processPacket(std::shared_ptr<inet::Packet> pk)
 
 void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
 {   // update variables in real time
-    sdcardCount = sdcard.size();
-    inputCount = inputBuffer.size();
-    outputCount = outputBuffer.size();
+    //sdcardCount = sdcard.size();
+    //inputCount = inputBuffer.size();
+    //outputCount = outputBuffer.size();
 
 
     if (msg == Control_Task_Timer) {
@@ -217,108 +224,128 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
         EV_INFO << "INFO: controlInterface: "<< ConnectionToAP << endl;
         bool update_timer = true;
 
-        if (SignStateConnectAP == 0) { // GW UNSUBSCRIBE >> try to subscriber
-            subscriptionSignalState();
 
-        }else if (SignStateConnectAP == 1) { // Subscribe to signal 'state connection AP'
+            if (SignStateConnectAP == 0) { // GW UNSUBSCRIBE >> try to subscriber
+                subscriptionSignalState();
 
-            // recovery names from interfaces table
-            interfaceTable = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
-            wifi = interfaceTable->findInterfaceByName("wlan0");
-            celular = interfaceTable->findInterfaceByName("cellular");
+            }else if (SignStateConnectAP == 1) { // Subscribe to signal 'state connection AP'
 
-            scheduleAt(simTime() + SimTime(6, SIMTIME_S), Control_Task_Timer);
-            SignStateConnectAP = 2;
-            update_timer = false;
+                // recovery names from interfaces table
+                interfaceTable = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
+                wifi = interfaceTable->findInterfaceByName("wlan0");
+                celular = interfaceTable->findInterfaceByName("cellular");
 
-        }else if (SignStateConnectAP == 2) { // CONFIGURATION DATA RECOVERED GW READY
+                scheduleAt(simTime() + SimTime(6, SIMTIME_S), Control_Task_Timer);
+                SignStateConnectAP = 2;
+                update_timer = false;
 
-            if(!Vehicle_With_Interface){
-                std::string vehicle = mobility->getExternalId();
+            }else if (SignStateConnectAP == 2) { // CONFIGURATION DATA RECOVERED GW READY
 
-                // check if vehicle from simulation is type Autobus
-                if (vehicle.rfind("buses_cosenza.", 0) == 0) {
-                    getParentModule()->getDisplayString().setTagArg("i", 1, "red");
-                    Vehicle_With_Interface = true;
+                if(!Vehicle_With_Interface){
+                    std::string vehicle = mobility->getExternalId();
+
+                    // check if vehicle from simulation is type Autobus
+                    if (vehicle.rfind("buses_cosenza.", 0) == 0) {
+                        getParentModule()->getDisplayString().setTagArg("i", 1, "red");
+                        Vehicle_With_Interface = true;
+                    }
                 }
+
+                //********** Start GPS get Dapa *********************************/
+                if (!Control_GPS_Data) {
+                    // we are programming a message called 'controlTimer' it start a timer of 1 second,
+                    // when this time finish it sent himself the message to 'handleMessage(cMessage *msg)'
+                    Control_GPS_Data = new cMessage("Data_LAT_LONG");
+                    scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_GPS_Data); // the GW REQUIRE MORE TIME TO RECOVER INITIALITATION VARIABLES VALUES
+
+
+                }
+
+                //********* Start Collection Data *******************************/
+                if(!Control_Data_Emission){
+
+                    Control_Data_Emission = new cMessage("Data_Co2_No2_So2");
+                    scheduleAt(simTime() + SimTime(5, SIMTIME_S), Control_Data_Emission);
+
+
+                }
+
+                //********* Start Get State Vehicle *****************************/
+                if(!Control_Data_Vehicle){
+
+                    Control_Data_Vehicle = new cMessage("Data_Speed_Accel");
+                    scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
+
+
+                }
+
+                SignStateConnectAP = 3;
+
+            }else if (SignStateConnectAP == 3) { // GW check diferents tasks (void loop)
+
+
+                // 1. Interface control (Northbound)
+
+                /****** select / Switch Interface ***************************/
+                if(ConnectionToAP != ConnectionToAP_Pass){
+                    interfaceAvailable();
+                    ConnectionToAP_Pass = ConnectionToAP;
+                }
+                /**************************************************/
+
+                /****** Counter messages Sent ***************************/
+                //if(ConnectionToAP)
+                //    coun_msg_sent++;
+
+                sendDataToCloud(); // prepare and send message
+                /**************************************************/
+
+
             }
 
-            //********** Start GPS get Dapa *********************************/
-            if (!Control_GPS_Data) {
-                // we are programming a message called 'controlTimer' it start a timer of 1 second,
-                // when this time finish it sent himself the message to 'handleMessage(cMessage *msg)'
-                Control_GPS_Data = new cMessage("Data_LAT_LONG");
-                scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_GPS_Data); // the GW REQUIRE MORE TIME TO RECOVER INITIALITATION VARIABLES VALUES
+
+
+            // 2. Reprogramar el timer (si es que quieres que controlInterface() se siga ejecutando cada 1s)
+            if (update_timer) {
+
+
+                 scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Task_Timer);
+
+                 //nextControlTask = simTime() + 0.163;
+                 //scheduleAt(nextControlTask, Control_Task_Timer);
+
             }
 
-            //********* Start Collection Data *******************************/
-            if(!Control_Data_Emission){
-
-                Control_Data_Emission = new cMessage("Data_Co2_No2_So2");
-                scheduleAt(simTime() + SimTime(5, SIMTIME_S), Control_Data_Emission);
-            }
-
-            //********* Start Get State Vehicle *****************************/
-            if(!Control_Data_Vehicle){
-
-                Control_Data_Vehicle = new cMessage("Data_Speed_Accel");
-                scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
-            }
-
-            SignStateConnectAP = 3;
-
-        }else if (SignStateConnectAP == 3) { // GW check diferents tasks (void loop)
 
 
-        // 1. Interface control (Northbound)
-
-        /****** select / Switch Interface ***************************/
-        if(ConnectionToAP != ConnectionToAP_Pass){
-            interfaceAvailable();
-            ConnectionToAP_Pass = ConnectionToAP;
-        }
-        /**************************************************/
-
-        /****** Counter messages Sent ***************************/
-        //if(ConnectionToAP)
-        //    coun_msg_sent++;
-
-        sendDataToCloud(); // prepare and send message
-        /**************************************************/
-
-
-        }
-
-        // 2. Reprogramar el timer (si es que quieres que controlInterface() se siga ejecutando cada 1s)
-        if (update_timer) {
-             scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Task_Timer);
-        }
     }else if (msg == Control_GPS_Data) {    // gettin position GPS with error N(0,σ)
 
-        std::string vehicle = mobility->getExternalId();
-        Coord pos = mobility->getCurrentPosition();
-        Coord geo = convertXYtoLatLon(pos);
 
-        double lat = geo.y;
-        double lon = geo.x;
+            std::string vehicle = mobility->getExternalId();
+            Coord pos = mobility->getCurrentPosition();
+            Coord geo = convertXYtoLatLon(pos);
 
-        EV_INFO << std::fixed << std::setprecision(6)
-        << "LAT: " << lat
-        << " | LON: " << lon
-        << std::defaultfloat << endl;
+            double lat = geo.y;
+            double lon = geo.x;
 
+//            EV_INFO << std::fixed << std::setprecision(6)
+//            << "LAT: " << lat
+//            << " | LON: " << lon
+//            << std::defaultfloat << endl;
 
-        // ---------- Build format of DATA ------------
-        std::vector<double> gps = {lat, lon};
-        std::string data = buildDataString(gps);
-        // --------------------------------------------
+            // ---------- Build format of DATA ------------
+            std::vector<double> gps = {lat, lon};
+            std::string data = buildDataString(gps);
+            // --------------------------------------------
 
-        if (inputBuffer.add(data)) {
-            // save buffer en SDCARD
-            auto batch = inputBuffer.flush();
-            sdcard.pushBatch(batch);
+            EV_INFO << "NEW GPS" << data << endl;
 
-        }//else{
+            if (inputBuffer.add(data)) {
+                // save buffer en SDCARD
+                auto batch = inputBuffer.flush();
+                sdcard.pushBatch(batch);
+                EV_INFO << "SAVING LAST GPS" << endl;
+            }
 
             // update the state of SDCARD % OCCUPATIONAL
             double currentBytes = (double)sdcard.getCurrentBytes();
@@ -329,43 +356,40 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
             emit(sdcardPercentSignal, usagePercent);
             emit(sdcardBufferSignal, sdcard.getCurrentBytes());
 
-            EV_INFO << "SAVE ON sdcard" << endl;
-
-
-
 
             emit(inputBufferSignal, inputBuffer.getCurrentBytes());
-           // }
 
 
+            scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_GPS_Data);
 
-        scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_GPS_Data);
 
     } else if (msg == Control_Data_Emission) {
 
 
-        std::string vehicle = mobility->getExternalId();
+            std::string vehicle = mobility->getExternalId();
 
-        // Emissions
-        double co2 = traciVehicle->getCO2Emissions();
-        double co = traciVehicle->getCOEmissions();
-        double nox = traciVehicle->getNOxEmissions();
-        double pmx = traciVehicle->getPMxEmissions();
+            // Emissions
+            double co2 = traciVehicle->getCO2Emissions();
+            double co = traciVehicle->getCOEmissions();
+            double nox = traciVehicle->getNOxEmissions();
+            double pmx = traciVehicle->getPMxEmissions();
 
-        // -------- OTHER TYPE SENSORS ----------------
-         std::vector<double> sensor = {
-             co2, co, nox,
-             pmx
-         };
+            // -------- OTHER TYPE SENSORS ----------------
+             std::vector<double> sensor = {
+                 co2, co, nox, pmx
+             };
 
-         std::string data = buildDataString(sensor);
-         // --------------------------------------------
+             std::string data = buildDataString(sensor);
+             // --------------------------------------------
 
-         if (inputBuffer.add(data)) {
-             // save buffer en SDCARD
-             auto batch = inputBuffer.flush();
-             sdcard.pushBatch(batch);
-         }//else{
+             EV_INFO << "NEW POLLUTION" << data << endl;
+
+             if (inputBuffer.add(data)) {
+                 // save buffer en SDCARD
+                 auto batch = inputBuffer.flush();
+                 sdcard.pushBatch(batch);
+                 EV_INFO << "SAVING LAST POLUTION" << endl;
+             }
              // update the state of SDCARD % OCCUPATIONAL
              double currentBytes = (double)sdcard.getCurrentBytes();
              double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
@@ -374,38 +398,44 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
 
              emit(sdcardPercentSignal, usagePercent);
              emit(sdcardBufferSignal, sdcard.getCurrentBytes());
-             EV_INFO << "SAVE ON sdcard" << endl;
+
 
 
              emit(inputBufferSignal, inputBuffer.getCurrentBytes());
-            // }
 
 
-        scheduleAt(simTime() + SimTime(5, SIMTIME_S), Control_Data_Emission);
+             scheduleAt(simTime() + SimTime(5, SIMTIME_S), Control_Data_Emission);
+
 
     } else if (msg == Control_Data_Vehicle) {
-        std::string vehicle = mobility->getExternalId();
-
-        double speed = traciVehicle->getSpeed();
-        double accel = traciVehicle->getAcceleration();
-        double Decaccel = traciVehicle->getDeccel();
-        double fuel = traciVehicle->getFuelConsumption();
-        double time_trip = traciVehicle->getDistanceTravelled();
 
 
-        // -------- OTHER TYPE SENSORS ----------------
-         std::vector<double> sensor = {
-             speed, accel, Decaccel, fuel, time_trip
-         };
 
-         std::string data = buildDataString(sensor);
-         // --------------------------------------------
+            std::string vehicle = mobility->getExternalId();
 
-         if (inputBuffer.add(data)) {
-             // save buffer en SDCARD
-             auto batch = inputBuffer.flush();
-             sdcard.pushBatch(batch);
-         }//else{
+            double speed = traciVehicle->getSpeed();
+            double accel = traciVehicle->getAcceleration();
+            double Decaccel = traciVehicle->getDeccel();
+            double fuel = traciVehicle->getFuelConsumption();
+            double time_trip = traciVehicle->getDistanceTravelled();
+
+
+            // -------- OTHER TYPE SENSORS ----------------
+             std::vector<double> sensor = {
+                 speed, accel, Decaccel, fuel, time_trip
+             };
+
+             std::string data = buildDataString(sensor);
+             // --------------------------------------------
+
+             EV_INFO << "NEW VEHICLE" << data << endl;
+
+             if (inputBuffer.add(data)) {
+                 // save buffer en SDCARD
+                 auto batch = inputBuffer.flush();
+                 sdcard.pushBatch(batch);
+                 EV_INFO << "SAVING LAST VEHICLE" << endl;
+             }
              // update the state of SDCARD % OCCUPATIONAL
              double currentBytes = (double)sdcard.getCurrentBytes();
              double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
@@ -414,14 +444,14 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
 
              emit(sdcardPercentSignal, usagePercent);
              emit(sdcardBufferSignal, sdcard.getCurrentBytes());
-             EV_INFO << "SAVE ON sdcard" << endl;
 
 
-         emit(inputBufferSignal, inputBuffer.getCurrentBytes());
-         //}
+             emit(inputBufferSignal, inputBuffer.getCurrentBytes());
 
 
-        scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
+             scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
+
+
     } else {
         // Llama al manejo de mensajes base para mensajes del framework (paquetes, etc.)
         veins::VeinsInetApplicationBase::handleMessage(msg);
@@ -501,6 +531,10 @@ void AppBusDataCollectionUDP::sendDataToCloud(){
                 L3Address destAddr = L3AddressResolver().resolve("15.0.0.1"); // server address
                 socket.sendTo(packet.release(), destAddr, 3000);
 
+                //count_msg_UPD_send++;
+                //emit(packetSendUDPSignal, count_msg_UPD_send);
+
+
             }
 
         }
@@ -525,6 +559,10 @@ void AppBusDataCollectionUDP::sendDataToCloud(){
 void AppBusDataCollectionUDP::interfaceAvailable(){
 
     if(ConnectionToAP){
+        //------------------ start counter time --------------------
+        connectionWiFiStart = simTime();
+        //----------------------------------------------------------
+
         coun_msg_sent++;
         wifi->setState(NetworkInterface::State::UP);
         celular->setState(NetworkInterface::State::DOWN);
@@ -555,6 +593,15 @@ void AppBusDataCollectionUDP::interfaceAvailable(){
         EV_INFO << "Default route added via WIFI (gw=192.168.0.1)" << endl;
 
     }else {
+
+        simtime_t duration = simTime() - connectionWiFiStart;
+
+        // Save only the connection is greater that;
+        if (duration > 1) { // time minimum to establish connection with WIFI ***** pain attention, really we must to check if there are connection
+            emit(timeWiFiWorking, duration.dbl()); // we Emit with double variable type
+            //EV_INFO << "Desconectado. Duración de la conexión: " << duration << " segundos." << endl;
+        }
+
         celular->setState(NetworkInterface::State::UP);
         wifi->setState(NetworkInterface::State::DOWN);
         EV_INFO << "WiFi disable → Using interfaz celular" << endl;
@@ -607,16 +654,36 @@ inet::Coord AppBusDataCollectionUDP::convertXYtoLatLon(inet::Coord pos)
     // ------------------ Modelling GPS ERROR with a ----------------------------------------------
     // ------------------ Normal Distribution  N(0,σ) ---------------------------------------------
 
-    double sigma = 0.00005; // ~5-10 meters aprox
+    double lon_pass = lon;
+    double lat_pass = lat;
 
-    static std::default_random_engine generator;
-    static std::normal_distribution<double> distribution(0.0, sigma);
+    lat += normal(0, sigma);
+    lon += normal(0, sigma);
 
-    double error_lat = distribution(generator);
-    double error_lon = distribution(generator);
+    // -------- calculate distance between GPS real and GPS error ---------------
 
-    lat += error_lat;
-    lon += error_lon;
+    /*const double R = 6371000.0;
+    const double PI = 3.14159265358979323846;
+
+    double lat1 = lat_pass * PI / 180.0;
+    double lat2 = lat * PI / 180.0;
+    double dLat = (lat - lat_pass) * PI / 180.0;
+    double dLon = (lon - lon_pass) * PI / 180.0;
+
+    // fórmula de Haversine
+    double a = sin(dLat/2) * sin(dLat/2) +
+               cos(lat1) * cos(lat2) *
+               sin(dLon/2) * sin(dLon/2);
+    double c = 2 * atan2(sqrt(a), sqrt(1-a));
+    double distance_m = R * c;
+
+    EV_INFO << "GPS ERROR ANALYSIS:" << endl;
+    EV_INFO << "   Real: (" << lat_pass << ", " << lon_pass << ")" << endl;
+    EV_INFO << "   With Error: (" << lat << ", " << lon << ")" << endl;
+    EV_INFO << "   Distance Delta: " << distance_m << " meters" << endl;*/
+    // ----------------------------------------------------------------------------
+
+
 
     return inet::Coord(lon, lat);
 }

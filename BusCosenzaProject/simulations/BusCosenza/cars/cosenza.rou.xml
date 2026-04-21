@@ -67,9 +67,8 @@
 	
 	<!--vType id="aggressive_driver_passenger" vClass="passenger" color="blue" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="13.88" speedFactor="1.65" speedDev="0.1"/-->
 	
-
-	<route id="LINEA_N_138_RENDE-COSENZA_(Autostazione)" edges="120516824#0 120516823#0 
-																120516823#1 120516823#2 -1204295335#0 -1204295334 -1204295336 -1204295338 -1204295337 -31059667#3 -31059667#2 -31059667#1 -31059667#0 -264395293 264395294 31059664 264395685#0 
+	   
+	<route id="LINEA_N_138_RENDE-COSENZA_(Autostazione)" edges="120516823#1 120516823#2 -1204295335#0 -1204295334 -1204295336 -1204295338 -1204295337 -31059667#3 -31059667#2 -31059667#1 -31059667#0 -264395293 264395294 31059664 264395685#0 
 																264395685#1 264395685#2 30504142#0 30504142#1 823101118 30924715 264392322 43950786 264392320 264392318 518769704 -518769706#2 -518769706#1 -518769706#0 44290352 30504136#4 30504136#5 30504136#6 85884159 85885668#0 85885668#1 85885668#2 
 																85885668#3 85885668#4 85885668#5 85885668#6 85885668#7 85885668#8 85885668#9 1204295339 401180412#0 401180412#1 401180412#2 858257969#0 858257969#1
 																418617956#0 418617956#1 418617956#2 418617956#3 128202085 316330978#0 316330978#1 316330978#2 316330978#3 316330978#4 316330978#5 316330978#6 316330978#7 30692867#0 30692867#1 121915311#0 121915311#1 154532557#1 121915310#0 121915310#1 121915310#2 121915310#3 30692864#0
@@ -113,64 +112,64 @@
 																-120516816#0 -1204295332#2 -1204295332#1 -1204295332#0 -1204295333 -1204295331 30924735 45849800#0
 																45849800#1 45849800#2 45849800#3 45849800#4 45849800#5 45849800#6 45849800#7 45849800#8 45849800#9 45849800#10 45849800#11 45849800#12 45849800#13 45849800#14 45849800#15 45849800#16 45849800#17 45849800#18 45849800#19
 																121823451 30924737#2 30924737#0 121823455 -45849800#19 -45849800#18 -45849800#17 -45849800#16 -45849800#15 -45849800#14 -45849800#13 -45849800#12 -45849800#11 -45849800#10 -45849800#9 -45849800#8 -45849800#7
-																-45849800#6 -45849800#5 -45849800#4 -45849800#3 -45849800#2 -45849800#1 -45849800#0 860834233 120516824#0" color="red">
+																-45849800#6 -45849800#5 -45849800#4 -45849800#3 -45849800#2 -45849800#1 -45849800#0 860834233 120516824#0 120516823#0" color="red">
 
-		<stop busStop="Unical_Terminal" duration="1.00"/>
+
+		
 		<stop busStop="Unical_Terminal_Start" duration="10.00"/>
-		<stop busStop="Via_Padre_Leon_Dehon_2_A" duration="1.00"/>
-		<stop busStop="Quattromiglia_Via_Marconi_81_A" duration="1.00"/>
-		<stop busStop="Via_Leonardo_Da_Vinci_42_A" duration="1.00"/>
-		<stop busStop="Via_Gioacchino_Rossini_47_A" duration="1.00"/>
-		<stop busStop="Via_Gioacchino_Rossini_60_A" duration="1.00"/>
-		<stop busStop="Via_Gioacchino_Rossini_194_A" duration="1.00"/>
-		<stop busStop="Via_Don_Minzoni_Campi_Da_Tennis_A" duration="1.00"/>
-		<stop busStop="Via_Ciro_Menotti_A" duration="1.00"/>
-		<stop busStop="Via_Don_Giovanni_Minzoni_78_A" duration="1.00"/>
-		<stop busStop="Via_Lenin_1c_A" duration="1.00"/>
-		<stop busStop="Metropolis_A" duration="1.00"/>
-		<stop busStop="Via_Genova_7_A" duration="1.00"/>
-		<stop busStop="Via_Busento_16_A" duration="1.00"/>
-		<stop busStop="Via_Crati_Parco_Robinson_A" duration="1.00"/>
-		<stop busStop="Viale_Cosmai_Farmacia_Russo_A" duration="1.00"/>
-		<stop busStop="Viale_Cosmai_GDF_A" duration="1.00"/>
-		<stop busStop="Viale_Sergio_Cosmai_Casermette_A" duration="1.00"/>
-		<stop busStop="Viale_Paolo_Borsellino_71_A" duration="1.00"/>
-		<stop busStop="Viale_Paolo_Borsellino_1_A" duration="1.00"/>
-		<stop busStop="Viale_Falcone_11_A" duration="1.00"/>
-		<stop busStop="Autostazione_Corsia_N7_Finish" duration="10.00"/>
+		<stop busStop="Via_Padre_Leon_Dehon_2_A" duration="0.00"/>
+		<stop busStop="Quattromiglia_Via_Marconi_81_A" duration="0.00"/>
+		<stop busStop="Via_Leonardo_Da_Vinci_42_A" duration="0.00"/>
+		<stop busStop="Via_Gioacchino_Rossini_47_A" duration="0.00"/>
+		<stop busStop="Via_Gioacchino_Rossini_60_A" duration="0.00"/>
+		<stop busStop="Via_Gioacchino_Rossini_194_A" duration="0.00"/>
+		<stop busStop="Via_Don_Minzoni_Campi_Da_Tennis_A" duration="0.00"/>
+		<stop busStop="Via_Ciro_Menotti_A" duration="0.00"/>
+		<stop busStop="Via_Don_Giovanni_Minzoni_78_A" duration="0.00"/>
+		<stop busStop="Via_Lenin_1c_A" duration="0.00"/>
+		<stop busStop="Metropolis_A" duration="0.00"/>
+		<stop busStop="Via_Genova_7_A" duration="0.00"/>
+		<stop busStop="Via_Busento_16_A" duration="0.00"/>
+		<stop busStop="Via_Crati_Parco_Robinson_A" duration="0.00"/>
+		<stop busStop="Viale_Cosmai_Farmacia_Russo_A" duration="0.00"/>
+		<stop busStop="Viale_Cosmai_GDF_A" duration="0.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_Casermette_A" duration="0.00"/>
+		<stop busStop="Viale_Paolo_Borsellino_71_A" duration="0.00"/>
+		<stop busStop="Viale_Paolo_Borsellino_1_A" duration="0.00"/>
+		<stop busStop="Viale_Falcone_11_A" duration="0.00"/>
+		<stop busStop="Autostazione_Corsia_N7_Finish" duration="60.00"/>
 		
 
 		
-		<stop busStop="Viale_Falcone_11_R" duration="1.00"/>
-		<stop busStop="Via_Borsellino_ex_Rettorato_R" duration="1.00"/>
-		<stop busStop="Via_Borsellino_Staz_Serv_IP_R" duration="1.00"/>
-		<stop busStop="Viale_Sergio_Cosmai_casermette_R" duration="1.00"/>
-		<stop busStop="Viale_Sergio_Cosmai_casermette_2_R" duration="1.00"/>
-		<stop busStop="Viale_Sergio_Cosmai_Guardia_di_Finanza_R" duration="1.00"/>
-		<stop busStop="Viale_Sergio_Cosmai_74_R" duration="1.00"/>
-		<stop busStop="Via_Crati_12_R" duration="1.00"/>
-		<stop busStop="Via_Valle_del_Neto_7_R" duration="1.00"/>
-		<stop busStop="Viale_Kennedy_114_R" duration="1.00"/>
-		<stop busStop="Viale_Kennedy_166_R" duration="1.00"/>
-		<stop busStop="Via_della_Resistenza_96_R" duration="1.00"/>
-		<stop busStop="Via_della_Resistenza_132_R" duration="1.00"/>
-		<stop busStop="Via_G_Verdi_110_R" duration="1.00"/>
-		<stop busStop="Via_G_Verdi_170_R" duration="1.00"/>
-		<stop busStop="Via_G_Verdi_220_R" duration="1.00"/>
-		<stop busStop="Via_G_Verdi_248_R" duration="1.00"/>
-		<stop busStop="Via_A_Volta_66_R" duration="1.00"/>
-		<stop busStop="Via_Volta_Staz_Ferrov_R" duration="1.00"/>
-		<stop busStop="Via_L_DaVinci_Poliambul_R" duration="1.00"/>
-		<stop busStop="Villa_Giorcelli_R" duration="1.00"/>
-		<stop busStop="Quattromiglia_Via_Marconi_81_R" duration="1.00"/>
-		<stop busStop="Via_A_Savinio_Pensilina_R" duration="1.00"/>
-		<stop busStop="V_delle_Scienze_Cubo_1A_R" duration="1.00"/>
-		<stop busStop="Dip_Ing_Compl_Martensson" duration="1.00"/>
-		<stop busStop="Unical_Dipart_Dif_Scienza_E_Terra_R" duration="1.00"/>
-	
-
-
-
+		<stop busStop="Viale_Falcone_11_R" duration="0.00"/>
+		<stop busStop="Via_Borsellino_ex_Rettorato_R" duration="0.00"/>
+		<stop busStop="Via_Borsellino_Staz_Serv_IP_R" duration="0.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_casermette_R" duration="0.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_casermette_2_R" duration="0.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_Guardia_di_Finanza_R" duration="0.00"/>
+		<stop busStop="Viale_Sergio_Cosmai_74_R" duration="0.00"/>
+		<stop busStop="Via_Crati_12_R" duration="0.00"/>
+		<stop busStop="Via_Valle_del_Neto_7_R" duration="0.00"/>
+		<stop busStop="Viale_Kennedy_114_R" duration="0.00"/>
+		<stop busStop="Viale_Kennedy_166_R" duration="0.00"/>
+		<stop busStop="Via_della_Resistenza_96_R" duration="0.00"/>
+		<stop busStop="Via_della_Resistenza_132_R" duration="0.00"/>
+		<stop busStop="Via_G_Verdi_110_R" duration="0.00"/>
+		<stop busStop="Via_G_Verdi_170_R" duration="0.00"/>
+		<stop busStop="Via_G_Verdi_220_R" duration="0.00"/>
+		<stop busStop="Via_G_Verdi_248_R" duration="0.00"/>
+		<stop busStop="Via_A_Volta_66_R" duration="0.00"/>
+		<stop busStop="Via_Volta_Staz_Ferrov_R" duration="0.00"/>
+		<stop busStop="Via_L_DaVinci_Poliambul_R" duration="0.00"/>
+		<stop busStop="Villa_Giorcelli_R" duration="0.00"/>
+		<stop busStop="Quattromiglia_Via_Marconi_81_R" duration="0.00"/>
+		<stop busStop="Via_A_Savinio_Pensilina_R" duration="0.00"/>
+		<stop busStop="V_delle_Scienze_Cubo_1A_R" duration="0.00"/>
+		<stop busStop="Dip_Ing_Compl_Martensson" duration="0.00"/>
+		<stop busStop="Unical_Dipart_Dif_Scienza_E_Terra_R" duration="0.00"/>
+		
+		<stop busStop="Unical_Terminal" duration="60.00"/>	<!--   /-->
+		
 	
 	
     </route>
@@ -178,7 +177,7 @@
 	
 	
 	
-	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="1000" period="900.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
+	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="3500" period="3010.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
 	
 	<!--
 	<vehicle id="bus2" type="CONSORZIO_AUTOLINEE_DUE" depart="10.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>

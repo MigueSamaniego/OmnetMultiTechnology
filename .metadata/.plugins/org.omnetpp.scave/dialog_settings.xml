@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.omnetpp.scave.wizard.ScaveExportWizard">
+		<item key="CSV-R:quoteChar" value="doublequote"/>
+		<item key="CSV-R:columnNames" value="true"/>
+		<item key="CSV-R:omitBlankColumns" value="true"/>
+		<item key="CSV-R:quoteEscaping" value="doubling"/>
+		<item key="CSV-R:precision" value="14"/>
+		<item key="CSV-R:separator" value="comma"/>
 	</section>
 	<section name="org.omnetpp.scave.editors.ui.ChartTemplateGalleryDialog">
 		<item key="mainSash.weights" value="200 800"/>
@@ -11,11 +17,11 @@
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
 	</section>
 	<section name="ChartEditForm">
-		<item key="active-tab" value="Legend"/>
+		<item key="active-tab" value="Lines"/>
 	</section>
 	<section name="org.omnetpp.scave.editors.ui.ConfigureChartDialog">
-		<item key="DIALOG_X_ORIGIN" value="384"/>
-		<item key="DIALOG_Y_ORIGIN" value="31"/>
+		<item key="DIALOG_X_ORIGIN" value="554"/>
+		<item key="DIALOG_Y_ORIGIN" value="279"/>
 		<item key="DIALOG_WIDTH" value="1087"/>
 		<item key="DIALOG_HEIGHT" value="653"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

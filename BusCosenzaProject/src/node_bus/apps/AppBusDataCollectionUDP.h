@@ -67,9 +67,9 @@ private:
 
 
     // observe variables in real time
-    int sdcardCount = 0;
-    int inputCount = 0;
-    int outputCount = 0;
+    //int sdcardCount = 0;
+    //int inputCount = 0;
+    //int outputCount = 0;
 
     // buffer occupation
     simsignal_t inputBufferSignal;
@@ -77,6 +77,29 @@ private:
     simsignal_t sdcardBufferSignal;
 
     simsignal_t sdcardPercentSignal;
+
+    // time of working interfaces
+    simtime_t connectionWiFiStart;
+
+    simsignal_t timeWiFiWorking;
+    simsignal_t timeWiFiTransfer;
+
+    //bool isProcessingSD = false;
+    //int sdProcessingDelay = 200;
+    //omnetpp::cMessage* sdProcessingDelay = nullptr;
+
+    simtime_t nextGpsTime;
+    simtime_t nextVehicleTime;
+    simtime_t nextEmissionTime;
+    simtime_t nextControlTask;
+
+
+    double sigma = 0.00005; // ~5-10 meters aprox
+
+
+    //simsignal_t packetSendUDPSignal;
+    //int count_msg_UPD_send = 0;
+
 
 protected:
     // ** MODIFICAR: Reemplazar el initialize simple por el de etapas **
