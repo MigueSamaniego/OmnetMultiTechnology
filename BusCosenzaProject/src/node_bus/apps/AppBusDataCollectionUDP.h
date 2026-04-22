@@ -97,8 +97,10 @@ private:
     double sigma = 0.00005; // ~5-10 meters aprox
 
 
-    //simsignal_t packetSendUDPSignal;
-    //int count_msg_UPD_send = 0;
+    simsignal_t packetSendUDPSignal;
+    int count_msg_UPD_send = 0;
+
+    int test_color = 0;
 
 
 protected:

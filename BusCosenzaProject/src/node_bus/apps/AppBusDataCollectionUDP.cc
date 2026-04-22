@@ -99,6 +99,7 @@ AppBusDataCollectionUDP::AppBusDataCollectionUDP()
     ConnectionToAP = false;
     Control_Data_Emission = nullptr;
     Control_Data_Vehicle = nullptr;
+    count_msg_UPD_send = 0;
 
 }
 
@@ -138,7 +139,7 @@ void AppBusDataCollectionUDP::initialize(int stage)
         timeWiFiWorking = registerSignal("timeWiFiStateON");    // time from connection
         timeWiFiTransfer = registerSignal("timeWiFiTransferOK"); // time of transmission
 
-        //packetSendUDPSignal = registerSignal("numMsgUDPSend"); // count packets sent
+        packetSendUDPSignal = registerSignal("numMsgUDPSend"); // count packets sent
 
     }
 
@@ -226,6 +227,7 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
 
 
             if (SignStateConnectAP == 0) { // GW UNSUBSCRIBE >> try to subscriber
+
                 subscriptionSignalState();
 
             }else if (SignStateConnectAP == 1) { // Subscribe to signal 'state connection AP'
@@ -302,8 +304,6 @@ void AppBusDataCollectionUDP::handleMessage(cMessage *msg)
 
 
             }
-
-
 
             // 2. Reprogramar el timer (si es que quieres que controlInterface() se siga ejecutando cada 1s)
             if (update_timer) {
@@ -531,8 +531,8 @@ void AppBusDataCollectionUDP::sendDataToCloud(){
                 L3Address destAddr = L3AddressResolver().resolve("15.0.0.1"); // server address
                 socket.sendTo(packet.release(), destAddr, 3000);
 
-                //count_msg_UPD_send++;
-                //emit(packetSendUDPSignal, count_msg_UPD_send);
+                count_msg_UPD_send++;
+                emit(packetSendUDPSignal, count_msg_UPD_send);
 
 
             }

@@ -38,16 +38,23 @@ simple AppBusDataCollectionUDP extends VeinsInetApplicationBase
     	// time connection with interfaces
     	@signal[timeWiFiStateON](type="double");
     	
+    	// Count udp messages sent
+    	@signal[numMsgUDPSend](type="int");
+    	
     	
         // Configuración de estadísticas para que se graben como vectores
         @statistic[inputBufferSize](title="Input Buffer Size"; source="inputBufferSize"; record=vector,last);
         @statistic[outputBufferSize](title="Output Buffer Size"; source="outputBufferSize"; record=vector,last);
         @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last);
 		//@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
-		@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=none);
+		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=none);
         
         
-        @statistic[timeWiFiStateON](titlle= "WiFi connection duration"; source="timeWiFiStateON"; record=vector,last,mean; interpolationmode=none);
+        @statistic[timeWiFiStateON](title= "WiFi connection duration"; source="timeWiFiStateON"; record=vector,last,mean; interpolationmode=none);
+        
+        
+        @statistic[numMsgUDPSend](title="UDP packet sent"; source="numMsgUDPSend"; record=vector,count,last);
+        
         
         @class(AppBusDataCollectionUDP);
     gates:
