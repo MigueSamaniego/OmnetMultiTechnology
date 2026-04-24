@@ -108,6 +108,7 @@ AppBusDataCollectionTCP::AppBusDataCollectionTCP()
     ConnectionToAP = false;
     Control_Data_Emission = nullptr;
     Control_Data_Vehicle = nullptr;
+    Control_Send_Data = nullptr;
     count_msg_TCP_send = 0;
 
 }
@@ -306,6 +307,14 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
 
                         }
 
+                        //********* Start Send Data to Cloud *****************************/
+                        if(!Control_Send_Data){
+
+                            Control_Send_Data = new cMessage("Sending_Data_to_Cloud");
+                            scheduleAt(simTime() + SimTime(30, SIMTIME_S), Control_Send_Data);
+
+                        }
+
                         //*************** STABLISH CONNECTION TCP ****************************
                         //stablishTCP();
                         //--------------------------------------------------------------------
@@ -314,37 +323,60 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
 
                     }else if (SignStateConnectAP == 3) { // GW check diferents tasks (void loop)
 
+                        int waiting_changing_x_10ms = 10;
 
                         // 1. Interface control (Northbound)
 
                         /****** select / Switch Interface ***************************/
                         if(ConnectionToAP != ConnectionToAP_Pass){
                             interfaceAvailable();
+                            socket_ready = false;
+                            socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
+                            socket_state_close = true;
 
-                            if(ConnectionToAP){
-                                //socket.abort();
-                                socket_close = true;
-                            }
+                            cancelEvent(Control_Send_Data); // STOP TIMER TO SEND DATA ON THE CLOUD
 
                             ConnectionToAP_Pass = ConnectionToAP;
                         }
                         /**************************************************/
 
-                        if((ConnectionToAP)&&(socket_close)){
-                            count_reTX++;
-                            EV_INFO <<"esperando para abrir socket"<< count_reTX <<endl;
+                        if(socket_state_close){
+
+                           count_reTX++;
+                           EV_INFO <<"waiting for changes"<< count_reTX <<endl;
+
                         }
 
-                        if(count_reTX > 1){
-                            socket_close = false;
-                            count_reTX = 0;
-                            EV_INFO <<"abriendo socket nuevo ahora"<<endl;
-                            stablishTCP();
+                        if(count_reTX >= (waiting_changing_x_10ms+1)){
+
+                            EV_INFO <<"try to open new socket"<<endl;
+
+                            if(count_reTX == (waiting_changing_x_10ms+1)){
+                                if(!stablishTCP(ConnectionToAP)){
+                                    EV_WARN << "ERROR CREATING NEW SOCKET!!!, try again" << endl;
+                                    socket_state_close = true; // try again in the next cycle
+                                    count_reTX = waiting_changing_x_10ms;
+                                }
+                            }
+
+                            if(count_reTX >= (((waiting_changing_x_10ms*3))+1)){    // llimitation to count for waiting changes
+                                EV_WARN << "the count_reTX is overhead. STOP SIMULATION!!!" << endl;
+                                count_reTX = 0;
+                            }
+
                         }
 
+
+                        if ((count_reTX >= (waiting_changing_x_10ms+2))&&(socket.getState() == inet::TcpSocket::CONNECTED)) {
+                            socket_state_close = false; // don't increase count
+                            count_reTX = 0; // restart counter.
+                            EV_WARN << "Socket Ready to SENT DATA: "<< endl;
+                            socket_ready = true;
+                            scheduleAt(simTime() + SimTime(50, SIMTIME_MS), Control_Send_Data); // Start timer to call the function periodic to send data
+                        }
 
                         /****** Sent Message to Cloud *********************/
-                        sendDataToCloud(); // prepare and send message
+                        //sendDataToCloud(); // prepare and send message
                         /**************************************************/
 
 
@@ -353,11 +385,8 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                     // 2. Reprogramar el timer (si es que quieres que controlInterface() se siga ejecutando cada 1s)
                     if (update_timer) {
 
-
-                         scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Task_Timer);
-
-                         //nextControlTask = simTime() + 0.163;
-                         //scheduleAt(nextControlTask, Control_Task_Timer);
+                         //scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Task_Timer);
+                         scheduleAt(simTime() + SimTime(10, SIMTIME_MS), Control_Task_Timer);
 
                     }
 
@@ -495,7 +524,20 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                      scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
 
 
-            } else {
+            }else if (msg == Control_Send_Data) {
+
+                if(socket_ready){
+                    /****** Sent Message to Cloud *********************/
+                    sendDataToCloud(); // prepare and send message
+                    /**************************************************/
+                    if(ConnectionToAP){
+                        scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Send_Data); // LATENCY WIFI
+                    }else{
+                        scheduleAt(simTime() + SimTime(205, SIMTIME_MS), Control_Send_Data); // LATENCY LTE
+                    }
+                }
+
+            }else {
                 // Llama al manejo de mensajes base para mensajes del framework (paquetes, etc.)
                 veins::VeinsInetApplicationBase::handleMessage(msg);
             }
@@ -718,41 +760,63 @@ inet::Coord AppBusDataCollectionTCP::convertXYtoLatLon(inet::Coord pos)
     return inet::Coord(lon, lat);
 }
 
-void AppBusDataCollectionTCP::stablishTCP()
+bool AppBusDataCollectionTCP::stablishTCP(bool Use_Netwok)
 {
+    // Use_Network --> 0 (Cellular)
+    // Use_Network --> 1 (WIFI)
 
     printSocketInfo();
 
-    // 1. ¡ESTA ES LA CLAVE!: Borra el estado anterior y el bind viejo
+    // Destroy internal structure establish to TCP. it mean clean the socket
     socket.renewSocket();
 
+    // we indicate the exit door
     socket.setOutputGate(gate("socketOut"));
 
     inet::L3Address localAddr;
 
-    // 2. Intentar obtener la IP de la interfaz WiFi
-    wifi = interfaceTable->findInterfaceByName("wlan0");
+    //**************** this block no necessary **************************************
+    //**************** because this step was made in the start STAGE GW. ************
+    //**************** look it (SignStateConnectAP==2) ******************************
+    // getting IP from Wlan0 interface
+    ////wifi = interfaceTable->findInterfaceByName("wlan0");
+    // getting IP from cellular interface
+    ////celular = interfaceTable->findInterfaceByName("cellular");
+    //*******************************************************************************
+    const inet::Ipv4InterfaceData* ipv4Data = nullptr;
 
-    if (wifi) {
-        auto ipv4Data = wifi->findProtocolData<inet::Ipv4InterfaceData>();
+    if(Use_Netwok){
+
+        ipv4Data = wifi->findProtocolData<inet::Ipv4InterfaceData>();
         if (ipv4Data) {
             localAddr = ipv4Data->getIPAddress();
-            EV_INFO << "IP de wlan0 detectada: " << localAddr << endl;
+            EV_INFO << "IP from wlan0 : " << localAddr << endl;
+        }
+
+    }else {
+        ipv4Data = celular->findProtocolData<inet::Ipv4InterfaceData>();
+        if (ipv4Data) {
+            localAddr = ipv4Data->getIPAddress();
+            EV_INFO << "IP from cellular : " << localAddr << endl;
         }
     }
 
-    // 3. Ahora el bind funcionará porque el socket está "fresco"
+
+    // Now we can bind the new socket using the new IP source device.
     if (!localAddr.isUnspecified()) {
-        EV_INFO << "Haciendo BIND del socket a la interfaz WiFi..." << endl;
+        EV_INFO << "Bind socket using IP" << localAddr << endl;
         socket.bind(localAddr, -1);
+    }else {
+        return false;
     }
 
-    // 4. Conectar al servidor
+    // we indicate the destination IP address and socket
     inet::L3Address destAddress = inet::L3AddressResolver().resolve("15.0.0.1");
+    socket.connect(destAddress, 3000);
 
     printSocketInfo();
 
-    socket.connect(destAddress, 3000);
+    return true;
 }
 
 void AppBusDataCollectionTCP::printSocketInfo() {

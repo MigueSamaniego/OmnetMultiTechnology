@@ -34,6 +34,7 @@ private:
     omnetpp::cMessage* Control_GPS_Data = nullptr; // Usar omnetpp::cMessage
     omnetpp::cMessage* Control_Data_Emission = nullptr; // Usar omnetpp::cMessage
     omnetpp::cMessage* Control_Data_Vehicle = nullptr; // Usar omnetpp::cMessage
+    omnetpp::cMessage* Control_Send_Data = nullptr; // Usar omnetpp::cMessage
 
     SDCardBuffer sdcard;
     InputBuffer inputBuffer;
@@ -90,8 +91,8 @@ private:
     int test_color = 0;
 
     int count_reTX = 0;
-    bool socket_close = false;
-
+    bool socket_state_close = false;
+    bool socket_ready = false;
 
 protected:
     // ** MODIFICAR: Reemplazar el initialize simple por el de etapas **
@@ -120,7 +121,7 @@ protected:
     virtual void interfaceAvailable();
     virtual inet::Coord convertXYtoLatLon(inet::Coord pos);
     virtual void receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) override;
-    virtual void stablishTCP();
+    virtual bool stablishTCP(bool Use_Netwok);
     virtual void printSocketInfo();
 
 

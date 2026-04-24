@@ -1,0 +1,883 @@
+#include "AppBusDataCollectionTCP.h"
+//#include "../apps/VeinsInetSampleMessage_m.h"
+#include "../apps/AirPollutionMessage_m.h"
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/packet/Packet.h"
+#include "inet/common/TagBase_m.h"
+#include "inet/common/TimeTag_m.h"
+#include "inet/networklayer/common/L3AddressResolver.h"
+#include "inet/networklayer/common/L3AddressTag_m.h"
+//#include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"    // DELETE
+#include "inet/transportlayer/contract/tcp/TcpCommand_m.h"
+
+
+
+#include "inet/networklayer/common/InterfaceTable.h" // Para IInterfaceTable
+#include "inet/networklayer/ipv4/Ipv4InterfaceData.h" // Para Ipv4InterfaceData
+#include "inet/networklayer/common/NetworkInterface.h" // Para NetworkInterface
+
+#include "veins/modules/mobility/traci/TraCICoordinateTransformation.h"
+#include "inet/common/geometry/common/Coord.h"
+//#include "inet/common/geometry/common/Coord.h"
+//#include "inet/common/geometry/common/GeographicCoordinateSystem.h"
+
+#include "inet/common/Simsignals.h"
+
+#include "inet/networklayer/ipv4/Ipv4RoutingTable.h"
+
+#include <iomanip> // for print more decimals
+//#include <random>  // for random function
+#include <string>
+#include <vector>
+
+#include <sstream>
+#include <iomanip>
+#include <ctime>
+
+
+
+// *****************************************************************
+// IMPORTANTE: Definiciones necesarias para INET y OMNeT++
+// *****************************************************************
+using namespace inet;
+using namespace omnetpp;
+
+Define_Module(AppBusDataCollectionTCP);
+
+bool AppBusDataCollectionTCP::initialized = false;
+// --------------------------------------------------------------]
+// --------------- Data Concatenator ----------------------------]
+// --------------------------------------------------------------]
+
+
+
+std::string AppBusDataCollectionTCP::buildDataString(const std::vector<double>& values)
+{
+
+    std::ostringstream oss;
+
+    // tiempo simulado + offset real
+    std::time_t simTimestamp = startTime + (long)simTime().dbl();
+
+    std::tm* tm_info = std::localtime(&simTimestamp);
+
+    oss << std::put_time(tm_info, "%Y-%m-%d-%H-%M-%S");
+
+    // add dynamic values
+    for (size_t i = 0; i < values.size(); i++) {
+        if (i < 2) { // lat y lon
+            oss << "/" << std::fixed << std::setprecision(5) << values[i];
+        } else {
+            oss << "/" << std::fixed << std::setprecision(2) << values[i];
+        }
+    }
+
+    oss << "/$";
+
+    return oss.str();
+}
+
+
+// --------------------------------------------------------------]
+// --------------------------------------------------------------]
+// --------------------------------------------------------------]
+
+
+int AppBusDataCollectionTCP::getBufferBytes(const std::vector<std::string>& buffer) const
+{
+    int total = 0;
+    for (const auto& s : buffer) {
+        total += s.size();
+    }
+    return total;
+}
+
+
+
+
+
+// *****************************************************************
+// Implementación de Constructor y Destructor
+// *****************************************************************
+
+AppBusDataCollectionTCP::AppBusDataCollectionTCP()
+{
+    // Begin flags
+    SignStateConnectAP = 0;
+    Control_Task_Timer = nullptr;
+    ConnectionToAP = false;
+    Control_Data_Emission = nullptr;
+    Control_Data_Vehicle = nullptr;
+    Control_Send_Data = nullptr;
+    count_msg_TCP_send = 0;
+
+}
+
+AppBusDataCollectionTCP::~AppBusDataCollectionTCP()
+{
+}
+
+// *****************************************************************
+// 1. LÓGICA DE INICIALIZACIÓN (Registro de Señales)
+// *****************************************************************
+
+void AppBusDataCollectionTCP::initialize(int stage)
+{
+    // CALL INIZIALITATION BASE
+    veins::VeinsInetApplicationBase::initialize(stage);
+
+
+
+    if (!initialized) {
+        startTime = std::time(nullptr);
+        initialized = true;
+    }
+
+    // REGISTRATION NEW SIGNAL JUST IN THE initialitation 'STAGE'
+    if (stage == INITSTAGE_APPLICATION_LAYER) {
+
+        // Registration socket and callbacks
+        socket.setOutputGate(gate("socketOut"));
+        socket.setCallback(this);
+
+        //EV_INFO << "Inicializando AppBusDataCollectionTCP en stage " << stage << endl;
+        stateAssociationSignalId = registerSignal("stateAssociationSignal");
+
+        // buffer occupation
+        inputBufferSignal = registerSignal("inputBufferSize");
+        outputBufferSignal = registerSignal("outputBufferSize");
+        sdcardBufferSignal = registerSignal("sdcardBufferSize");
+
+        sdcardPercentSignal = registerSignal("sdcardPercentSize"); // state occupation buffer
+
+
+        timeWiFiWorking = registerSignal("timeWiFiStateON");    // time from connection
+        timeWiFiTransfer = registerSignal("timeWiFiTransferOK"); // time of transmission
+
+        packetSendTCPSignal = registerSignal("numMsgTCPSend"); // count packets sent
+
+    }
+
+    // look variables in real time
+    //WATCH(sdcardCount);
+    //WATCH(inputCount);
+    //WATCH(outputCount);
+
+
+
+}
+
+
+// ----------------------------------------------------------------------
+// 2. structure of signal for connection state with AP
+// ----------------------------------------------------------------------
+void AppBusDataCollectionTCP::receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details)
+{
+    EV_INFO << "INFO: receiveSignal: "<< l << endl;
+
+    if (signalID == stateAssociationSignalId) {
+        EV_INFO << "🟢 Señal RECIBIDA (Long): Disociado (sin AP). Valor: " << l << " Fuente: " << source->getFullPath() << endl;
+        ConnectionToAP = l;
+    }
+}
+
+// *****************************************************************
+// 3. functions on the application layers
+// *****************************************************************
+
+bool AppBusDataCollectionTCP::startApplication()
+{
+    // this function is like 'main fuction'
+    // here we can start timers
+    if (!Control_Task_Timer) {
+        // we are programming a message called 'controlTimer' it start a timer of 1 second,
+        // when this time finish it sent himself the message to 'handleMessage(cMessage *msg)'
+        Control_Task_Timer = new cMessage("Check_Tasks");
+        scheduleAt(simTime() + SimTime(100, SIMTIME_MS), Control_Task_Timer); // the GW REQUIRE MORE TIME TO RECOVER INITIALITATION VARIABLES VALUES
+    }
+
+    return true;
+}
+
+bool AppBusDataCollectionTCP::stopApplication()
+{
+    if (Control_Task_Timer) {
+        cancelAndDelete(Control_Task_Timer);
+        Control_Task_Timer = nullptr;
+    }
+
+    // Llama a la función stopApplication base
+    veins::VeinsInetApplicationBase::stopApplication();
+    return true;
+}
+
+void AppBusDataCollectionTCP::finish()
+{
+    // Llama a la función finish base
+    veins::VeinsInetApplicationBase::finish();
+
+    if (SignStateConnectAP != 0) {
+        cModule *wlanAgent = getParentModule()->findModuleByPath("wlan[0].agent");
+        if (wlanAgent) {
+             wlanAgent->unsubscribe(stateAssociationSignalId, this);
+        }
+    }
+}
+
+void AppBusDataCollectionTCP::processPacket(std::shared_ptr<inet::Packet> pk)
+{
+    // Lógica para procesar paquetes entrantes
+}
+
+
+
+void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
+{   // update variables in real time
+    //sdcardCount = sdcard.size();
+    //inputCount = inputBuffer.size();
+    //outputCount = outputBuffer.size();
+
+    if (msg->getArrivalGate() == gate("socketIn")) {
+
+        socket.processMessage(msg); // TCP management the message internally
+
+    }
+
+
+        if (msg->isSelfMessage()) {
+
+            if (msg == Control_Task_Timer) {
+
+                EV_INFO << "INFO: controlInterface: "<< ConnectionToAP << endl;
+                bool update_timer = true;
+
+
+                    if (SignStateConnectAP == 0) { // GW UNSUBSCRIBE >> try to subscriber
+
+                        subscriptionSignalState();
+
+                    }else if (SignStateConnectAP == 1) { // Subscribe to signal 'state connection AP'
+
+                        // recovery names from interfaces table
+                        interfaceTable = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
+                        wifi = interfaceTable->findInterfaceByName("wlan0");
+                        celular = interfaceTable->findInterfaceByName("cellular");
+
+                        scheduleAt(simTime() + SimTime(6, SIMTIME_S), Control_Task_Timer);
+                        SignStateConnectAP = 2;
+                        update_timer = false;
+
+                    }else if (SignStateConnectAP == 2) { // CONFIGURATION DATA RECOVERED GW READY
+
+                        if(!Vehicle_With_Interface){
+                            std::string vehicle = mobility->getExternalId();
+
+                            // check if vehicle from simulation is type Autobus
+                            if (vehicle.rfind("buses_cosenza.", 0) == 0) {
+                                getParentModule()->getDisplayString().setTagArg("i", 1, "red");
+                                Vehicle_With_Interface = true;
+                            }
+                        }
+
+                        //********** Start GPS get Dapa *********************************/
+                        if (!Control_GPS_Data) {
+                            // we are programming a message called 'controlTimer' it start a timer of 1 second,
+                            // when this time finish it sent himself the message to 'handleMessage(cMessage *msg)'
+                            Control_GPS_Data = new cMessage("Data_LAT_LONG");
+                            scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_GPS_Data); // the GW REQUIRE MORE TIME TO RECOVER INITIALITATION VARIABLES VALUES
+
+
+                        }
+
+                        //********* Start Collection Data *******************************/
+                        if(!Control_Data_Emission){
+
+                            Control_Data_Emission = new cMessage("Data_Co2_No2_So2");
+                            scheduleAt(simTime() + SimTime(5, SIMTIME_S), Control_Data_Emission);
+
+
+                        }
+
+                        //********* Start Get State Vehicle *****************************/
+                        if(!Control_Data_Vehicle){
+
+                            Control_Data_Vehicle = new cMessage("Data_Speed_Accel");
+                            scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
+
+
+                        }
+
+                        //********* Start Send Data to Cloud *****************************/
+                        if(!Control_Send_Data){
+
+                            Control_Send_Data = new cMessage("Sending_Data_to_Cloud");
+                            scheduleAt(simTime() + SimTime(30, SIMTIME_S), Control_Send_Data);
+
+
+                        }
+
+                        //*************** STABLISH CONNECTION TCP ****************************
+                        //stablishTCP();
+                        //--------------------------------------------------------------------
+
+                        SignStateConnectAP = 3;
+
+                    }else if (SignStateConnectAP == 3) { // GW check diferents tasks (void loop)
+
+                        int waiting_changing_x_10ms = 10;
+
+                        // 1. Interface control (Northbound)
+
+                        /****** select / Switch Interface ***************************/
+                        if(ConnectionToAP != ConnectionToAP_Pass){
+                            interfaceAvailable();
+                            socket_ready = false;
+                            socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
+                            socket_state_close = true;
+
+                            cancelEvent(Control_Send_Data); // STOP TIMER TO SEND DATA ON THE CLOUD
+
+                            ConnectionToAP_Pass = ConnectionToAP;
+                        }
+                        /**************************************************/
+
+                        if(socket_state_close){
+
+                           count_reTX++;
+                           EV_INFO <<"waiting for changes"<< count_reTX <<endl;
+
+                        }
+
+                        if(count_reTX >= (waiting_changing_x_10ms+1)){
+
+                            EV_INFO <<"try to open new socket"<<endl;
+
+                            if(count_reTX == (waiting_changing_x_10ms+1)){
+                                if(stablishTCP(ConnectionToAP)){
+                                    count_reTX = 0;// TCP configured wait for confirmation
+                                }else{
+                                    EV_WARN << "ERROR CREATING NEW SOCKET!!!, try again" << endl;
+                                    socket_state_close = true; // try again in the next cycle
+                                    count_reTX = waiting_changing_x_10ms;
+                                }
+                            }
+
+                            if(count_reTX >= (((waiting_changing_x_10ms*3))+1)){
+                                EV_WARN << "the count_reTX is overhead. STOP SIMULATION!!!" << endl;
+                                count_reTX = 0;
+                            }
+
+                        }
+
+
+                        if ((count_reTX >= (waiting_changing_x_10ms+2))&&(socket.getState() == inet::TcpSocket::CONNECTED)) {
+
+                            socket_state_close = false; // don't increase count
+                            count_reTX = 0; // restart counter.
+                            EV_WARN << "Socket Ready to SENT DATA: " << socket.getState() << endl;
+                            socket_ready = true;
+
+                        }
+
+                        /****** Sent Message to Cloud *********************/
+                        //sendDataToCloud(); // prepare and send message
+                        /**************************************************/
+
+
+                    }
+
+                    // 2. Reprogramar el timer (si es que quieres que controlInterface() se siga ejecutando cada 1s)
+                    if (update_timer) {
+
+                         //scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Task_Timer);
+                         scheduleAt(simTime() + SimTime(10, SIMTIME_MS), Control_Task_Timer);
+
+                    }
+
+            }else if (msg == Control_GPS_Data) {    // gettin position GPS with error N(0,σ)
+
+
+                    std::string vehicle = mobility->getExternalId();
+                    Coord pos = mobility->getCurrentPosition();
+                    Coord geo = convertXYtoLatLon(pos);
+
+                    double lat = geo.y;
+                    double lon = geo.x;
+
+        //            EV_INFO << std::fixed << std::setprecision(6)
+        //            << "LAT: " << lat
+        //            << " | LON: " << lon
+        //            << std::defaultfloat << endl;
+
+                    // ---------- Build format of DATA ------------
+                    std::vector<double> gps = {lat, lon};
+                    std::string data = buildDataString(gps);
+                    // --------------------------------------------
+
+                    EV_INFO << "NEW GPS" << data << endl;
+
+                    if (inputBuffer.add(data)) {
+                        // save buffer en SDCARD
+                        auto batch = inputBuffer.flush();
+                        sdcard.pushBatch(batch);
+                        EV_INFO << "SAVING LAST GPS" << endl;
+                    }
+
+                    // update the state of SDCARD % OCCUPATIONAL
+                    double currentBytes = (double)sdcard.getCurrentBytes();
+                    double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+
+                    if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+                    emit(sdcardPercentSignal, usagePercent);
+                    emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+
+
+                    emit(inputBufferSignal, inputBuffer.getCurrentBytes());
+
+
+                    scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_GPS_Data);
+
+
+            } else if (msg == Control_Data_Emission) {
+
+
+                    std::string vehicle = mobility->getExternalId();
+
+                    // Emissions
+                    double co2 = traciVehicle->getCO2Emissions();
+                    double co = traciVehicle->getCOEmissions();
+                    double nox = traciVehicle->getNOxEmissions();
+                    double pmx = traciVehicle->getPMxEmissions();
+
+                    // -------- OTHER TYPE SENSORS ----------------
+                     std::vector<double> sensor = {
+                         co2, co, nox, pmx
+                     };
+
+                     std::string data = buildDataString(sensor);
+                     // --------------------------------------------
+
+                     EV_INFO << "NEW POLLUTION" << data << endl;
+
+                     if (inputBuffer.add(data)) {
+                         // save buffer en SDCARD
+                         auto batch = inputBuffer.flush();
+                         sdcard.pushBatch(batch);
+                         EV_INFO << "SAVING LAST POLUTION" << endl;
+                     }
+                     // update the state of SDCARD % OCCUPATIONAL
+                     double currentBytes = (double)sdcard.getCurrentBytes();
+                     double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+
+                     if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+                     emit(sdcardPercentSignal, usagePercent);
+                     emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+
+
+
+                     emit(inputBufferSignal, inputBuffer.getCurrentBytes());
+
+
+                     scheduleAt(simTime() + SimTime(5, SIMTIME_S), Control_Data_Emission);
+
+
+            } else if (msg == Control_Data_Vehicle) {
+
+
+
+                    std::string vehicle = mobility->getExternalId();
+
+                    double speed = traciVehicle->getSpeed();
+                    double accel = traciVehicle->getAcceleration();
+                    double Decaccel = traciVehicle->getDeccel();
+                    double fuel = traciVehicle->getFuelConsumption();
+                    double time_trip = traciVehicle->getDistanceTravelled();
+
+
+                    // -------- OTHER TYPE SENSORS ----------------
+                     std::vector<double> sensor = {
+                         speed, accel, Decaccel, fuel, time_trip
+                     };
+
+                     std::string data = buildDataString(sensor);
+                     // --------------------------------------------
+
+                     EV_INFO << "NEW VEHICLE" << data << endl;
+
+                     if (inputBuffer.add(data)) {
+                         // save buffer en SDCARD
+                         auto batch = inputBuffer.flush();
+                         sdcard.pushBatch(batch);
+                         EV_INFO << "SAVING LAST VEHICLE" << endl;
+                     }
+                     // update the state of SDCARD % OCCUPATIONAL
+                     double currentBytes = (double)sdcard.getCurrentBytes();
+                     double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+
+                     if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+                     emit(sdcardPercentSignal, usagePercent);
+                     emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+
+
+                     emit(inputBufferSignal, inputBuffer.getCurrentBytes());
+
+
+                     scheduleAt(simTime() + SimTime(1, SIMTIME_S), Control_Data_Vehicle);
+
+
+            }else if (msg == Control_Send_Data) {
+
+                if(socket_ready){
+                    /****** Sent Message to Cloud *********************/
+                    sendDataToCloud(); // prepare and send message
+                    /**************************************************/
+                    if(ConnectionToAP){
+                        scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Send_Data); // LATENCY WIFI
+                    }else{
+                        scheduleAt(simTime() + SimTime(205, SIMTIME_MS), Control_Send_Data); // LATENCY LTE
+                    }
+                }
+
+            }else {
+                // Llama al manejo de mensajes base para mensajes del framework (paquetes, etc.)
+                veins::VeinsInetApplicationBase::handleMessage(msg);
+            }
+    }
+
+
+
+
+
+}
+
+
+void AppBusDataCollectionTCP::subscriptionSignalState(){
+
+    // subscription signal to get the state AP connection
+
+    EV_INFO << "Try Subscription to Signal AGENT..." << endl;
+
+    cModule *host = getParentModule();
+    cModule *wlanAgent = nullptr;
+
+    // 1. Obtener la ruta completa del MAC
+    std::string macPath = host->getFullPath() + ".wlan[0].agent";
+    wlanAgent = getSystemModule()->findModuleByPath(macPath.c_str());
+    if (wlanAgent) {
+
+        wlanAgent->subscribe(stateAssociationSignalId, this);
+
+        EV_INFO << "🟢 Suscripción exitosa a señales de gestión de asociación en " << wlanAgent->getFullPath() << endl;
+        SignStateConnectAP = 1; // flag to indicate subscription to signal 'stateAssociationSignalId' successful
+    } else {
+        // Reintentará en el siguiente ciclo del timer (cada 1s)
+        EV_WARN << "🟡 ADVERTENCIA: Módulo AGENT no encontrado. Reintentando en el siguiente ciclo." << endl;
+        //SignStateConnectAP = false;
+    }
+
+
+}
+
+
+// *****************************************************************
+// 4. FUNCIÓN DE CONTROL CON LÓGICA DE SUSCRIPCIÓN ROBUSTA
+// *****************************************************************
+
+void AppBusDataCollectionTCP::sendDataToCloud(){
+
+    if (socket.getState() != inet::TcpSocket::CONNECTED) {
+        EV_WARN << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
+
+        //stablishTCP();
+        return;
+    }
+
+    if(Vehicle_With_Interface){
+        // -------------- fill buffer OUTPUT AGAIN -----------------
+        if (outputBuffer.isEmpty()) {
+
+            auto batch = sdcard.popBatch(20);
+            outputBuffer.load(batch);
+
+        }
+
+        //if(ConnectionToAP){
+
+            if (outputBuffer.hasData()) {
+
+                // ------ create the packet -----------------
+                auto packet = new inet::Packet("accident_car_test_TCP");
+
+                std::string data = outputBuffer.getOne();
+
+                auto payload = makeShared<AirPollutionMessage>();
+                payload->setChunkLength(B(data.size())); // send X BYTES
+                payload->setRawPayload(data.c_str());
+                timestampPayload(payload);
+
+                packet->insertAtBack(payload);
+
+                socket.send(packet);
+
+                count_msg_TCP_send++;
+                emit(packetSendTCPSignal, count_msg_TCP_send);
+
+            }
+        //}
+    }
+
+
+}
+
+void AppBusDataCollectionTCP::interfaceAvailable(){
+
+    if(ConnectionToAP){
+        //------------------ start counter time --------------------
+        connectionWiFiStart = simTime();
+        //----------------------------------------------------------
+
+        coun_msg_sent++;
+        wifi->setState(NetworkInterface::State::UP);
+        celular->setState(NetworkInterface::State::DOWN);
+
+
+        EV_INFO << "CELLULAR disable → Using interfaz WIFI" << endl;
+
+        auto rt = check_and_cast<Ipv4RoutingTable*>(getModuleByPath("^.ipv4.routingTable"));
+
+        // delete default route previous
+        for (int i = rt->getNumRoutes() - 1; i >= 0; --i) {
+            auto route = rt->getRoute(i);
+            if (route->getDestination().isUnspecified()) {
+                rt->deleteRoute(route);
+            }
+        }
+
+        // we update the routing table with WIFI domain like GW
+        auto wlan0 = interfaceTable->findInterfaceByName("wlan0");
+        auto def = new Ipv4Route();
+        def->setDestination(Ipv4Address("0.0.0.0"));
+        def->setNetmask(Ipv4Address("0.0.0.0"));
+        def->setGateway(Ipv4Address("192.168.0.1"));
+        def->setInterface(wlan0);
+        def->setSourceType(Ipv4Route::MANUAL);
+        rt->addRoute(def);
+
+        EV_INFO << "Default route added via WIFI (gw=192.168.0.1)" << endl;
+
+    }else {
+
+        simtime_t duration = simTime() - connectionWiFiStart;
+
+        // Save only the connection is greater that;
+        if (duration > 1) { // time minimum to establish connection with WIFI ***** pain attention, really we must to check if there are connection
+            emit(timeWiFiWorking, duration.dbl()); // we Emit with double variable type
+            //EV_INFO << "Desconectado. Duración de la conexión: " << duration << " segundos." << endl;
+        }
+
+        celular->setState(NetworkInterface::State::UP);
+        wifi->setState(NetworkInterface::State::DOWN);
+        EV_INFO << "WiFi disable → Using interfaz celular" << endl;
+
+        auto rt = check_and_cast<Ipv4RoutingTable*>(getModuleByPath("^.ipv4.routingTable"));
+        auto interfaceTable = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
+
+        // limpiar default routes previas
+        for (int i = rt->getNumRoutes() - 1; i >= 0; --i) {
+            auto route = rt->getRoute(i);
+            if (route->getDestination().isUnspecified()) {
+                rt->deleteRoute(route);
+            }
+        }
+
+        // we update the routing table with cellular domain like GW
+        auto celular = interfaceTable->findInterfaceByName("cellular");
+        auto def = new Ipv4Route();
+        def->setDestination(Ipv4Address("0.0.0.0"));
+        def->setNetmask(Ipv4Address("0.0.0.0"));
+        def->setGateway(Ipv4Address("10.0.0.1"));
+        def->setInterface(celular);
+        def->setSourceType(Ipv4Route::MANUAL);
+        rt->addRoute(def);
+
+        EV_INFO << "Default route added via CELLULAR (gw=10.0.0.1)" << endl;
+
+    }
+
+}
+
+
+inet::Coord AppBusDataCollectionTCP::convertXYtoLatLon(inet::Coord pos)
+{
+    //------------ calibration successfull----------------------- ----------------
+    // it was maked because the 'mobility' object dont has the function (getCurrentPositionGeo)
+    double x_min = 0.0;
+    double y_min = 19063.42;    // traci recovery the position in way inverted
+    double x_max = 10989.02;
+    double y_max = 0.0;
+
+    double lon_min = 16.186100;
+    double lat_min = 39.234796;
+    double lon_max = 16.313759;
+    double lat_max = 39.408000;
+    //---------------------------------------------------------------------------------------------
+    //---------------  LAN and Long Calculation ---------------------------------------------------
+    double lon = lon_min + ((pos.x - x_min) * (lon_max - lon_min) / (x_max - x_min));
+    double lat = lat_min + ((pos.y - y_min) * (lat_max - lat_min) / (y_max - y_min));
+    // ------------------ Modelling GPS ERROR with a ----------------------------------------------
+    // ------------------ Normal Distribution  N(0,σ) ---------------------------------------------
+
+    double lon_pass = lon;
+    double lat_pass = lat;
+
+    lat += normal(0, sigma);
+    lon += normal(0, sigma);
+
+    // -------- calculate distance between GPS real and GPS error ---------------
+
+    /*const double R = 6371000.0;
+    const double PI = 3.14159265358979323846;
+
+    double lat1 = lat_pass * PI / 180.0;
+    double lat2 = lat * PI / 180.0;
+    double dLat = (lat - lat_pass) * PI / 180.0;
+    double dLon = (lon - lon_pass) * PI / 180.0;
+
+    // fórmula de Haversine
+    double a = sin(dLat/2) * sin(dLat/2) +
+               cos(lat1) * cos(lat2) *
+               sin(dLon/2) * sin(dLon/2);
+    double c = 2 * atan2(sqrt(a), sqrt(1-a));
+    double distance_m = R * c;
+
+    EV_INFO << "GPS ERROR ANALYSIS:" << endl;
+    EV_INFO << "   Real: (" << lat_pass << ", " << lon_pass << ")" << endl;
+    EV_INFO << "   With Error: (" << lat << ", " << lon << ")" << endl;
+    EV_INFO << "   Distance Delta: " << distance_m << " meters" << endl;*/
+    // ----------------------------------------------------------------------------
+
+
+
+    return inet::Coord(lon, lat);
+}
+
+bool AppBusDataCollectionTCP::stablishTCP(bool Use_Netwok)
+{
+    // Use_Network --> 0 (Cellular)
+    // Use_Network --> 1 (WIFI)
+
+    printSocketInfo();
+
+    // Destroy internal structure establish to TCP. it mean clean the socket
+    socket.renewSocket();
+
+    // we indicate the exit door
+    socket.setOutputGate(gate("socketOut"));
+
+    inet::L3Address localAddr;
+
+    //**************** this block no necessary **************************************
+    //**************** because this step was made in the start STAGE GW. ************
+    //**************** look it (SignStateConnectAP==2) ******************************
+    // getting IP from Wlan0 interface
+    ////wifi = interfaceTable->findInterfaceByName("wlan0");
+    // getting IP from cellular interface
+    ////celular = interfaceTable->findInterfaceByName("cellular");
+    //*******************************************************************************
+    const inet::Ipv4InterfaceData* ipv4Data = nullptr;
+
+    if(Use_Netwok){
+
+        ipv4Data = wifi->findProtocolData<inet::Ipv4InterfaceData>();
+        if (ipv4Data) {
+            localAddr = ipv4Data->getIPAddress();
+            EV_INFO << "IP from wlan0 : " << localAddr << endl;
+        }
+
+    }else {
+        ipv4Data = celular->findProtocolData<inet::Ipv4InterfaceData>();
+        if (ipv4Data) {
+            localAddr = ipv4Data->getIPAddress();
+            EV_INFO << "IP from cellular : " << localAddr << endl;
+        }
+    }
+
+
+    // Now we can bind the new socket using the new IP source device.
+    if (!localAddr.isUnspecified()) {
+        EV_INFO << "Bind socket using IP" << localAddr << endl;
+        socket.bind(localAddr, -1);
+    }else {
+        return false;
+    }
+
+    // we indicate the destination IP address and socket
+    inet::L3Address destAddress = inet::L3AddressResolver().resolve("15.0.0.1");
+    socket.connect(destAddress, 3000);
+
+    printSocketInfo();
+
+    return true;
+}
+
+void AppBusDataCollectionTCP::printSocketInfo() {
+    EV_INFO << "--- DATOS DEL SOCKET ACTUAL ---" << endl;
+    EV_INFO << "ID del Socket: " << socket.getSocketId() << endl;
+    EV_INFO << "Estado: " << socket.getState() << endl;
+
+    // Imprimir IP y Puerto local (a qué interfaz está atado)
+    EV_INFO << "Local Address: " << socket.getLocalAddress() << ":" << socket.getLocalPort() << endl;
+
+    // Imprimir IP y Puerto remoto (hacia dónde apunta)
+    EV_INFO << "Remote Address: " << socket.getRemoteAddress() << ":" << socket.getRemotePort() << endl;
+    EV_INFO << "-------------------------------" << endl;
+}
+
+
+
+
+//*********************************************************************************************
+//************* NEW METHODS TO HANDLE CONNECTION TCP ******************************************
+//*********************************************************************************************
+
+// --- Implementación de ICallback para evitar clase abstracta ---
+
+// --- En AppBusDataCollectionTCP.cc ---
+
+void AppBusDataCollectionTCP::socketDataArrived(inet::TcpSocket *socket, inet::Packet *packet, bool urgent) {
+    delete packet; // Liberar memoria
+}
+
+void AppBusDataCollectionTCP::socketAvailable(inet::TcpSocket *socket, inet::TcpAvailableInfo *availableInfo) {
+    delete availableInfo; // Liberar memoria si no se usa
+}
+
+void AppBusDataCollectionTCP::socketEstablished(inet::TcpSocket *socket) {
+    EV_INFO << "Conexión TCP establecida." << endl;
+    //ConnectionToAP = true;
+}
+
+void AppBusDataCollectionTCP::socketPeerClosed(inet::TcpSocket *socket) {
+    if (socket->getState() == inet::TcpSocket::CONNECTED) socket->close();
+}
+
+void AppBusDataCollectionTCP::socketClosed(inet::TcpSocket *socket) {
+    EV_INFO << "Conexión TCP cerrada." << endl;
+    //ConnectionToAP = false;
+}
+
+void AppBusDataCollectionTCP::socketFailure(inet::TcpSocket *socket, int code) {
+    EV_ERROR << "Error de socket TCP: " << code << endl;
+    //ConnectionToAP = false;
+}
+
+void AppBusDataCollectionTCP::socketStatusArrived(inet::TcpSocket *socket, inet::TcpStatusInfo *status) {
+    delete status;
+}
+
+void AppBusDataCollectionTCP::socketDeleted(inet::TcpSocket *socket) {
+    // No hacer nada o limpiar punteros si fuera necesario
+}
