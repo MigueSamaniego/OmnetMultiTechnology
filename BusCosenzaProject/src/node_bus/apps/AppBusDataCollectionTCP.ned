@@ -27,6 +27,39 @@ import org.car2x.veins.subprojects.veins_inet.VeinsInetApplicationBase;
 simple AppBusDataCollectionTCP extends VeinsInetApplicationBase
 {
     parameters:
+        
+        @display("i=block/app");
         @class(AppBusDataCollectionTCP);
+        
+        // Declaración de señales
+        @signal[inputBufferSize](type="long");
+        @signal[outputBufferSize](type="long");
+        @signal[sdcardBufferSize](type="long");
+    	@signal[sdcardPercentSize](type="double");
+    	
+    	// time connection with interfaces
+    	@signal[timeWiFiStateON](type="double");
+    	
+    	// Count udp messages sent
+    	@signal[numMsgTCPSend](type="int");
+    	
+    	
+        // Configuración de estadísticas para que se graben como vectores
+        @statistic[inputBufferSize](title="Input Buffer Size"; source="inputBufferSize"; record=vector,last);
+        @statistic[outputBufferSize](title="Output Buffer Size"; source="outputBufferSize"; record=vector,last);
+        @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last);
+		//@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
+		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=none);
+        
+        
+        @statistic[timeWiFiStateON](title= "WiFi connection duration"; source="timeWiFiStateON"; record=vector,last,mean; interpolationmode=none);
+        
+        
+        @statistic[numMsgTCPSend](title="TCP packet sent"; source="numMsgTCPSend"; record=vector,count,last);
+        
+        
+        
     gates:
+
+        
 }

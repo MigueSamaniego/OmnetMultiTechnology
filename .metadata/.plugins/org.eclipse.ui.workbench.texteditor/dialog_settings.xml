@@ -5,34 +5,34 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="sdcardBufferSize"/>
+		<item key="selection" value="configurator.config"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="sdcardBufferSize"/>
-			<item value="packetSendUDPSignal"/>
-			<item value="sdcardPercentSize"/>
-			<item value="10.00"/>
-			<item value="0.00"/>
-			<item value="timeWiFiStateON"/>
-			<item value="coun_msg_sent"/>
-			<item value="inputBufferSignal"/>
-			<item value="1.00"/>
-			<item value="HostAutoConfiguratorAP_M"/>
-			<item value="inet::HostAutoConfiguratorAP_M"/>
-			<item value="timeWiFiWorking"/>
-			<item value="sdcardPercentSignal"/>
+			<item value="configurator.config"/>
+			<item value="config"/>
+			<item value="stablishTCP"/>
+			<item value="    auto wlan0 = interfaceTable-&gt;findInterfaceByName(&quot;wlan0&quot;);"/>
+			<item value="interfaceTableModule"/>
+			<item value="stablishTCP()"/>
+			<item value="cerrando"/>
+			<item value="Conexión TCP establecida"/>
+			<item value="Intentando conectar por la nueva interfaz disponible"/>
 			<item value="sendDataToCloud"/>
-			<item value="EV_INFO"/>
+			<item value="interfaceAvailable"/>
+			<item value="Vehicle_With_Interface"/>
+			<item value="socket.connect"/>
+			<item value="socket.connect()"/>
+			<item value="numMsgTCPSend"/>
 		</list>
 		<list key="replacehistory">
+			<item value="AppBusDataCollectionTCP"/>
 			<item value="0.00"/>
 			<item value="10.00"/>
 			<item value="AppBusDataCollectionUDP"/>
-			<item value="AppBusDataCollectionTCP"/>
 			<item value="Control_Task_Timer"/>
 			<item value="SignStateConnectAP"/>
 			<item value=" AppBusDataCollectionUDP"/>
@@ -47,8 +47,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1250"/>
-		<item key="DIALOG_Y_ORIGIN" value="192"/>
+		<item key="DIALOG_X_ORIGIN" value="1199"/>
+		<item key="DIALOG_Y_ORIGIN" value="188"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

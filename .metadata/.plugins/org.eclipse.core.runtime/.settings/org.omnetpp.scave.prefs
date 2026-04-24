@@ -4,4 +4,5 @@ DataTable.SCALARS.Module.width=271
 DataTable.SCALARS.Name.width=291
 DataTable.VECTORS.Module.width=164
 DataTable.VECTORS.Name.width=261
+DataTable.VECTORS.Variance.width=163
 eclipse.preferences.version=1
