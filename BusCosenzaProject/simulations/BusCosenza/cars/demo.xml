@@ -14,4 +14,7 @@
     <route hosts="server" destination="10.0.0.0" netmask="255.255.0.0" gateway="router"/>
     <route hosts="router" destination="10.0.0.0" netmask="255.255.0.0" gateway="pgw"/>
     
+    <!-- Routing fix for packets on AP 
+    <route hosts="ap[*]" destination="0.0.0.0" netmask="0.0.0.0" gateway="router"/>/-->
+    
 </config>

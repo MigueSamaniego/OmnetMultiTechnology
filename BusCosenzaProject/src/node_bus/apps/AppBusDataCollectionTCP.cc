@@ -18,8 +18,9 @@
 
 #include "veins/modules/mobility/traci/TraCICoordinateTransformation.h"
 #include "inet/common/geometry/common/Coord.h"
-//#include "inet/common/geometry/common/Coord.h"
-//#include "inet/common/geometry/common/GeographicCoordinateSystem.h"
+
+#include "inet/common/packet/chunk/BytesChunk.h"
+
 
 #include "inet/common/Simsignals.h"
 
@@ -126,7 +127,7 @@ void AppBusDataCollectionTCP::initialize(int stage)
     // CALL INIZIALITATION BASE
     veins::VeinsInetApplicationBase::initialize(stage);
 
-
+    EV_INFO << "App BUS without Re-Try msg from server"<<endl;
 
     if (!initialized) {
         startTime = std::time(nullptr);
@@ -323,7 +324,7 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
 
                     }else if (SignStateConnectAP == 3) { // GW check diferents tasks (void loop)
 
-                        int waiting_changing_x_10ms = 10;
+                        int waiting_changing_x_10ms = 700;  // socket on arduino replay after 7-14s
 
                         // 1. Interface control (Northbound)
 
@@ -342,42 +343,42 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
 
                         if(socket_state_close){
 
-                           count_reTX++;
-                           EV_INFO <<"waiting for changes"<< count_reTX <<endl;
+                            // check timer to sent msg
+                            if (Control_Send_Data->isScheduled()) {
+                                cancelEvent(Control_Send_Data);
+                            }
 
+                            count_reTX++;
+                            if(count_reTX % 100 == 0) {
+                                EV_INFO << "En Cooldown... " << (count_reTX/100) << " segundos." << endl;
+                            }
                         }
 
-                        if(count_reTX >= (waiting_changing_x_10ms+1)){
+                        if(count_reTX >= (waiting_changing_x_10ms + 1)){
 
-                            EV_INFO <<"try to open new socket"<<endl;
-
-                            if(count_reTX == (waiting_changing_x_10ms+1)){
+                            if(count_reTX == (waiting_changing_x_10ms + 1)){
+                                EV_INFO << "Cooldown Timer/Backoff. trying open new socket" << endl;
                                 if(!stablishTCP(ConnectionToAP)){
-                                    EV_WARN << "ERROR CREATING NEW SOCKET!!!, try again" << endl;
-                                    socket_state_close = true; // try again in the next cycle
-                                    count_reTX = waiting_changing_x_10ms;
+                                    EV_WARN << "ERROR CREATING NEW SOCKET, retrying..." << endl;
+                                    count_reTX = 0;
                                 }
                             }
 
-                            if(count_reTX >= (((waiting_changing_x_10ms*3))+1)){    // llimitation to count for waiting changes
-                                EV_WARN << "the count_reTX is overhead. STOP SIMULATION!!!" << endl;
+
+                            if(count_reTX >= (waiting_changing_x_10ms + 500)){
+                                EV_WARN << "timeout waiting for response from the Server. Aborting and restarting cycle." << endl;
                                 count_reTX = 0;
                             }
-
                         }
 
-
-                        if ((count_reTX >= (waiting_changing_x_10ms+2))&&(socket.getState() == inet::TcpSocket::CONNECTED)) {
-                            socket_state_close = false; // don't increase count
-                            count_reTX = 0; // restart counter.
-                            EV_WARN << "Socket Ready to SENT DATA: "<< endl;
+                        if ((count_reTX >= (waiting_changing_x_10ms + 2)) && (socket.getState() == inet::TcpSocket::CONNECTED)) {
+                            socket_state_close = false;
+                            count_reTX = 0;
+                            EV_WARN << "Socket ready for send data." << endl;
                             socket_ready = true;
-                            scheduleAt(simTime() + SimTime(50, SIMTIME_MS), Control_Send_Data); // Start timer to call the function periodic to send data
-                        }
 
-                        /****** Sent Message to Cloud *********************/
-                        //sendDataToCloud(); // prepare and send message
-                        /**************************************************/
+                            scheduleAt(simTime() + SimTime(50, SIMTIME_MS), Control_Send_Data);
+                        }
 
 
                     }
@@ -386,7 +387,7 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                     if (update_timer) {
 
                          //scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Task_Timer);
-                         scheduleAt(simTime() + SimTime(10, SIMTIME_MS), Control_Task_Timer);
+                         scheduleAt(simTime() + SimTime(time_check_tasks, SIMTIME_MS), Control_Task_Timer);   // Check tasks
 
                     }
 
@@ -530,11 +531,13 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                     /****** Sent Message to Cloud *********************/
                     sendDataToCloud(); // prepare and send message
                     /**************************************************/
-                    if(ConnectionToAP){
-                        scheduleAt(simTime() + SimTime(163, SIMTIME_MS), Control_Send_Data); // LATENCY WIFI
-                    }else{
-                        scheduleAt(simTime() + SimTime(205, SIMTIME_MS), Control_Send_Data); // LATENCY LTE
-                    }
+
+                    int time_to_other_process = 5 + intrand(11); // Generate jitter Process other tasks to UC from 5 to 15
+
+                    int time_process_uc = time_check_tasks + time_to_other_process;
+
+                    scheduleAt(simTime() + SimTime(time_process_uc, SIMTIME_MS), Control_Send_Data); // LATENCY WIFI
+
                 }
 
             }else {
@@ -600,29 +603,26 @@ void AppBusDataCollectionTCP::sendDataToCloud(){
 
         }
 
-        //if(ConnectionToAP){
+        if (outputBuffer.hasData()) {
 
-            if (outputBuffer.hasData()) {
+            // ------ create the packet -----------------
+            auto packet = new inet::Packet("accident_car_test_TCP");
 
-                // ------ create the packet -----------------
-                auto packet = new inet::Packet("accident_car_test_TCP");
+            std::string data = outputBuffer.getOne();
 
-                std::string data = outputBuffer.getOne();
+            auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
 
-                auto payload = makeShared<AirPollutionMessage>();
-                payload->setChunkLength(B(data.size())); // send X BYTES
-                payload->setRawPayload(data.c_str());
-                timestampPayload(payload);
+            timestampPayload(payload);
 
-                packet->insertAtBack(payload);
+            packet->insertAtBack(payload);
 
-                socket.send(packet);
+            socket.send(packet);
 
-                count_msg_TCP_send++;
-                emit(packetSendTCPSignal, count_msg_TCP_send);
+            count_msg_TCP_send++;
+            emit(packetSendTCPSignal, count_msg_TCP_send);
 
-            }
-        //}
+        }
+
     }
 
 
@@ -729,7 +729,7 @@ inet::Coord AppBusDataCollectionTCP::convertXYtoLatLon(inet::Coord pos)
     double lon_pass = lon;
     double lat_pass = lat;
 
-    lat += normal(0, sigma);
+    lat += normal(0, sigma);// sigma = 0.00005;
     lon += normal(0, sigma);
 
     // -------- calculate distance between GPS real and GPS error ---------------
@@ -820,14 +820,12 @@ bool AppBusDataCollectionTCP::stablishTCP(bool Use_Netwok)
 }
 
 void AppBusDataCollectionTCP::printSocketInfo() {
-    EV_INFO << "--- DATOS DEL SOCKET ACTUAL ---" << endl;
-    EV_INFO << "ID del Socket: " << socket.getSocketId() << endl;
-    EV_INFO << "Estado: " << socket.getState() << endl;
+    EV_INFO << "--- Information of SOCKET current ---" << endl;
+    EV_INFO << "ID Socket: " << socket.getSocketId() << endl;
+    EV_INFO << "State: " << socket.getState() << endl;
 
-    // Imprimir IP y Puerto local (a qué interfaz está atado)
     EV_INFO << "Local Address: " << socket.getLocalAddress() << ":" << socket.getLocalPort() << endl;
 
-    // Imprimir IP y Puerto remoto (hacia dónde apunta)
     EV_INFO << "Remote Address: " << socket.getRemoteAddress() << ":" << socket.getRemotePort() << endl;
     EV_INFO << "-------------------------------" << endl;
 }
@@ -841,39 +839,57 @@ void AppBusDataCollectionTCP::printSocketInfo() {
 
 // --- Implementación de ICallback para evitar clase abstracta ---
 
-// --- En AppBusDataCollectionTCP.cc ---
-
 void AppBusDataCollectionTCP::socketDataArrived(inet::TcpSocket *socket, inet::Packet *packet, bool urgent) {
-    delete packet; // Liberar memoria
+    // extract the contents of the package
+    auto bytesChunk = packet->peekAllAsBytes();
+
+    // extract the bytes
+    std::vector<uint8_t> bytes = bytesChunk->getBytes();
+    // converter Bytes on Strings
+    std::string receivedMsg(bytes.begin(), bytes.end());
+
+    // print cmd
+    EV_INFO << "I should not receive msg from SERVER" << endl;
+
+    delete packet;
 }
 
 void AppBusDataCollectionTCP::socketAvailable(inet::TcpSocket *socket, inet::TcpAvailableInfo *availableInfo) {
+    //EV_INFO << "socker available 1." << endl;
     delete availableInfo; // Liberar memoria si no se usa
 }
 
 void AppBusDataCollectionTCP::socketEstablished(inet::TcpSocket *socket) {
-    EV_INFO << "Conexión TCP establecida." << endl;
-    //ConnectionToAP = true;
+    EV_INFO << "Connexion TCP successful." << endl;
 }
 
 void AppBusDataCollectionTCP::socketPeerClosed(inet::TcpSocket *socket) {
     if (socket->getState() == inet::TcpSocket::CONNECTED) socket->close();
+    socket_ready = false;
+    socket_state_close = true; // start cooldown
+    count_reTX = 0;
 }
 
 void AppBusDataCollectionTCP::socketClosed(inet::TcpSocket *socket) {
-    EV_INFO << "Conexión TCP cerrada." << endl;
-    //ConnectionToAP = false;
+    EV_INFO << "Connection TCP close." << endl;
+    socket_ready = false;
+    socket_state_close = true; // start cooldown
+    count_reTX = 0;
 }
 
 void AppBusDataCollectionTCP::socketFailure(inet::TcpSocket *socket, int code) {
-    EV_ERROR << "Error de socket TCP: " << code << endl;
-    //ConnectionToAP = false;
+    EV_ERROR << "Error socket TCP: " << code << " (Handover LTE)" << endl;
+    socket_ready = false;
+    socket_state_close = true; // start cooldown
+    count_reTX = 0;
 }
 
 void AppBusDataCollectionTCP::socketStatusArrived(inet::TcpSocket *socket, inet::TcpStatusInfo *status) {
+    EV_INFO << "socket status arrived" << endl;
     delete status;
 }
 
 void AppBusDataCollectionTCP::socketDeleted(inet::TcpSocket *socket) {
+    EV_INFO << "socket deleted." << endl;
     // No hacer nada o limpiar punteros si fuera necesario
 }

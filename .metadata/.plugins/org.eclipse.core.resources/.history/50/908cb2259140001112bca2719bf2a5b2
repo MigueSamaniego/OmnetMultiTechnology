@@ -1,0 +1,162 @@
+//
+// Copyright (C) 2004 OpenSim Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+//
+
+
+#include "inet/applications/tcpapp/TcpServerBusApp.h"
+
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/lifecycle/NodeStatus.h"
+#include "inet/common/packet/Message.h"
+#include "inet/common/socket/SocketTag_m.h"
+#include "inet/networklayer/common/L3AddressResolver.h"
+
+namespace inet {
+
+Define_Module(TcpServerBusApp);
+Define_Module(TcpServerBusAppThread);
+
+TcpServerBusApp::TcpServerBusApp()
+{
+}
+
+TcpServerBusApp::~TcpServerBusApp()
+{
+}
+
+void TcpServerBusApp::initialize(int stage)
+{
+    TcpServerHostApp::initialize(stage);
+
+    if (stage == INITSTAGE_LOCAL) {
+        bytesRcvd = 0;
+        WATCH(bytesRcvd);
+        EV_INFO << "TEST SERVER INITIALIZE" << endl;
+    }
+}
+
+void TcpServerBusApp::refreshDisplay() const
+{
+    EV_INFO << "TEST server refresh" << endl;
+    ApplicationBase::refreshDisplay();
+
+    char buf[160];
+    sprintf(buf, "threads: %d\nrcvd: %ld bytes", socketMap.size(), bytesRcvd);
+    getDisplayString().setTagArg("t", 0, buf);
+}
+
+void TcpServerBusApp::finish()
+{
+    EV_INFO << "TEST server finish" << endl;
+    TcpServerHostApp::finish();
+
+    recordScalar("bytesRcvd", bytesRcvd);
+}
+
+void TcpServerBusAppThread::initialize(int stage)
+{
+    EV_INFO << "TEST thread initialize" << endl;
+    TcpServerThreadBase::initialize(stage);
+
+    if (stage == INITSTAGE_LOCAL) {
+        bytesRcvd = 0;
+        WATCH(bytesRcvd);
+    }
+}
+
+void TcpServerBusAppThread::established()
+{
+    Enter_Method_Silent();
+
+    EV_INFO << "TEST thread establish" << endl;
+    bytesRcvd = 0;
+    lastDataTime = simTime(); // Tiempo actual de la simulación
+
+    // Crear y programar el primer disparo del timer
+    timeoutMsg = new cMessage("watchdog-timer");
+    scheduleAt(simTime() + 5.0, timeoutMsg);
+
+    EV_INFO << "Conexión establecida. Watchdog iniciado para T+5s." << endl;
+}
+
+void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
+{
+    lastDataTime = simTime(); // Reset del tiempo
+
+    EV_INFO << "TEST thread arrived" << endl;
+    long packetLength = pk->getByteLength();
+    bytesRcvd += packetLength;
+    sinkAppModule->bytesRcvd += packetLength;
+
+    emit(packetReceivedSignal, pk);
+    delete pk;
+}
+
+void TcpServerBusAppThread::refreshDisplay() const
+{
+    EV_INFO << "TEST thread refresh" << endl;
+    std::ostringstream os;
+    os << (sock ? TcpSocket::stateName(sock->getState()) : "NULL_SOCKET") << "\nrcvd: " << bytesRcvd << " bytes";
+    getDisplayString().setTagArg("t", 0, os.str().c_str());
+}
+
+void TcpServerBusAppThread::timerExpired(cMessage *msg)
+{
+    Enter_Method_Silent();
+
+    if (msg == timeoutMsg) {
+        simtime_t tiempoInactivo = simTime() - lastDataTime;
+
+        if (tiempoInactivo >= 4.9) {
+            // Si han pasado 5s o más sin datos...
+            EV_INFO << "Inactividad detectada (" << tiempoInactivo << "s). Cerrando socket." << endl;
+
+            timeoutMsg = nullptr; // Evitamos referencias huérfanas
+            delete msg;           // Borramos el mensaje porque no se reprogramará
+
+            if (sock) {
+                sock->abort();    // Cierre forzado (envía un RST al cliente si es posible)
+            }
+        }
+        else {
+            // Si recibió datos hace poco, reprogramamos el timer para el futuro
+            // El próximo chequeo será 5 segundos después del ÚLTIMO paquete recibido
+            scheduleAt(lastDataTime + 5.0, timeoutMsg);
+        }
+    } else {
+        delete msg; // Limpieza por seguridad si llegaran otros mensajes
+    }
+}
+
+void TcpServerBusAppThread::handleMessage(cMessage *msg)
+{
+    // Si el mensaje es un mensaje de sistema de TCP (paquetes, control)
+    if (msg->isSelfMessage()) {
+        // Es nuestro timer, lo mandamos a la función que ya escribiste
+        timerExpired(msg);
+    }
+    else {
+        // Si no es un self-message, es probable que sea un mensaje de control de TCP
+        // que debería manejar la clase base
+        TcpServerThreadBase::handleMessage(msg);
+    }
+}
+
+TcpServerBusAppThread::~TcpServerBusAppThread()
+{
+    // Si el timer sigue pendiente en el calendario de eventos, lo cancelamos y borramos
+
+    // clean msg only if msg exist
+    if (timeoutMsg) {
+        cancelAndDelete(timeoutMsg);
+    }
+}
+
+
+
+
+} // namespace inet
+

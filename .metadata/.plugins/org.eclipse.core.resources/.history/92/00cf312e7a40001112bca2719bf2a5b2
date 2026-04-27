@@ -1,0 +1,90 @@
+//
+// Copyright (C) 2004 OpenSim Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+//
+
+
+#include "inet/applications/tcpapp/TcpServerBusApp.h"
+
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/lifecycle/NodeStatus.h"
+#include "inet/common/packet/Message.h"
+#include "inet/common/socket/SocketTag_m.h"
+#include "inet/networklayer/common/L3AddressResolver.h"
+
+namespace inet {
+
+Define_Module(TcpServerBusApp);
+Define_Module(TcpServerBusAppThread);
+
+TcpServerBusApp::TcpServerBusApp()
+{
+}
+
+TcpServerBusApp::~TcpServerBusApp()
+{
+}
+
+void TcpServerBusApp::initialize(int stage)
+{
+    TcpServerHostApp::initialize(stage);
+
+    if (stage == INITSTAGE_LOCAL) {
+        bytesRcvd = 0;
+        WATCH(bytesRcvd);
+        EV_INFO << "TEST FROM TCP SERVER BUS APP" << endl;
+    }
+}
+
+void TcpServerBusApp::refreshDisplay() const
+{
+    ApplicationBase::refreshDisplay();
+
+    char buf[160];
+    sprintf(buf, "threads: %d\nrcvd: %ld bytes", socketMap.size(), bytesRcvd);
+    getDisplayString().setTagArg("t", 0, buf);
+}
+
+void TcpServerBusApp::finish()
+{
+    TcpServerHostApp::finish();
+
+    recordScalar("bytesRcvd", bytesRcvd);
+}
+
+void TcpServerBusAppThread::initialize(int stage)
+{
+    TcpServerThreadBase::initialize(stage);
+
+    if (stage == INITSTAGE_LOCAL) {
+        bytesRcvd = 0;
+        WATCH(bytesRcvd);
+    }
+}
+
+void TcpServerBusAppThread::established()
+{
+    bytesRcvd = 0;
+}
+
+void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
+{
+    long packetLength = pk->getByteLength();
+    bytesRcvd += packetLength;
+    sinkAppModule->bytesRcvd += packetLength;
+
+    emit(packetReceivedSignal, pk);
+    delete pk;
+}
+
+void TcpServerBusAppThread::refreshDisplay() const
+{
+    std::ostringstream os;
+    os << (sock ? TcpSocket::stateName(sock->getState()) : "NULL_SOCKET") << "\nrcvd: " << bytesRcvd << " bytes";
+    getDisplayString().setTagArg("t", 0, os.str().c_str());
+}
+
+} // namespace inet
+

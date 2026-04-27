@@ -5,30 +5,37 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="configurator.config"/>
+		<item key="selection" value="sendDataToCloud"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="configurator.config"/>
-			<item value="config"/>
-			<item value="stablishTCP"/>
-			<item value="    auto wlan0 = interfaceTable-&gt;findInterfaceByName(&quot;wlan0&quot;);"/>
-			<item value="interfaceTableModule"/>
-			<item value="stablishTCP()"/>
-			<item value="cerrando"/>
-			<item value="Conexión TCP establecida"/>
-			<item value="Intentando conectar por la nueva interfaz disponible"/>
 			<item value="sendDataToCloud"/>
-			<item value="interfaceAvailable"/>
-			<item value="Vehicle_With_Interface"/>
-			<item value="socket.connect"/>
-			<item value="socket.connect()"/>
-			<item value="numMsgTCPSend"/>
+			<item value="endToEndDelay"/>
+			<item value="time_process_uc"/>
+			<item value="TcpServerBusApp"/>
+			<item value="AppBusDataCollectionTCP"/>
+			<item value="contenido"/>
+			<item value="dataArrived"/>
+			<item value="socketDataArrived"/>
+			<item value="socket_state_close"/>
+			<item value="connect"/>
+			<item value="socketFailure"/>
+			<item value="AVAILABLE"/>
+			<item value="TcpAck"/>
+			<item value="TcpSck"/>
+			<item value="TcpSinkApp"/>
 		</list>
 		<list key="replacehistory">
+			<item value="TcpServerBusApp_R"/>
+			<item value="#ifndef __INET_TCPSERVERBUSAPP_H&#x0A;#define __INET_TCPSERVERBUSAPP_H"/>
+			<item value="AppBusDataCollectionTCP_R"/>
+			<item value="content"/>
+			<item value="TcpServerBusApp"/>
+			<item value="TcpSinkApp"/>
+			<item value="TcpSinkAppServer"/>
 			<item value="AppBusDataCollectionTCP"/>
 			<item value="0.00"/>
 			<item value="10.00"/>
@@ -37,18 +44,11 @@
 			<item value="SignStateConnectAP"/>
 			<item value=" AppBusDataCollectionUDP"/>
 			<item value=" "/>
-			<item value="*.bus[*]"/>
-			<item value="**.BusGW"/>
-			<item value="wlanAgent"/>
-			<item value="Ieee80211MacM"/>
-			<item value="AppBusDataCollection"/>
-			<item value="bus"/>
-			<item value="ap"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1199"/>
-		<item key="DIALOG_Y_ORIGIN" value="188"/>
+		<item key="DIALOG_X_ORIGIN" value="1257"/>
+		<item key="DIALOG_Y_ORIGIN" value="179"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

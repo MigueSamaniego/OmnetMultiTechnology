@@ -58,6 +58,8 @@ OBJS = \
     $O/inet/applications/tcpapp/TcpEchoApp.o \
     $O/inet/applications/tcpapp/TcpGenericServerApp.o \
     $O/inet/applications/tcpapp/TcpGenericServerThread.o \
+    $O/inet/applications/tcpapp/TcpServerBusApp.o \
+    $O/inet/applications/tcpapp/TcpServerBusApp_R.o \
     $O/inet/applications/tcpapp/TcpServerHostApp.o \
     $O/inet/applications/tcpapp/TcpServerListener.o \
     $O/inet/applications/tcpapp/TcpServerSocketIo.o \

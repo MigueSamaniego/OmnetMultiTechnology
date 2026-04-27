@@ -1,0 +1,127 @@
+//
+// Copyright (C) 2004 OpenSim Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+//
+
+
+#include "inet/applications/tcpapp/TcpSinkAppServer.h"
+
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/lifecycle/NodeStatus.h"
+#include "inet/common/packet/Message.h"
+#include "inet/common/socket/SocketTag_m.h"
+#include "inet/networklayer/common/L3AddressResolver.h"
+
+namespace inet {
+
+Define_Module(TcpSinkAppServer);
+Define_Module(TcpSinkAppServerThread);
+
+TcpSinkAppServer::TcpSinkAppServer()
+{
+}
+
+TcpSinkAppServer::~TcpSinkAppServer()
+{
+}
+
+void TcpSinkAppServer::initialize(int stage)
+{
+    TcpServerHostApp::initialize(stage);
+
+    if (stage == INITSTAGE_LOCAL) {
+        bytesRcvd = 0;
+        WATCH(bytesRcvd);
+    }
+    EV << "!!!!!!!!!!!Test file modifire!!!!!!!!." << endl;
+}
+
+void TcpSinkAppServer::refreshDisplay() const
+{
+    ApplicationBase::refreshDisplay();
+
+    char buf[160];
+    sprintf(buf, "threads: %d\nrcvd: %ld bytes", socketMap.size(), bytesRcvd);
+    getDisplayString().setTagArg("t", 0, buf);
+}
+
+void TcpSinkAppServer::finish()
+{
+    TcpServerHostApp::finish();
+
+    recordScalar("bytesRcvd", bytesRcvd);
+}
+
+void TcpSinkAppServerThread::initialize(int stage)
+{
+    TcpServerThreadBase::initialize(stage);
+
+    if (stage == INITSTAGE_LOCAL) {
+        bytesRcvd = 0;
+        WATCH(bytesRcvd);
+    }
+}
+
+void TcpSinkAppServerThread::established()
+{
+    bytesRcvd = 0;
+
+    lastDataTime = simTime();
+
+    // creat and programmer the new time/out
+    timeoutMsg = new cMessage("time_out_socket");
+    EV << "Timer to Socket Started: "<< lastDataTime << endl;
+    scheduleAt(simTime() + 5.0, timeoutMsg);
+
+}
+
+void TcpSinkAppServerThread::dataArrived(Packet *pk, bool urgent)
+{
+    lastDataTime = simTime();
+
+    //// 1. Extract the data from msg
+    //auto appPkt = pk->peekAtFront<GenericAppMsg>();
+    //// 2. Save data for post-process
+    //EV << "Received from Bus: " << appPkt->getChunkLength() << " bytes." << endl;
+
+    // 3. update statistics
+    long packetLength = pk->getByteLength();
+    bytesRcvd += packetLength;
+    sinkAppModule->bytesRcvd += packetLength;
+
+    emit(packetReceivedSignal, pk);
+
+    // 4. Destroy msg (clean packet)
+    delete pk;
+
+}
+
+void TcpSinkAppServerThread::refreshDisplay() const
+{
+    std::ostringstream os;
+    os << (sock ? TcpSocket::stateName(sock->getState()) : "NULL_SOCKET") << "\nrcvd: " << bytesRcvd << " bytes";
+    getDisplayString().setTagArg("t", 0, os.str().c_str());
+}
+
+
+void TcpSinkAppServerThread::timerExpired(cMessage *msg) {
+    if (msg == timeoutMsg) {
+        if (simTime() - lastDataTime >= 5.0) {
+            EV << "Inactividad detectada. Cerrando socket del vehículo." << endl;
+
+            timeoutMsg = nullptr;
+            delete msg;
+
+            sock->abort(); // Cerramos el socket violentamente para limpiar el server
+        } else {
+            EV << "Update timeOut TO MANTEIN DATA." << endl;
+            scheduleAt(lastDataTime + 5.0, timeoutMsg);
+        }
+    }
+}
+
+
+} // namespace inet
+
