@@ -5,30 +5,31 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="sendDataToCloud"/>
+		<item key="selection" value="CurrentBytes"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="sendDataToCloud"/>
-			<item value="endToEndDelay"/>
-			<item value="time_process_uc"/>
-			<item value="TcpServerBusApp"/>
-			<item value="AppBusDataCollectionTCP"/>
-			<item value="contenido"/>
-			<item value="dataArrived"/>
-			<item value="socketDataArrived"/>
-			<item value="socket_state_close"/>
-			<item value="connect"/>
-			<item value="socketFailure"/>
-			<item value="AVAILABLE"/>
-			<item value="TcpAck"/>
-			<item value="TcpSck"/>
-			<item value="TcpSinkApp"/>
+			<item value="load"/>
+			<item value="CurrentBytes"/>
+			<item value="currentBytes"/>
+			<item value="packetReceiveServerTCPSignal"/>
+			<item value="numMsgTCPReceiveServer"/>
+			<item value="registerSignal"/>
+			<item value="registe"/>
+			<item value="packetReceived"/>
+			<item value="sdcardPercentSignal"/>
+			<item value="count_msg_TCP_send"/>
+			<item value="numMsgTCPSend"/>
+			<item value="sdcardBufferSignal"/>
+			<item value="outputBufferSignal"/>
+			<item value="count_reTX"/>
+			<item value="Retry_Sent"/>
 		</list>
 		<list key="replacehistory">
+			<item value="packetReceiveServerTCPSignal"/>
 			<item value="TcpServerBusApp_R"/>
 			<item value="#ifndef __INET_TCPSERVERBUSAPP_H&#x0A;#define __INET_TCPSERVERBUSAPP_H"/>
 			<item value="AppBusDataCollectionTCP_R"/>
@@ -43,12 +44,11 @@
 			<item value="Control_Task_Timer"/>
 			<item value="SignStateConnectAP"/>
 			<item value=" AppBusDataCollectionUDP"/>
-			<item value=" "/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1257"/>
-		<item key="DIALOG_Y_ORIGIN" value="179"/>
+		<item key="DIALOG_X_ORIGIN" value="956"/>
+		<item key="DIALOG_Y_ORIGIN" value="606"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

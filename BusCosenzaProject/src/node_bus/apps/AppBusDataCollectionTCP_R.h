@@ -25,14 +25,14 @@ protected:
 
     simsignal_t stateAssociationSignalId;
 
-
-
 private:
     bool Vehicle_With_Interface = false;
     int coun_msg_sent = 0;
 
     int time_check_tasks = 10;
     int Retry_Sent = 0;
+
+    int Adaptative_TCP = 1000;
 
     std::string lastMessageSent; // used to maintein last string sent
 
@@ -93,7 +93,10 @@ private:
 
 
     simsignal_t packetSendTCPSignal;
+    simsignal_t packetReceiveTCPSignal;
+
     int count_msg_TCP_send = 0;
+    int count_msg_TCP_receive = 0;
 
     int test_color = 0;
 

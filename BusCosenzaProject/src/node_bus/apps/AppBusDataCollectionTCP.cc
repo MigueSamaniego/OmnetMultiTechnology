@@ -427,7 +427,7 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                     if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
 
                     emit(sdcardPercentSignal, usagePercent);
-                    emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+                    emit(sdcardBufferSignal, currentBytes);
 
 
                     emit(inputBufferSignal, inputBuffer.getCurrentBytes());
@@ -470,7 +470,7 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                      if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
 
                      emit(sdcardPercentSignal, usagePercent);
-                     emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+                     emit(sdcardBufferSignal, currentBytes);
 
 
 
@@ -516,7 +516,7 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                      if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
 
                      emit(sdcardPercentSignal, usagePercent);
-                     emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+                     emit(sdcardBufferSignal, currentBytes);
 
 
                      emit(inputBufferSignal, inputBuffer.getCurrentBytes());
@@ -601,9 +601,7 @@ void AppBusDataCollectionTCP::sendDataToCloud(){
             auto batch = sdcard.popBatch(20);
             outputBuffer.load(batch);
 
-        }
-
-        if (outputBuffer.hasData()) {
+        }else{
 
             // ------ create the packet -----------------
             auto packet = new inet::Packet("accident_car_test_TCP");
@@ -619,9 +617,22 @@ void AppBusDataCollectionTCP::sendDataToCloud(){
             socket.send(packet);
 
             count_msg_TCP_send++;
-            emit(packetSendTCPSignal, count_msg_TCP_send);
+
 
         }
+
+
+        emit(packetSendTCPSignal, count_msg_TCP_send);
+
+        emit(outputBufferSignal, outputBuffer.getCurrentBytes());
+
+        double currentBytes = (double)sdcard.getCurrentBytes();
+        double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+
+        if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+        emit(sdcardPercentSignal, usagePercent);
+        emit(sdcardBufferSignal, currentBytes);
 
     }
 

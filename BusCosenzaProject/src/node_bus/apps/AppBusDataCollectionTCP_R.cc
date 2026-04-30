@@ -111,7 +111,9 @@ AppBusDataCollectionTCP_R::AppBusDataCollectionTCP_R()
     Control_Data_Vehicle = nullptr;
     Control_Send_Data = nullptr;
     count_msg_TCP_send = 0;
+    count_msg_TCP_receive = 0;
     Retry_Sent = 0;
+    lastMessageSent.clear();    // last msg sent to cloud
 
 }
 
@@ -157,6 +159,13 @@ void AppBusDataCollectionTCP_R::initialize(int stage)
         timeWiFiTransfer = registerSignal("timeWiFiTransferOK"); // time of transmission
 
         packetSendTCPSignal = registerSignal("numMsgTCPSend"); // count packets sent
+        packetReceiveTCPSignal = registerSignal("numMsgTCPReceive"); // count packets sent
+
+        // START SDCAR FILL TO 50%
+        int memory_start_with = 50;
+        sdcard.preloadHalf(memory_start_with);
+
+        EV_INFO << "SDCard pre-cargada con " << sdcard.size() << " mensajes. "<< memory_start_with << "% of Capacity" << endl;
 
     }
 
@@ -336,9 +345,6 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
                             socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
                             socket_state_close = true;
 
-                            if(Retry_Sent > 0)  //if is detected a change interface and retry it was great that 0 insure retay again
-                                Retry_Sent = 1;
-
                             if (Control_Send_Data->isScheduled()) {
                                 cancelEvent(Control_Send_Data); // STOP TIMER TO SEND DATA ON THE CLOUD
                             }
@@ -356,7 +362,7 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
 
                             count_reTX++;
                             if(count_reTX % 100 == 0) {
-                                EV_INFO << "En Cooldown... " << (count_reTX/100) << " segundos." << endl;
+                                EV_INFO << "Cooldown... " << (count_reTX/100) << " Seconds." << endl;
                             }
                         }
 
@@ -382,6 +388,9 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
                             count_reTX = 0;
                             EV_WARN << "Socket ready for send data." << endl;
                             socket_ready = true;
+
+                            if(Retry_Sent > 0)  //if was detected Socket re-open and the last message it was not delivery
+                                Retry_Sent = 1;
 
                             scheduleAt(simTime() + SimTime(50, SIMTIME_MS), Control_Send_Data);
                         }
@@ -428,11 +437,10 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
                     // update the state of SDCARD % OCCUPATIONAL
                     double currentBytes = (double)sdcard.getCurrentBytes();
                     double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
-
                     if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
 
+                    emit(sdcardBufferSignal, currentBytes);
                     emit(sdcardPercentSignal, usagePercent);
-                    emit(sdcardBufferSignal, sdcard.getCurrentBytes());
 
 
                     emit(inputBufferSignal, inputBuffer.getCurrentBytes());
@@ -471,11 +479,10 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
                      // update the state of SDCARD % OCCUPATIONAL
                      double currentBytes = (double)sdcard.getCurrentBytes();
                      double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
-
                      if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
 
+                     emit(sdcardBufferSignal, currentBytes);
                      emit(sdcardPercentSignal, usagePercent);
-                     emit(sdcardBufferSignal, sdcard.getCurrentBytes());
 
 
 
@@ -517,11 +524,10 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
                      // update the state of SDCARD % OCCUPATIONAL
                      double currentBytes = (double)sdcard.getCurrentBytes();
                      double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
-
                      if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
 
-                     emit(sdcardPercentSignal, usagePercent);
-                     emit(sdcardBufferSignal, sdcard.getCurrentBytes());
+                     emit(sdcardBufferSignal, currentBytes);
+                     emit(sdcardPercentSignal, usagePercent);;
 
 
                      emit(inputBufferSignal, inputBuffer.getCurrentBytes());
@@ -538,7 +544,10 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
                         /****** Sent Message to Cloud *********************/
                         sendDataToCloud(); // prepare and send message
                         /**************************************************/
+
                     }else if((Retry_Sent >= 1)&&(Retry_Sent < 4)) {
+
+                            Adaptative_TCP = 1000;
 
                             // resent data on RAM
                             auto packet = new inet::Packet("accident_car_test_TCP");
@@ -559,7 +568,8 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
 
                     }else if(Retry_Sent >= 4) {
 
-                        Retry_Sent = 1; // pain attention when it reconnect it should send the last msg
+                        //Retry_Sent = 1; // pain attention when it reconnect it should send the last msg
+                        EV_ERROR << "cerrando socket el contado de mensajes no debe aumentar: " << count_msg_TCP_send << endl;
 
                         // ************** try to reconnect **************
                         socket_ready = false;
@@ -569,7 +579,16 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
 
                     }
 
-                    scheduleAt(simTime() + SimTime(2, SIMTIME_S), Control_Send_Data); // time-out without response
+                    EV_INFO << "number of msg send: " << count_msg_TCP_send << endl;
+
+                    // llimit to Adaptative_TCP
+                    if (Adaptative_TCP < 500)//100
+                        Adaptative_TCP = 500;
+
+                    if (Adaptative_TCP > 1000)//500
+                        Adaptative_TCP = 1000;
+
+                    scheduleAt(simTime() + SimTime(2000, SIMTIME_MS), Control_Send_Data); // time-out without response
                 }
 
             }else {
@@ -620,8 +639,7 @@ void AppBusDataCollectionTCP_R::subscriptionSignalState(){
 void AppBusDataCollectionTCP_R::sendDataToCloud(){
 
     if (socket.getState() != inet::TcpSocket::CONNECTED) {
-        EV_WARN << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
-
+        EV_ERROR << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
         //stablishTCP();
         return;
     }
@@ -631,17 +649,21 @@ void AppBusDataCollectionTCP_R::sendDataToCloud(){
         if (outputBuffer.isEmpty()) {
 
             auto batch = sdcard.popBatch(20);
+
             outputBuffer.load(batch);
 
-        }
+            // aqui va el timer SDCARD
+            //if(batch > 0){
+                //active timer to blocked system
+            //}
 
-        if (outputBuffer.hasData()) {
+        }else {
 
             // ------ create the packet -----------------
             auto packet = new inet::Packet("accident_car_test_TCP");
 
             std::string data = outputBuffer.getOne();
-            EV_ERROR << "SEND next DATA NUMBER: " << Retry_Sent << endl;
+            //EV_WARN << "SEND next DATA NUMBER: " << Retry_Sent << endl;
             lastMessageSent = data;
             Retry_Sent++;
 
@@ -654,9 +676,11 @@ void AppBusDataCollectionTCP_R::sendDataToCloud(){
             socket.send(packet);
 
             count_msg_TCP_send++;
-            emit(packetSendTCPSignal, count_msg_TCP_send);
+
 
         }
+
+        emit(packetSendTCPSignal, count_msg_TCP_send);
 
     }
 
@@ -885,23 +909,44 @@ void AppBusDataCollectionTCP_R::socketDataArrived(inet::TcpSocket *socket, inet:
     std::string receivedMsg(bytes.begin(), bytes.end());
 
     // print cm
-    EV_INFO << "🟢 msg received successful payload: [" << receivedMsg << "]" << endl;
+    EV_INFO << "🟢 msg received: [" << receivedMsg << "]" << endl;
+    EV_INFO << "🟢 msg hoppe: [" << lastMessageSent << "]" << endl;
 
-    // 5. Ahora puedes usar un 'if' para tomar decisiones basadas en lo que te dijo el servidor
+
     if (receivedMsg == lastMessageSent) {
+
+        Adaptative_TCP -= 100; // timeout reduce to minimmun
+
+        count_msg_TCP_receive++;
 
         lastMessageSent.clear();
 
-        EV_INFO << "Echo receive OK." << endl;
+        EV_INFO << "Echo received number: " << count_msg_TCP_receive << endl;
         Retry_Sent = 0; // send next message
 
         if (Control_Send_Data->isScheduled()) {
             cancelEvent(Control_Send_Data);
         }
 
+        // update signals just if data it was received for the server
+        emit(outputBufferSignal, outputBuffer.getCurrentBytes());
+
+        double currentBytes = (double)sdcard.getCurrentBytes();
+        double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+        if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+        emit(sdcardBufferSignal, currentBytes);
+        emit(sdcardPercentSignal, usagePercent);
+
+
+
         scheduleAt(simTime() + SimTime(10, SIMTIME_MS), Control_Send_Data); // LATENCY tasks before to sent the next data
 
+
+
     }
+
+    emit(packetReceiveTCPSignal, count_msg_TCP_receive);
 
     // 6. Finalmente, liberar la memoria del paquete entrante
     delete packet;

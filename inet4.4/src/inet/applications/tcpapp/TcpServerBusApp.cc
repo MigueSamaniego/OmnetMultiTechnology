@@ -29,6 +29,9 @@ TcpServerBusApp::~TcpServerBusApp()
 {
 }
 
+
+simsignal_t TcpServerBusApp::packetReceiveServerTCPSignal = registerSignal("numMsgTCPReceiveServer");
+
 void TcpServerBusApp::initialize(int stage)
 {
     TcpServerHostApp::initialize(stage);
@@ -37,6 +40,9 @@ void TcpServerBusApp::initialize(int stage)
         bytesRcvd = 0;
         WATCH(bytesRcvd);
         EV_INFO << "App SERVER without Re-Try msg"<<endl;
+
+        global_msg_counter = 0;
+
     }
 }
 
@@ -114,6 +120,11 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
 
     emit(packetReceivedSignal, pk);
     delete pk; // clear packet, its not more necessary
+
+    int currentCount = sinkAppModule->incrementMsgCounter();
+
+    sinkAppModule->emit(TcpServerBusApp::packetReceiveServerTCPSignal, currentCount);
+
 }
 
 void TcpServerBusAppThread::refreshDisplay() const

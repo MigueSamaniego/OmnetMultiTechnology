@@ -63,6 +63,27 @@ public:
 
         return total;
     }
+
+    // Método para precargar el 50% de la capacidad
+    void preloadHalf(int percent) {
+
+        int half = 0;
+
+        if(percent >  100) percent = 100;
+
+        half = (percent*MAX)/100;
+
+
+        for (int i = 0; i < half; i++) {
+            // Creamos un dato ficticio con formato similar al tuyo
+            // Ejemplo: "PRELOADED_DATA_TIMESTAMP_XXX"
+            std::string dummyData = "1970-01-01-00-00/00.000/00.000/$";
+
+            buffer[head] = dummyData;
+            head = (head + 1) % MAX;
+            count++;
+        }
+    }
 };
 
 class InputBuffer {

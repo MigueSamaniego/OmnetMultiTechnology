@@ -19,8 +19,14 @@ module TcpServerBusApp extends TcpServerHostApp
         serverThreadModuleType = default("inet.applications.tcpapp.TcpServerBusAppThread");
         @class(TcpServerBusApp);
         @display("i=block/sink");
+        
+        @signal[numMsgTCPReceiveServer](type="int");
+        
+        
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none; checkSignals=false);
         @statistic[endToEndDelay](title="end-to-end delay"; source="dataAge(packetReceived)"; unit=s; record=histogram,weightedHistogram,vector; interpolationmode=none; checkSignals=false);
+
+		@statistic[numMsgTCPReceiveServer](title="TCP packet received on server"; source="numMsgTCPReceiveServer"; record=vector,count,last);
 }
 
 simple TcpServerBusAppThread

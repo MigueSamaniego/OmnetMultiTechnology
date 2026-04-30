@@ -42,6 +42,7 @@ simple AppBusDataCollectionTCP_R extends VeinsInetApplicationBase
     	
     	// Count udp messages sent
     	@signal[numMsgTCPSend](type="int");
+    	@signal[numMsgTCPReceive](type="int");
     	
     	
         // Configuración de estadísticas para que se graben como vectores
@@ -56,6 +57,7 @@ simple AppBusDataCollectionTCP_R extends VeinsInetApplicationBase
         
         
         @statistic[numMsgTCPSend](title="TCP packet sent"; source="numMsgTCPSend"; record=vector,count,last);
+        @statistic[numMsgTCPReceive](title="TCP packet received"; source="numMsgTCPReceive"; record=vector,count,last);
         
         
         

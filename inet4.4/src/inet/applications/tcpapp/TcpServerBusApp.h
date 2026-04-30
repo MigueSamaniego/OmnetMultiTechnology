@@ -24,6 +24,10 @@ class INET_API TcpServerBusApp : public TcpServerHostApp
   protected:
     long bytesRcvd = 0;
 
+  public:
+      static simsignal_t packetReceiveServerTCPSignal;
+      int global_msg_counter = 0;
+
   protected:
     virtual void initialize(int stage) override;
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -31,6 +35,8 @@ class INET_API TcpServerBusApp : public TcpServerHostApp
     virtual void refreshDisplay() const override;
 
     void removeBusThread(TcpServerThreadBase *thread);
+
+    int incrementMsgCounter() { return ++global_msg_counter; }
 
   public:
     TcpServerBusApp();
@@ -47,6 +53,8 @@ class INET_API TcpServerBusAppThread : public TcpServerThreadBase
 
     cMessage *timeoutMsg = nullptr;
     simtime_t lastDataTime;
+
+    int count_msg_received_on_server = 0;
 
   public:
     // Destructor to clean socket if it was closed
