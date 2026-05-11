@@ -5,30 +5,33 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="CurrentBytes"/>
+		<item key="selection" value="interfaceAvailable"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="load"/>
-			<item value="CurrentBytes"/>
-			<item value="currentBytes"/>
-			<item value="packetReceiveServerTCPSignal"/>
-			<item value="numMsgTCPReceiveServer"/>
-			<item value="registerSignal"/>
-			<item value="registe"/>
-			<item value="packetReceived"/>
-			<item value="sdcardPercentSignal"/>
-			<item value="count_msg_TCP_send"/>
-			<item value="numMsgTCPSend"/>
-			<item value="sdcardBufferSignal"/>
-			<item value="outputBufferSignal"/>
-			<item value="count_reTX"/>
-			<item value="Retry_Sent"/>
+			<item value="interfaceAvailable"/>
+			<item value="Eth10G"/>
+			<item value="Ipv4NetworkLayer"/>
+			<item value="Adaptative_TCP"/>
+			<item value="smoothing_Factor"/>
+			<item value="last_RTT_ms"/>
+			<item value="timer_Control_Send_Data"/>
+			<item value="packetReceiveTCPSignal"/>
+			<item value="numMsgTCPReceive"/>
+			<item value="numMsgTCP"/>
+			<item value="socket_ready"/>
+			<item value="AppBusTCP_R_StateM"/>
+			<item value="inputBufferSignal"/>
+			<item value="connectionWiFiStart"/>
+			<item value="startTime"/>
 		</list>
 		<list key="replacehistory">
+			<item value="AppBusTCP_StateM"/>
+			<item value="AppBusTCP_R_StateM"/>
+			<item value="time_threshold_send_data"/>
 			<item value="packetReceiveServerTCPSignal"/>
 			<item value="TcpServerBusApp_R"/>
 			<item value="#ifndef __INET_TCPSERVERBUSAPP_H&#x0A;#define __INET_TCPSERVERBUSAPP_H"/>
@@ -41,14 +44,11 @@
 			<item value="0.00"/>
 			<item value="10.00"/>
 			<item value="AppBusDataCollectionUDP"/>
-			<item value="Control_Task_Timer"/>
-			<item value="SignStateConnectAP"/>
-			<item value=" AppBusDataCollectionUDP"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="956"/>
-		<item key="DIALOG_Y_ORIGIN" value="606"/>
+		<item key="DIALOG_X_ORIGIN" value="1229"/>
+		<item key="DIALOG_Y_ORIGIN" value="202"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

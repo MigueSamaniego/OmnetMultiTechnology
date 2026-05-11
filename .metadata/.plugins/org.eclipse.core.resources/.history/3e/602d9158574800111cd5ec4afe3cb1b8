@@ -1,0 +1,70 @@
+//
+// Copyright (C) 2018 Christoph Sommer <sommer@ccs-labs.org>
+//
+// Documentation for these modules is at http://veins.car2x.org/
+//
+// SPDX-License-Identifier: GPL-2.0-or-later
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+
+package src.node_bus.apps;
+
+import org.car2x.veins.subprojects.veins_inet.VeinsInetApplicationBase;
+
+simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
+{
+    parameters:
+        
+        @display("i=block/app");
+        @class(AppBusTCP_R_StateM);
+        
+        // Declaración de señales
+        @signal[inputBufferSize](type="long");
+        @signal[outputBufferSize](type="long");
+        @signal[sdcardBufferSize](type="long");
+    	@signal[sdcardPercentSize](type="double");
+    	
+    	// time connection with interfaces
+    	@signal[timeWiFiStateON](type="double");
+    	
+    	// Count udp messages sent
+    	@signal[numMsgTCPSend](type="int");
+    	@signal[numMsgTCPReceive](type="int");
+    	
+    	// RTT
+    	@signal[timeRTT](type="double");
+    	
+    	
+        // Configuración de estadísticas para que se graben como vectores
+        @statistic[inputBufferSize](title="Input Buffer Size"; source="inputBufferSize"; record=vector,last);
+        @statistic[outputBufferSize](title="Output Buffer Size"; source="outputBufferSize"; record=vector,last);
+        @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last);
+		//@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
+		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=none);
+        
+        
+        @statistic[timeWiFiStateON](title= "WiFi connection duration"; source="timeWiFiStateON"; record=vector,last,mean; interpolationmode=none);
+        
+        
+        @statistic[numMsgTCPSend](title="TCP packet sent"; source="numMsgTCPSend"; record=vector,count,last);
+        @statistic[numMsgTCPReceive](title="TCP packet received"; source="numMsgTCPReceive"; record=vector,count,last);
+        
+        @statistic[timeRTT](title="RTT (ms)"; source="timeRTT"; record=vector,count,last);
+        
+    gates:
+
+        
+}

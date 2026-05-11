@@ -41,6 +41,12 @@ import src.node_bus.cars.BusGW;
 
 import org.car2x.veins.subprojects.veins_inet.VeinsInetManager;
 
+channel MyDelayLink extends ned.DatarateChannel
+{
+    datarate = 10Gbps;      // Velocidad del Eth10G
+    delay = default(20ms);  // Ahora sí es un valor por defecto configurable
+}
+
 network HighwayTCP
 {
     parameters:
@@ -147,25 +153,25 @@ network HighwayTCP
 
 
     connections allowunconnected:
-        server.pppg++ <--> Eth10G <--> router.pppg++;
-        router.pppg++ <--> Eth10G <--> pgw.filterGate;
-        router.ethg++ <--> Eth10G <--> switch.ethg++;
-        pgw.pppg++ <--> Eth10G <--> eNodeB1.ppp;
-        pgw.pppg++ <--> Eth10G <--> eNodeB2.ppp;
+        server.pppg++ <--> MyDelayLink <--> router.pppg++;
+        router.pppg++ <--> MyDelayLink <--> pgw.filterGate;
+        router.ethg++ <--> MyDelayLink <--> switch.ethg++;
+        pgw.pppg++ <--> MyDelayLink <--> eNodeB1.ppp;
+        pgw.pppg++ <--> MyDelayLink <--> eNodeB2.ppp;
         // new EnodeB
-        pgw.pppg++ <--> Eth10G <--> eNodeB3.ppp;
+        pgw.pppg++ <--> MyDelayLink <--> eNodeB3.ppp;
 
         //# X2 connections
-        eNodeB1.x2++ <--> Eth10G <--> eNodeB2.x2++;
+        eNodeB1.x2++ <--> MyDelayLink <--> eNodeB2.x2++;
         // new connections between EnodeBs
-        eNodeB1.x2++ <--> Eth10G <--> eNodeB3.x2++;
-        eNodeB2.x2++ <--> Eth10G <--> eNodeB3.x2++;
+        eNodeB1.x2++ <--> MyDelayLink <--> eNodeB3.x2++;
+        eNodeB2.x2++ <--> MyDelayLink <--> eNodeB3.x2++;
 
         //router.pppg++ <--> Eth10G <--> ap[0].pppg++;
         //router.pppg++ <--> Eth10G <--> ap[1].pppg++;
         
         for i=0..numAPs-1 {
-            ap[i].ethg++ <--> Eth10G <--> switch.ethg++;
+            ap[i].ethg++ <--> MyDelayLink <--> switch.ethg++;
         }
         
 }

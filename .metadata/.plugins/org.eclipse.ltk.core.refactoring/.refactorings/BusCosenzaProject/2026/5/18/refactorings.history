@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;BusCosenzaProject/src/node_bus/trush/AppBusDataCollectionTCP_R.xml.original&apos; to &apos;AppBusDataCollectionTCP_R.xml&apos;" description="Rename resource &apos;AppBusDataCollectionTCP_R.xml.original&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/node_bus/trush/AppBusDataCollectionTCP_R.xml.original" name="AppBusDataCollectionTCP_R.xml" stamp="1777598930005" updateReferences="true"/>
+</session>

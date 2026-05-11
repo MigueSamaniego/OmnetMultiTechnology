@@ -34,9 +34,12 @@ private:
 
     int Adaptative_TCP = 1000;
 
+    int delay_sdcard = 0;
+
     std::string lastMessageSent; // used to maintein last string sent
 
     omnetpp::cMessage* Control_Task_Timer = nullptr; // Usar omnetpp::cMessage
+
     omnetpp::cMessage* Control_GPS_Data = nullptr; // Usar omnetpp::cMessage
     omnetpp::cMessage* Control_Data_Emission = nullptr; // Usar omnetpp::cMessage
     omnetpp::cMessage* Control_Data_Vehicle = nullptr; // Usar omnetpp::cMessage
@@ -103,6 +106,17 @@ private:
     int count_reTX = 0;
     bool socket_state_close = false;
     bool socket_ready = false;
+
+    // ******************* GW REPLICATE Task ************************
+//    int timer_Control_GPS_Data = 0;
+//    int timer_Control_Data_Emission = 0;
+//    int timer_Control_Data_Vehicle = 0;
+//    int timer_Control_Send_Data = 0;
+//
+//    int time_threshold_send_data = 0;
+//
+//    int control_all_timers = 0;
+
 
 protected:
     // ** MODIFICAR: Reemplazar el initialize simple por el de etapas **

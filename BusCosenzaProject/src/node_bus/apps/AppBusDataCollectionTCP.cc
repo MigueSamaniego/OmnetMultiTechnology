@@ -275,7 +275,7 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
 
                             // check if vehicle from simulation is type Autobus
                             if (vehicle.rfind("buses_cosenza.", 0) == 0) {
-                                getParentModule()->getDisplayString().setTagArg("i", 1, "red");
+                                getParentModule()->getDisplayString().setTagArg("i", 1, "green");
                                 Vehicle_With_Interface = true;
                             }
                         }
@@ -332,7 +332,8 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                         if(ConnectionToAP != ConnectionToAP_Pass){
                             interfaceAvailable();
                             socket_ready = false;
-                            socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
+                            if (socket.getState() != inet::TcpSocket::CLOSED)
+                                socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
                             socket_state_close = true;
 
                             cancelEvent(Control_Send_Data); // STOP TIMER TO SEND DATA ON THE CLOUD
@@ -341,43 +342,47 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
                         }
                         /**************************************************/
 
-                        if(socket_state_close){
+                        if(ConnectionToAP){
 
-                            // check timer to sent msg
-                            if (Control_Send_Data->isScheduled()) {
-                                cancelEvent(Control_Send_Data);
+                            if(socket_state_close){
+
+                                // check timer to sent msg
+                                if (Control_Send_Data->isScheduled()) {
+                                    cancelEvent(Control_Send_Data);
+                                }
+
+                                count_reTX++;
+                                if(count_reTX % 100 == 0) {
+                                    EV_INFO << "En Cooldown... " << (count_reTX/100) << " segundos." << endl;
+                                }
                             }
 
-                            count_reTX++;
-                            if(count_reTX % 100 == 0) {
-                                EV_INFO << "En Cooldown... " << (count_reTX/100) << " segundos." << endl;
-                            }
-                        }
+                            if(count_reTX >= (waiting_changing_x_10ms + 1)){
 
-                        if(count_reTX >= (waiting_changing_x_10ms + 1)){
+                                if(count_reTX == (waiting_changing_x_10ms + 1)){
+                                    EV_INFO << "Cooldown Timer/Backoff. trying open new socket" << endl;
+                                    if(!stablishTCP(ConnectionToAP)){
+                                        EV_WARN << "ERROR CREATING NEW SOCKET, retrying..." << endl;
+                                        count_reTX = 0;
+                                    }
+                                }
 
-                            if(count_reTX == (waiting_changing_x_10ms + 1)){
-                                EV_INFO << "Cooldown Timer/Backoff. trying open new socket" << endl;
-                                if(!stablishTCP(ConnectionToAP)){
-                                    EV_WARN << "ERROR CREATING NEW SOCKET, retrying..." << endl;
+
+                                if(count_reTX >= (waiting_changing_x_10ms + 500)){
+                                    EV_WARN << "timeout waiting for response from the Server. Aborting and restarting cycle." << endl;
                                     count_reTX = 0;
                                 }
                             }
 
-
-                            if(count_reTX >= (waiting_changing_x_10ms + 500)){
-                                EV_WARN << "timeout waiting for response from the Server. Aborting and restarting cycle." << endl;
+                            if ((count_reTX >= (waiting_changing_x_10ms + 2)) && (socket.getState() == inet::TcpSocket::CONNECTED)) {
+                                socket_state_close = false;
                                 count_reTX = 0;
+                                EV_WARN << "Socket ready for send data." << endl;
+                                socket_ready = true;
+
+                                scheduleAt(simTime() + SimTime(50, SIMTIME_MS), Control_Send_Data);
                             }
-                        }
 
-                        if ((count_reTX >= (waiting_changing_x_10ms + 2)) && (socket.getState() == inet::TcpSocket::CONNECTED)) {
-                            socket_state_close = false;
-                            count_reTX = 0;
-                            EV_WARN << "Socket ready for send data." << endl;
-                            socket_ready = true;
-
-                            scheduleAt(simTime() + SimTime(50, SIMTIME_MS), Control_Send_Data);
                         }
 
 
@@ -528,10 +533,11 @@ void AppBusDataCollectionTCP::handleMessage(cMessage *msg)
             }else if (msg == Control_Send_Data) {
 
                 if(socket_ready){
-                    /****** Sent Message to Cloud *********************/
-                    sendDataToCloud(); // prepare and send message
-                    /**************************************************/
-
+                    if(ConnectionToAP){
+                        /****** Sent Message to Cloud *********************/
+                        sendDataToCloud(); // prepare and send message
+                        /**************************************************/
+                    }
                     int time_to_other_process = 5 + intrand(11); // Generate jitter Process other tasks to UC from 5 to 15
 
                     int time_process_uc = time_check_tasks + time_to_other_process;

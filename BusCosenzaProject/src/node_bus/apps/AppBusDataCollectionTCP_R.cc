@@ -98,7 +98,7 @@ int AppBusDataCollectionTCP_R::getBufferBytes(const std::vector<std::string>& bu
 
 
 // *****************************************************************
-// Implementación de Constructor y Destructor
+// Implementaci贸n de Constructor y Destructor
 // *****************************************************************
 
 AppBusDataCollectionTCP_R::AppBusDataCollectionTCP_R()
@@ -122,7 +122,7 @@ AppBusDataCollectionTCP_R::~AppBusDataCollectionTCP_R()
 }
 
 // *****************************************************************
-// 1. LÓGICA DE INICIALIZACIÓN (Registro de Señales)
+// 1. L脫GICA DE INICIALIZACI脫N (Registro de Se帽ales)
 // *****************************************************************
 
 void AppBusDataCollectionTCP_R::initialize(int stage)
@@ -187,7 +187,7 @@ void AppBusDataCollectionTCP_R::receiveSignal(cComponent *source, simsignal_t si
     EV_INFO << "INFO: receiveSignal: "<< l << endl;
 
     if (signalID == stateAssociationSignalId) {
-        EV_INFO << "🟢 Señal RECIBIDA (Long): Disociado (sin AP). Valor: " << l << " Fuente: " << source->getFullPath() << endl;
+        EV_INFO << "馃煝 Se帽al RECIBIDA (Long): Disociado (sin AP). Valor: " << l << " Fuente: " << source->getFullPath() << endl;
         ConnectionToAP = l;
     }
 }
@@ -217,14 +217,14 @@ bool AppBusDataCollectionTCP_R::stopApplication()
         Control_Task_Timer = nullptr;
     }
 
-    // Llama a la función stopApplication base
+    // Llama a la funci贸n stopApplication base
     veins::VeinsInetApplicationBase::stopApplication();
     return true;
 }
 
 void AppBusDataCollectionTCP_R::finish()
 {
-    // Llama a la función finish base
+    // Llama a la funci贸n finish base
     veins::VeinsInetApplicationBase::finish();
 
     if (SignStateConnectAP != 0) {
@@ -237,7 +237,7 @@ void AppBusDataCollectionTCP_R::finish()
 
 void AppBusDataCollectionTCP_R::processPacket(std::shared_ptr<inet::Packet> pk)
 {
-    // Lógica para procesar paquetes entrantes
+    // L贸gica para procesar paquetes entrantes
 }
 
 
@@ -405,7 +405,7 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
 
                     }
 
-            }else if (msg == Control_GPS_Data) {    // gettin position GPS with error N(0,σ)
+            }else if (msg == Control_GPS_Data) {    // gettin position GPS with error N(0,蟽)
 
 
                     std::string vehicle = mobility->getExternalId();
@@ -591,7 +591,8 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
                     scheduleAt(simTime() + SimTime(2000, SIMTIME_MS), Control_Send_Data); // time-out without response
                 }
 
-            }else {
+            }
+            else {
                 // Llama al manejo de mensajes base para mensajes del framework (paquetes, etc.)
                 veins::VeinsInetApplicationBase::handleMessage(msg);
             }
@@ -620,11 +621,11 @@ void AppBusDataCollectionTCP_R::subscriptionSignalState(){
 
         wlanAgent->subscribe(stateAssociationSignalId, this);
 
-        EV_INFO << "🟢 Suscripción exitosa a señales de gestión de asociación en " << wlanAgent->getFullPath() << endl;
+        EV_INFO << "馃煝 Suscripci贸n exitosa a se帽ales de gesti贸n de asociaci贸n en " << wlanAgent->getFullPath() << endl;
         SignStateConnectAP = 1; // flag to indicate subscription to signal 'stateAssociationSignalId' successful
     } else {
-        // Reintentará en el siguiente ciclo del timer (cada 1s)
-        EV_WARN << "🟡 ADVERTENCIA: Módulo AGENT no encontrado. Reintentando en el siguiente ciclo." << endl;
+        // Reintentar谩 en el siguiente ciclo del timer (cada 1s)
+        EV_WARN << "馃煛 ADVERTENCIA: M贸dulo AGENT no encontrado. Reintentando en el siguiente ciclo." << endl;
         //SignStateConnectAP = false;
     }
 
@@ -633,7 +634,7 @@ void AppBusDataCollectionTCP_R::subscriptionSignalState(){
 
 
 // *****************************************************************
-// 4. FUNCIÓN DE CONTROL CON LÓGICA DE SUSCRIPCIÓN ROBUSTA
+// 4. FUNCI脫N DE CONTROL CON L脫GICA DE SUSCRIPCI脫N ROBUSTA
 // *****************************************************************
 
 void AppBusDataCollectionTCP_R::sendDataToCloud(){
@@ -653,9 +654,21 @@ void AppBusDataCollectionTCP_R::sendDataToCloud(){
             outputBuffer.load(batch);
 
             // aqui va el timer SDCARD
-            //if(batch > 0){
-                //active timer to blocked system
-            //}
+            int data_recovery = outputBuffer.isEmpty();
+
+//            if(data_recovery > 0){
+//                // ****** active timer to blockched system *****
+//                delay_sdcard = (data_recovery * 300)/20;
+//
+//                // ************* Stop Control Tasks ********************
+//                if (Control_Task_Timer->isScheduled()) {
+//                    cancelEvent(Control_Task_Timer);
+//                }
+//
+//                scheduleAt(simTime() + SimTime(delay_sdcard, SIMTIME_MS), Control_Task_Timer);   // Check tasks
+//
+//
+//            }
 
         }else {
 
@@ -700,7 +713,7 @@ void AppBusDataCollectionTCP_R::interfaceAvailable(){
         celular->setState(NetworkInterface::State::DOWN);
 
 
-        EV_INFO << "CELLULAR disable → Using interfaz WIFI" << endl;
+        EV_INFO << "CELLULAR disable 鈫?Using interfaz WIFI" << endl;
 
         auto rt = check_and_cast<Ipv4RoutingTable*>(getModuleByPath("^.ipv4.routingTable"));
 
@@ -731,12 +744,12 @@ void AppBusDataCollectionTCP_R::interfaceAvailable(){
         // Save only the connection is greater that;
         if (duration > 1) { // time minimum to establish connection with WIFI ***** pain attention, really we must to check if there are connection
             emit(timeWiFiWorking, duration.dbl()); // we Emit with double variable type
-            //EV_INFO << "Desconectado. Duración de la conexión: " << duration << " segundos." << endl;
+            //EV_INFO << "Desconectado. Duraci贸n de la conexi贸n: " << duration << " segundos." << endl;
         }
 
         celular->setState(NetworkInterface::State::UP);
         wifi->setState(NetworkInterface::State::DOWN);
-        EV_INFO << "WiFi disable → Using interfaz celular" << endl;
+        EV_INFO << "WiFi disable 鈫?Using interfaz celular" << endl;
 
         auto rt = check_and_cast<Ipv4RoutingTable*>(getModuleByPath("^.ipv4.routingTable"));
         auto interfaceTable = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
@@ -784,7 +797,7 @@ inet::Coord AppBusDataCollectionTCP_R::convertXYtoLatLon(inet::Coord pos)
     double lon = lon_min + ((pos.x - x_min) * (lon_max - lon_min) / (x_max - x_min));
     double lat = lat_min + ((pos.y - y_min) * (lat_max - lat_min) / (y_max - y_min));
     // ------------------ Modelling GPS ERROR with a ----------------------------------------------
-    // ------------------ Normal Distribution  N(0,σ) ---------------------------------------------
+    // ------------------ Normal Distribution  N(0,蟽) ---------------------------------------------
 
     double lon_pass = lon;
     double lat_pass = lat;
@@ -802,7 +815,7 @@ inet::Coord AppBusDataCollectionTCP_R::convertXYtoLatLon(inet::Coord pos)
     double dLat = (lat - lat_pass) * PI / 180.0;
     double dLon = (lon - lon_pass) * PI / 180.0;
 
-    // fórmula de Haversine
+    // f贸rmula de Haversine
     double a = sin(dLat/2) * sin(dLat/2) +
                cos(lat1) * cos(lat2) *
                sin(dLon/2) * sin(dLon/2);
@@ -897,7 +910,7 @@ void AppBusDataCollectionTCP_R::printSocketInfo() {
 //************* NEW METHODS TO HANDLE CONNECTION TCP ******************************************
 //*********************************************************************************************
 
-// --- Implementación de ICallback para evitar clase abstracta ---
+// --- Implementacion de ICallback para evitar clase abstracta ---
 
 void AppBusDataCollectionTCP_R::socketDataArrived(inet::TcpSocket *socket, inet::Packet *packet, bool urgent) {
     // extract the contents of the package
@@ -909,8 +922,8 @@ void AppBusDataCollectionTCP_R::socketDataArrived(inet::TcpSocket *socket, inet:
     std::string receivedMsg(bytes.begin(), bytes.end());
 
     // print cm
-    EV_INFO << "🟢 msg received: [" << receivedMsg << "]" << endl;
-    EV_INFO << "🟢 msg hoppe: [" << lastMessageSent << "]" << endl;
+    EV_INFO << "msg received: [" << receivedMsg << "]" << endl;
+    EV_INFO << "msg hoppe: [" << lastMessageSent << "]" << endl;
 
 
     if (receivedMsg == lastMessageSent) {
