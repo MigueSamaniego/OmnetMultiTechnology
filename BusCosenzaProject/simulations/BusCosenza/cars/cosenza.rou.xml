@@ -116,7 +116,7 @@
 
 
 		
-		<stop busStop="Unical_Terminal_Start" duration="10.00"/>
+		<stop busStop="Unical_Terminal_Start" duration="60.00"/>
 		<stop busStop="Via_Padre_Leon_Dehon_2_A" duration="60.00"/>
 		<stop busStop="Quattromiglia_Via_Marconi_81_A" duration="0.00"/>
 		<stop busStop="Via_Leonardo_Da_Vinci_42_A" duration="0.00"/>
@@ -168,7 +168,7 @@
 		<stop busStop="Dip_Ing_Compl_Martensson" duration="0.00"/>
 		<stop busStop="Unical_Dipart_Dif_Scienza_E_Terra_R" duration="0.00"/>
 		
-		<stop busStop="Unical_Terminal" duration="60.00"/>	<!--   /-->
+		<stop busStop="Unical_Terminal" duration="120.00"/>	<!--   /-->
 		
 	
 	

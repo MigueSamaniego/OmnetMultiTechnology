@@ -33,7 +33,8 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
         
         // Declaración de señales
         @signal[inputBufferSize](type="long");
-        @signal[outputBufferSize](type="long");
+        @signal[outputBufferSize_wifi](type="long");
+        @signal[outputBufferSize_lte](type="long");
         @signal[sdcardBufferSize](type="long");
     	@signal[sdcardPercentSize](type="double");
     	
@@ -47,13 +48,17 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
     	// RTT
     	@signal[timeRTT](type="double");
     	
+    	// TCP ACK
+    	//@signal[packetDataAcked](type="long");
+    	
     	
         // Configuración de estadísticas para que se graben como vectores
         @statistic[inputBufferSize](title="Input Buffer Size"; source="inputBufferSize"; record=vector,last);
-        @statistic[outputBufferSize](title="Output Buffer Size"; source="outputBufferSize"; record=vector,last);
+        @statistic[outputBufferSize_wifi](title="Output Buffer Size Wifi"; source="outputBufferSize_wifi"; record=vector,last);
+        @statistic[outputBufferSize_lte](title="Output Buffer Size LTE"; source="outputBufferSize_lte"; record=vector,last);
         @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last);
 		//@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
-		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=none);
+		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last);
         
         
         @statistic[timeWiFiStateON](title= "WiFi connection duration"; source="timeWiFiStateON"; record=vector,last,mean; interpolationmode=none);

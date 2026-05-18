@@ -39,7 +39,7 @@ void HostAutoConfiguratorM::handleMessageWhenUp(cMessage *apMsg)
 
 void HostAutoConfiguratorM::setupNetworkLayer()
 {
-    EV_INFO << "host auto configuration started" << std::endl;
+    EV_INFO << "host auto configuration started bus" << std::endl;
 
     std::string interfaces = par("interfaces");
     Ipv4Address addressBase = Ipv4Address(par("addressBase").stringValue());

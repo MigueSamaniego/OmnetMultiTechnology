@@ -151,7 +151,8 @@ void AppBusTCP_R_StateM::initialize(int stage)
 
         // buffer occupation
         inputBufferSignal = registerSignal("inputBufferSize");
-        outputBufferSignal = registerSignal("outputBufferSize");
+        outputBufferSignal_wifi = registerSignal("outputBufferSize_wifi");
+        outputBufferSignal_lte = registerSignal("outputBufferSize_lte");
         sdcardBufferSignal = registerSignal("sdcardBufferSize");
 
         sdcardPercentSignal = registerSignal("sdcardPercentSize"); // state occupation buffer
@@ -166,10 +167,10 @@ void AppBusTCP_R_StateM::initialize(int stage)
         RTT_ms = registerSignal("timeRTT");
 
         // START SDCAR FILL TO 50%
-        int memory_start_with = 10;
-        sdcard.preloadHalf(memory_start_with);
+        //int memory_start_with = 0;
+        //sdcard.preloadHalf(memory_start_with);
 
-        EV_INFO << "SDCard pre-cargada con " << sdcard.size() << " mensajes. "<< memory_start_with << "% of Capacity" << endl;
+        //EV_INFO << "SDCard pre-cargada con " << sdcard.size() << " mensajes. "<< memory_start_with << "% of Capacity" << endl;
 
     }
 
@@ -188,12 +189,25 @@ void AppBusTCP_R_StateM::initialize(int stage)
 // ----------------------------------------------------------------------
 void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details)
 {
-    EV_INFO << "INFO: receiveSignal: "<< l << endl;
+    //EV_INFO << "INFO: receiveSignal: "<< l << endl;
 
     if (signalID == stateAssociationSignalId) {
-        EV_INFO << "🟢 Señal RECIBIDA (Long): Disociado (sin AP). Valor: " << l << " Fuente: " << source->getFullPath() << endl;
+        if(l){
+            EV_INFO << "INFO: Connect to WIFI: "<< endl;
+        }else{
+            EV_INFO << "INFO: Disconnected of AP: " << endl;
+        }
+        //EV_INFO << "🟢 Señal RECIBIDA (Long): Disociado (sin AP). Valor: " << l << " Fuente: " << source->getFullPath() << endl;
         ConnectionToAP = l;
-    }
+    }/*else if (signalID == tcpDataAckedSignal) {
+        // En INET, l suele ser el número de bytes que el receptor confirmó
+        EV_INFO << "¡ACK de TCP Recibido! El nodo destino confirmó " << l << " bytes." << endl;
+
+        // Aquí es donde confirmas que el mensaje llegó al nodo (Capa 4)
+        // aunque el servidor aún no haya respondido el "Echo".
+
+
+    }*/
 }
 
 // *****************************************************************
@@ -264,9 +278,13 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
             if (msg == Control_Task_Timer) {
 
-                EV_INFO << "INFO: controlInterface: "<< ConnectionToAP << endl;
+                if(ConnectionToAP){
+                    EV_INFO << "Connected to WIFI " << endl;
+                }else{
+                    EV_INFO << "Connecting to LTE " << endl;
+                }
+
                 bool update_timer = true;
-                bool val_update_state_sdcard = false;
 
 
                     if (SignStateConnectAP == 0) { // GW UNSUBSCRIBE >> try to subscriber
@@ -315,7 +333,22 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                         control_all_timers = 0;
 
-                        EV_INFO << "Start... GPS, EMISSION, VEHICLE, DATA: " << timer_Control_GPS_Data << " " << timer_Control_Data_Emission << " " << timer_Control_Data_Vehicle << " " << timer_Control_Send_Data << endl;
+                        deadline = 3600;// deadline high
+
+                        check_timers_expired = 0;
+                        take_time_when_find_expired_data = false;
+                        deadline_start = simTime() + 3600; // 1h
+                        deadline_until = 3600; // 1h
+
+                        static_currentBytes = 0.0;
+                        static_usagePercent = 0.0;
+                        static_inputBuff = 0;
+                        static_outputBuff_wifi = 0;
+                        static_outputBuff_lte = 0;
+
+                        //EV_INFO << "Start... GPS, EMISSION, VEHICLE, DATA: " << timer_Control_GPS_Data << " " << timer_Control_Data_Emission << " " << timer_Control_Data_Vehicle << " " << timer_Control_Send_Data << endl;
+
+                        EV_ERROR << "INICIANDO ON GW " << endl;
 
                         SignStateConnectAP = 3;
 
@@ -328,7 +361,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                         int waiting_changing_x_10ms = 700;  // socket on arduino replay after 7-14s
 
-                        EV_INFO << "Start... GPS, EMISSION, VEHICLE, DATA, next_time: " << timer_Control_GPS_Data << " " << timer_Control_Data_Emission << " " << timer_Control_Data_Vehicle << " " << timer_Control_Send_Data << " " << time_check_tasks << endl;
+                        //EV_INFO << "Start... GPS, EMISSION, VEHICLE, DATA, next_time: " << timer_Control_GPS_Data << " " << timer_Control_Data_Emission << " " << timer_Control_Data_Vehicle << " " << timer_Control_Send_Data << " " << time_check_tasks << endl;
 
                         // 1. Interface control (Northbound)
 
@@ -339,8 +372,13 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         if(ConnectionToAP != ConnectionToAP_Pass){
                             interfaceAvailable();
                             socket_ready = false;
-                            socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
                             socket_state_close = true;
+//                            if (socket.getState() != inet::TcpSocket::CLOSED){
+//                                socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
+//                                EV_ERROR << "Wifi Available if socket was open, NOW IS CLOSE" << endl;
+//                            }
+
+                            count_reTX = waiting_changing_x_10ms -1;    // obligamos a crear el socket con la nueva tecnologia
 
                             time_threshold_send_data = 900000; // dont execute the send data function
                             timer_Control_Send_Data = 0;
@@ -383,15 +421,16 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                     EV_WARN << "timeout waiting for response from the Server. Aborting and restarting cycle." << endl;
                                     count_reTX = 0;
                                 }
-                            }else if (socket.getState() == inet::TcpSocket::CONNECTED) {
+
+                            }else if ((count_reTX < (waiting_changing_x_10ms + 1))&&(socket.getState() == inet::TcpSocket::CONNECTED) ){
 
                                 socket_state_close = false;
                                 count_reTX = 0;
                                 EV_WARN << "Socket Restablish ready for send data." << endl;
                                 socket_ready = true;
 
-                                if(Retry_Sent > 0)  //if was detected Socket re-open and the last message it was not delivery
-                                    Retry_Sent = 1;
+                                //if(Retry_Sent > 0)  //if was detected Socket re-open and the last message it was not delivery
+                                //    Retry_Sent = 1;
 
                                 time_threshold_send_data = 5; // this is the time after stablish the link, so GW wait 50ms before to send
                                 timer_Control_Send_Data = 0;
@@ -404,8 +443,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 EV_WARN << "Socket ready for send data." << endl;
                                 socket_ready = true;
 
-                                if(Retry_Sent > 0)  //if was detected Socket re-open and the last message it was not delivery
-                                    Retry_Sent = 1;
+                                //if(Retry_Sent > 0)  //if was detected Socket re-open and the last message it was not delivery
+                                //    Retry_Sent = 1;
 
                                 time_threshold_send_data = 5; // this is the time after stablish the link, so GW wait 50ms before to send
                                 timer_Control_Send_Data = 0;
@@ -419,11 +458,28 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                          ************************************************************************************************************************
                          ************************************************************************************************************************/
 
+                        // ------------ Necessary control of station Near ------------------------
+                        // ----------- useful to start time average of arrive --------------------
+
+                        if(ConnectionToAP){
+                            std::string vehicle = mobility->getExternalId();
+                            Coord pos = mobility->getCurrentPosition();
+
+                            Coord ap0(3543.52, 5712.03);
+
+                            double distance_to_AP1 = pos.distance(ap0);
+
+                            if(distance_to_AP1 < 20){// time to next bus statition is necesary 23:38 min
+                                EV_INFO << "Distancia al AP autostation: " << distance_to_AP1 << " metros" << endl;
+                                deadline = 1538;// i must calculate the time
+                            }
+                        }
+
+                        //------------------------------------------------------------------------
 
 
 
                         if (timer_Control_GPS_Data >= 100) {
-                            val_update_state_sdcard = true;
 
                             // gettin position GPS with error N(0,σ)
                             std::string vehicle = mobility->getExternalId();
@@ -445,16 +501,36 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             counter_msg++;
                             EV_INFO << "NEW GPS, msg_num" << data << " " << counter_msg << endl;
 
-                            if (inputBuffer.add(data)) {
-                                delay_sdcard = ((inputBuffer.size()) * 30)/20; //(300/10)ms
+                            bool state_buff = inputBuffer.add(data, Priority_2, simTime());
+
+                            static_inputBuff = inputBuffer.size();
+
+                            emit(inputBufferSignal, static_inputBuff);
+
+                            if (state_buff) {
+
+                                delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                 EV_INFO << "NEW GPS time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
 
                                 // save buffer en SDCARD
                                 auto batch = inputBuffer.flush();
-                                sdcard.pushBatch(batch);
-                                EV_INFO << "SAVING LAST GPS" << endl;
 
+                                // Ahora pushBatch recibirá un vector de QueuedData (data + prio)
+                                sdcard.pushBatch(batch);
+
+                                EV_INFO << "SAVING LAST GPS" << endl;
                                 counter_msg = 0;
+
+                                //  update when inputBuffer was empty
+                                double currentBytes = (double)sdcard.totalSize();
+                                double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+                                if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+                                emit(sdcardBufferSignal, currentBytes);
+                                emit(sdcardPercentSignal, usagePercent);
+                                // Maintain the last state
+                                static_currentBytes = currentBytes;
+                                static_usagePercent = usagePercent;
 
                             }
 
@@ -465,7 +541,6 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         // *********************************************************************************************
 
                         if (timer_Control_Data_Emission >= 500) {
-                            val_update_state_sdcard = true;
 
                             std::string vehicle = mobility->getExternalId();
 
@@ -485,16 +560,36 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              counter_msg++;
                              EV_INFO << "NEW POLLUTION, msg_num" << data<< " " << counter_msg  << endl;
 
-                             if (inputBuffer.add(data)) {
+                             bool state_buff = inputBuffer.add(data, Priority_wifi, simTime());
 
-                                 delay_sdcard = ((inputBuffer.size()) * 30)/20; //(300/10)ms
+                             static_inputBuff = inputBuffer.size();
+
+                             emit(inputBufferSignal, static_inputBuff);
+
+                             if (state_buff) {
+
+                                 delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                 EV_INFO << "NEW airpollution time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
 
                                  // save buffer en SDCARD
                                  auto batch = inputBuffer.flush();
-                                 sdcard.pushBatch(batch);
-                                 EV_INFO << "SAVING LAST POLUTION"<< " " << counter_msg << endl;
 
+                                 // Ahora pushBatch recibirá un vector de QueuedData (data + prio)
+                                 sdcard.pushBatch(batch);
+
+                                 EV_INFO << "SAVING LAST POLUTION"<< " " << counter_msg << endl;
                                  counter_msg = 0;
+
+                                 //  update when inputBuffer was empty
+                                 double currentBytes = (double)sdcard.totalSize();
+                                 double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+                                 if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+                                 emit(sdcardBufferSignal, currentBytes);
+                                 emit(sdcardPercentSignal, usagePercent);
+                                 // Maintain the last state
+                                 static_currentBytes = currentBytes;
+                                 static_usagePercent = usagePercent;
 
                              }
 
@@ -506,8 +601,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         //**************************************************************************************************
 
 
-                        if (timer_Control_Data_Vehicle >= 100) {
-                            val_update_state_sdcard = true;
+                        if (timer_Control_Data_Vehicle >= 100) {// control of traffic congestion
                             std::string vehicle = mobility->getExternalId();
 
                             double speed = traciVehicle->getSpeed();
@@ -527,158 +621,155 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              counter_msg++;
                              EV_INFO << "NEW VEHICLE, msg_num : " << data<< " " << counter_msg << endl;
 
-                             if (inputBuffer.add(data)) {
+                             bool state_buff = inputBuffer.add(data, Priority_wifi, simTime());
+
+                             static_inputBuff = inputBuffer.size();
+
+                             emit(inputBufferSignal, static_inputBuff);
+
+                             if (state_buff) {
+
+                                  delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                  EV_INFO << "NEW traffic time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
+
+                                  // save buffer en SDCARD
+                                  auto batch = inputBuffer.flush();
+
+                                  // Ahora pushBatch recibirá un vector de QueuedData (data + prio)
+                                  sdcard.pushBatch(batch);
+
+                                  EV_INFO << "SAVING LAST VEHICLE"<< " " << counter_msg << endl;
+                                  counter_msg = 0;
+
+                                  //  update when inputBuffer was empty
+                                  double currentBytes = (double)sdcard.totalSize();
+                                  double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+                                  if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+                                  emit(sdcardBufferSignal, currentBytes);
+                                  emit(sdcardPercentSignal, usagePercent);
+                                  // Maintain the last state
+                                  static_currentBytes = currentBytes;
+                                  static_usagePercent = usagePercent;
 
 
-                                 delay_sdcard = ((inputBuffer.size()) * 30)/20; //(300/10)ms
-
-                                 // save buffer en SDCARD
-                                 auto batch = inputBuffer.flush();
-                                 sdcard.pushBatch(batch);
-                                 EV_INFO << "SAVING LAST VEHICLE"<< " " << counter_msg << endl;
-
-                                 counter_msg = 0;
-
-                             }
-
+                              }
 
                              timer_Control_Data_Vehicle = 0;
 
 
                         }
+                        // -------------------------------------------------------------------------------------------------------------------
 
+                        // ******************** detected collision ******************
 
-                        //*******************************************************************************************************************
-
-                        if (timer_Control_Send_Data >= time_threshold_send_data) {
-
-                           if(socket_ready){
-
-                               if(Retry_Sent == 0){
-                                   val_update_state_sdcard = true;
-                                   RTT_start = simTime();
-                                   /****** Sent Message to Cloud *********************/
-                                   sendDataToCloud(); // prepare and send message
-                                   /**************************************************/
+                        // -------------------------------------------------------------------------------------------------------------------
 
 
 
-                                   ///////////////////////////////////////////////////
-                                   // ************** TO EMA FILTER *******************
-                                   if(last_RTT_ms > 0){
-                                       time_threshold_send_data = ((int)(last_RTT_ms/10))+5;// more 50ms Jitter
-                                   }else{
-                                       time_threshold_send_data = 50; // Default threshold
-                                   }
-                                   ///////////////////////////////////////////////////
-
-                                  // *********************** Threshold fix *****************************************
-                                  //time_threshold_send_data = 50; // for the first response 500ms to default time
-                                  // -------------------------------------------------------------------------------
-
-                                  // *********************** ADAPTATIVE REDUCCION RTO ******************************
-                                  // THIS VALUE IS UPDATE WHEN WE RECEIVED AN ACK SUCCESSFUL
-//                                  if(Adaptative_TCP == 0){
-//                                      time_threshold_send_data = 50;
-//                                  }else {
-//
-//                                      // llimit to Adaptative_TCP
-//                                      if (Adaptative_TCP < 10)   Adaptative_TCP = 10; //50ms
-//
-//                                      if (Adaptative_TCP > 200) Adaptative_TCP = 200; //2000ms
-//
-//                                      time_threshold_send_data = Adaptative_TCP;
-//
-//                                  }
-                                  // -------------------------------------------------------------------------------
-
-
-                                   EV_ERROR << "TIME TO THRESHOL: " << time_threshold_send_data << endl;
-
-                               }else if((Retry_Sent >= 1)&&(Retry_Sent < 4)){
-
-                                   RTT_start = simTime();
-
-                                   //******************************** IF ACK from server es fail waiting maximun time default **************************
-
-                                   // ************************** EMA filter **************************************************************
-                                   time_threshold_send_data = (((int)(last_RTT_ms/10))*(Retry_Sent+1)); // increment exponential Average
-                                   if(time_threshold_send_data > 200) time_threshold_send_data = 200; // limitation of threshold to 2000ms
-
-                                   EV_ERROR << "TIME TO THRESHOL with error: " << Retry_Sent << " " << time_threshold_send_data << endl;
-
-
-                                   // *********************** Threshold fix *****************************************
-                                   //time_threshold_send_data = 50; // 500ms to retry
-                                   //time_threshold_send_data = 100; // 1000ms to retry
-                                   //time_threshold_send_data = 200; // 2000ms to retry
-                                   // -------------------------------------------------------------------------------
-
-                                   // *********************** ADAPTATIVE REDUCCION RTO ******************************
-                                   //Adaptative_TCP = 200; // WE FORCED TO WAIT MAXIMUN TIME
-                                   //--------------------------------------------------------------------------------
-
-
-                                   //time_threshold_send_data = 500; // 5000ms TIME OUT SERVER
 
 
 
-                                   // resent data on RAM
-                                   auto packet = new inet::Packet("accident_car_test_TCP");
 
-                                   EV_ERROR << "RETRYING SEND DATA NUMBER: " << Retry_Sent << endl;
+                        // -------------------------------------------------------------------------------------------------------------------
+                        // -------------------------------------- check expiration DATA ------------------------------------------------------
+                        // -------------------------------------- Depend of state of WIFI ----------------------------------------------------
+                        // -------------------------------------------------------------------------------------------------------------------
+                        if(ConnectionToAP){ // WIFI available
 
-                                   Retry_Sent++;
+                            if(socket_ready){
 
-                                   auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(lastMessageSent.begin(), lastMessageSent.end()));
+                                //check_timers_expired = 0; // reset time to check expired data
+                                //take_time_when_find_expired_data = false;
 
-                                   timestampPayload(payload);
+                                // sent all data on the cloud
+                                //EV_ERROR << "socket WIFI OK1: "<< endl;
+                                if (timer_Control_Send_Data >= time_threshold_send_data){
+                                    //EV_ERROR << "SEND  WIFI OK: "<< endl;
+                                    //if(Retry_Sent == 0){
 
-                                   packet->insertAtBack(payload);
+                                        deadline_start = simTime(); // update this time each call function is sufficient to empty data from SDCARD
+                                        deadline_until = 600;
+                                       /****** Sent Message to Cloud *********************/
+                                        sendDataToCloud("wifi"); // prepare and send message
+                                       /**************************************************/
 
-                                   socket.send(packet);
+                                       time_threshold_send_data = 2; // 20ms to retry
 
-                                   emit(packetSendTCPSignal, count_msg_TCP_send);
+                                    //}
 
-                               }else if(Retry_Sent >= 4) {
-
-                                   //Retry_Sent = 1; // pain attention when it reconnect it should send the last msg
-                                   EV_ERROR << "cerrando socket el contado de mensajes no debe aumentar: " << count_msg_TCP_send << endl;
-
-                                   // ************** try to reconnect **************
-                                   socket_ready = false;
-                                   socket_state_close = true;
-                                   count_reTX = 0;
-                                   // **********************************************
+                                   timer_Control_Send_Data = 0;
 
                                }
 
-                               EV_INFO << "number of msg send , timer_Control_Send_Data , time_threshold_send_data: " << count_msg_TCP_send << " " << timer_Control_Send_Data << " " << time_threshold_send_data << endl;
+                               timer_Control_Send_Data++;
+
+                            }/*else{
+                                EV_ERROR << "waiting socket wifi: "<< endl;
+                            }*/
+
+                            check_timers_expired = 105; // USED TO CHECK IN THE NEXT CYCLE WHEN WIFY IS LOSE
+                            take_time_when_find_expired_data = false; // reset this variable while it has WIFI, in this case i must sento all data
+
+                        }else{
+
+                            if((!take_time_when_find_expired_data)&&(check_timers_expired >= 100)){// check each second
+
+                                bool expiration_time_exceeded  = sdcard.hasExpiredData(simTime()+2); // 2s before data expired
+
+                                if((expiration_time_exceeded)&&(!take_time_when_find_expired_data)){
+                                    // DATA PENDING TO SEND BEFORE BECOMING UNUSABLE
+                                    //EV_ERROR << "DATA EXPIRED PREPARE LTE TO SEND: "<< endl;
+                                    deadline_start = simTime();
+                                    deadline_until = 300; // 5min (calculate the time remaining for the next bus stop)
+                                    EV_ERROR << "DATA EXPIRED PREPARE LTE TO SEND data from range: "<< deadline_start+2 << " " << deadline_start+deadline_until << endl;
+                                    take_time_when_find_expired_data = true;
+                                }
+
+                                check_timers_expired = 0;
+
+                            }else if(take_time_when_find_expired_data){
+                                check_timers_expired = 0; // reset timer for next time
+
+                                if(socket_ready){
+                                    //EV_ERROR << "socket LTE OK: "<< endl;
+                                    if (timer_Control_Send_Data >= time_threshold_send_data){
+                                        //EV_ERROR << "SEND LTE OK: "<< endl;
+                                        //if(Retry_Sent == 0){
+                                           /****** Sent Message to Cloud *********************/
+                                           sendDataToCloud("lte"); // prepare and send message
+                                           /**************************************************/
+
+                                           time_threshold_send_data = 2; // 20ms to retry
+
+                                           if(!take_time_when_find_expired_data){
+                                               // not increase the count number msg sent
+                                               // FINISH THE COMMUNICATION
+                                           }
+
+                                        //}
+
+                                        timer_Control_Send_Data = 0;
+
+                                    }
+
+                                    timer_Control_Send_Data++;
+
+                                }
 
 
 
-                               timer_Control_Send_Data = 0;
-                           }
-
-                       }
+                            }
 
 
-
-                        // udes to update fuctions buffers SD
-                        if(!val_update_state_sdcard){
-
-                            // update the state of SDCARD % OCCUPATIONAL
-                            double currentBytes = (double)sdcard.getCurrentBytes();
-                            double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
-                            if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
-
-                            emit(sdcardBufferSignal, currentBytes);
-                            emit(sdcardPercentSignal, usagePercent);
-
-                            emit(inputBufferSignal, inputBuffer.getCurrentBytes());
-                            emit(outputBufferSignal, outputBuffer.getCurrentBytes());
 
                         }
+
+                        // ------------------------------------------------------------------------------------------------------------------
+
+
+
+                        //*******************************************************************************************************************
 
 
 
@@ -699,11 +790,22 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                          /*********************************************
                           ************** UPDATE TIMERs ****************
                           *********************************************/
-                         if(control_all_timers >= delay_sdcard){
+                         if((SignStateConnectAP == 3)&&(control_all_timers >= delay_sdcard)){
                              timer_Control_GPS_Data++;
                              timer_Control_Data_Emission++;
                              timer_Control_Data_Vehicle++;
-                             timer_Control_Send_Data++;
+                             check_timers_expired++;
+
+                             // it is not calculate is update grafic
+                             emit(sdcardBufferSignal, static_currentBytes);
+                             emit(sdcardPercentSignal, static_usagePercent);
+                             emit(inputBufferSignal, static_inputBuff);
+                             emit(outputBufferSignal_wifi, static_outputBuff_wifi);
+                             emit(outputBufferSignal_lte, static_outputBuff_lte);
+                             emit(packetSendTCPSignal, count_msg_TCP_send); // just to try
+
+                             //EV_ERROR << "msg guardados en sdcadr: "<< " " << counter_msg << endl;
+
                          }
 
 
@@ -757,41 +859,83 @@ void AppBusTCP_R_StateM::subscriptionSignalState(){
 // 4. FUNCIÓN DE CONTROL CON LÓGICA DE SUSCRIPCIÓN ROBUSTA
 // *****************************************************************
 
-void AppBusTCP_R_StateM::sendDataToCloud(){
-
+void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
+{
     if (socket.getState() != inet::TcpSocket::CONNECTED) {
         EV_ERROR << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
-        //stablishTCP();
+        // ------------------- restart socket -----------------------
+        socket_ready = false;
+        socket_state_close = true;
+        count_reTX = 0;
+        // ----------------------------------------------------------
         return;
     }
+
+    //EV_ERROR << "socket WIFI OK2: "<< endl;
 
     if(Vehicle_With_Interface){
         // -------------- fill buffer OUTPUT AGAIN -----------------
         if (outputBuffer.isEmpty()) {
+            EV_ERROR << "socket WIFI OK3: "<< endl;
+            EV_ERROR << "recovery data on bufferOut times: "<< deadline_start << " " << deadline_until << endl;
 
-            if(sdcard.size() >= 5){
-                auto batch = sdcard.popBatch(20);
-                outputBuffer.load(batch);
+            auto batch = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
+
+            // chech if OutputBuffer block is not complete because sdcard don't has more data pending
+            if ((ConnectionToAP)&&(batch.size() < 20)) {
+                if (inputBuffer.size() > 0) {
+                    EV_INFO << "SDCard vacía o sin urgencias. Haciendo bypass desde InputBuffer." << endl;
 
 
-                // aqui va el timer SDCARD
-                int data_recovery = outputBuffer.size();
+                    std::vector<QueuedData> freshData = inputBuffer.flush();
 
-                if(data_recovery > 0){
-                    // ****** active timer to blockched system *****
-                    //delay_sdcard = 0;
-                    //control_all_timers = 0;
-                    delay_sdcard = (data_recovery * 30)/20; //(300/10)ms
 
-                    // ************* Stop Control Tasks ********************
-                    //time_threshold_send_data += delay_sdcard;
-                    EV_ERROR << "NUM DATA RECOVERY: num, delay, tiempo " << data_recovery << " " << delay_sdcard << " " << time_threshold_send_data << endl;
-
+                    for (auto& item : freshData) {
+                        if (batch.size() < 20) {
+                            batch.push_back(item.data);
+                        } else {
+                            // if OutputBuffer was fill, the rest of data save on sdcard
+                            std::vector<QueuedData> remainder;
+                            remainder.push_back(item);
+                            sdcard.pushBatch(remainder);
+                        }
+                    }
                 }
-                //emit(outputBufferSignal, outputBuffer.getCurrentBytes());
             }
 
+
+            if(!batch.empty())
+                outputBuffer.load(batch);
+
+            // aqui va el timer SDCARD
+            int data_recovery = outputBuffer.size();
+
+            if(data_recovery > 0){
+                delay_sdcard = (data_recovery * 30)/20; //(300/10)ms
+                EV_ERROR << "NUM DATA RECOVERY: num, delay, tiempo " << data_recovery << " " << delay_sdcard << " " << time_threshold_send_data << endl;
+
+            }else{
+                take_time_when_find_expired_data = false; // allow get out and continue to check data expired
+                if(ConnectionToAP)
+                    EV_ERROR << "not more data on SDCard "<< endl;
+                else
+                    EV_ERROR << "not more data on Range search next expired data: "<< endl;
+
+            }
+
+              //  update when inputBuffer was empty
+              double currentBytes = (double)sdcard.totalSize();
+              double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+              if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+              emit(sdcardBufferSignal, currentBytes);
+              emit(sdcardPercentSignal, usagePercent);
+              // Maintain the last state
+              static_currentBytes = currentBytes;
+              static_usagePercent = usagePercent;
+
         }else {
+            EV_ERROR << "socket WIFI OK4: "<< endl;
 
             // ------ create the packet -----------------
             auto packet = new inet::Packet("accident_car_test_TCP");
@@ -799,19 +943,32 @@ void AppBusTCP_R_StateM::sendDataToCloud(){
             std::string data = outputBuffer.getOne();
             //EV_WARN << "SEND next DATA NUMBER: " << Retry_Sent << endl;
             lastMessageSent = data;
-            Retry_Sent++;
+            //Retry_Sent++;
 
             auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
 
             timestampPayload(payload);
 
             packet->insertAtBack(payload);
-
+            EV_ERROR << "test1: "<< endl;
             socket.send(packet);
+
+            EV_ERROR << "PACKET SENT to SERVER: "<< endl;
 
             count_msg_TCP_send++;
 
-            //emit(outputBufferSignal, outputBuffer.getCurrentBytes());
+            if (interface_output == "wifi") {
+                // use wifi
+                static_outputBuff_wifi = outputBuffer.size();
+                emit(outputBufferSignal_wifi, static_outputBuff_wifi);
+            }
+            else if (interface_output == "lte") {
+                // use lte
+                static_outputBuff_lte = outputBuffer.size();
+                emit(outputBufferSignal_lte, static_outputBuff_lte);
+            }
+
+
 
         }
 
@@ -960,6 +1117,13 @@ bool AppBusTCP_R_StateM::stablishTCP(bool Use_Netwok)
     // Use_Network --> 0 (Cellular)
     // Use_Network --> 1 (WIFI)
 
+    EV_INFO << "estableciendo TCP PARA INTERFACE : " << Use_Netwok << endl;
+    if(ConnectionToAP){
+        EV_INFO << "DENTRO TCP Connected to WIFI " << endl;
+    }else{
+        EV_INFO << "DENTRO TCP Connecting to LTE " << endl;
+    }
+
     printSocketInfo();
 
     // Destroy internal structure establish to TCP. it mean clean the socket
@@ -973,10 +1137,9 @@ bool AppBusTCP_R_StateM::stablishTCP(bool Use_Netwok)
     //**************** this block no necessary **************************************
     //**************** because this step was made in the start STAGE GW. ************
     //**************** look it (SignStateConnectAP==2) ******************************
-    // getting IP from Wlan0 interface
-    ////wifi = interfaceTable->findInterfaceByName("wlan0");
-    // getting IP from cellular interface
-    ////celular = interfaceTable->findInterfaceByName("cellular");
+
+
+
     //*******************************************************************************
     const inet::Ipv4InterfaceData* ipv4Data = nullptr;
 
@@ -1043,59 +1206,62 @@ void AppBusTCP_R_StateM::socketDataArrived(inet::TcpSocket *socket, inet::Packet
     // converter Bytes on Strings
     std::string receivedMsg(bytes.begin(), bytes.end());
 
+
+    // ***************************** not waiting for ACK application level **********************************
+
     // print cm
-    EV_INFO << "🟢 msg received: [" << receivedMsg << "]" << endl;
-    EV_INFO << "🟢 msg hoppe: [" << lastMessageSent << "]" << endl;
+    //EV_INFO << "🟢 msg received: [" << receivedMsg << "]" << endl;
+    //EV_INFO << "🟢 msg hoppe: [" << lastMessageSent << "]" << endl;
 
 
-    if (receivedMsg == lastMessageSent) {
-        // -------------------------- RTT CALCULATION -----------------------
-        RTT_stop = simTime();
-        simtime_t duration = RTT_stop - RTT_start;
-        // CHANGE TO ms
-        new_RTT_ms = SIMTIME_DBL(duration) * 1000;
-        EV_INFO << "RTT AVERAGE: " << new_RTT_ms << " ms" << endl;
+//    if (receivedMsg == lastMessageSent) {
+//        // -------------------------- RTT CALCULATION -----------------------
+//        RTT_stop = simTime();
+//        simtime_t duration = RTT_stop - RTT_start;
+//        // CHANGE TO ms
+//        new_RTT_ms = SIMTIME_DBL(duration) * 1000;
+//        EV_INFO << "RTT AVERAGE: " << new_RTT_ms << " ms" << endl;
+//
+//        emit(RTT_ms, new_RTT_ms);
+//
+//
+//        // ****************** Calculation TECNICS FOR RTO (Re-Transmsion Time-Out) ********************************
+//
+//        // ********** using EMA FILTER ********************************************************
+//
+//        if(last_RTT_ms > 0.0){
+//            last_RTT_ms = ((1 - smoothing_Factor) * last_RTT_ms) + (smoothing_Factor * new_RTT_ms);
+//        }else{
+//            last_RTT_ms = new_RTT_ms; // first time measure
+//        }
+//
+//
+//        //-------------------------------------------------------------------------------------
+//
+//
+//        // ****************** using Adaptative lineal response ********************************
+//        // ******************* based on packet fail *******************************************
+//        // Adaptative_TCP -= 50; // timeout reduce (AGRESIVE)
+//        // ------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//
+//        // ****************** this is mandatory code for send next message ********************
+//        count_msg_TCP_receive++;
+//        lastMessageSent.clear();
+//        EV_INFO << "Echo received number: " << count_msg_TCP_receive << endl;
+//        Retry_Sent = 0; // send next message
+//
+//        timer_Control_Send_Data = time_threshold_send_data; // used to send the next data immediately
+//        //--------------------------------------------------------------------------------------
+//
+//
+//    }
 
-        emit(RTT_ms, new_RTT_ms);
-
-
-        // ****************** Calculation TECNICS FOR RTO (Re-Transmsion Time-Out) ********************************
-
-        // ********** using EMA FILTER ********************************************************
-
-        if(last_RTT_ms > 0.0){
-            last_RTT_ms = ((1 - smoothing_Factor) * last_RTT_ms) + (smoothing_Factor * new_RTT_ms);
-        }else{
-            last_RTT_ms = new_RTT_ms; // first time measure
-        }
-
-
-        //-------------------------------------------------------------------------------------
-
-
-        // ****************** using Adaptative lineal response ********************************
-        // ******************* based on packet fail *******************************************
-        // Adaptative_TCP -= 50; // timeout reduce (AGRESIVE)
-        // ------------------------------------------------------------------------------------
-
-
-
-
-
-
-        // ****************** this is mandatory code for send next message ********************
-        count_msg_TCP_receive++;
-        lastMessageSent.clear();
-        EV_INFO << "Echo received number: " << count_msg_TCP_receive << endl;
-        Retry_Sent = 0; // send next message
-
-        timer_Control_Send_Data = time_threshold_send_data; // used to send the next data immediately
-        //--------------------------------------------------------------------------------------
-
-
-    }
-
-    emit(packetReceiveTCPSignal, count_msg_TCP_receive);
+    //emit(packetReceiveTCPSignal, count_msg_TCP_receive);
 
     // 6. Finalmente, liberar la memoria del paquete entrante
     delete packet;
@@ -1125,7 +1291,39 @@ void AppBusTCP_R_StateM::socketClosed(inet::TcpSocket *socket) {
 }
 
 void AppBusTCP_R_StateM::socketFailure(inet::TcpSocket *socket, int code) {
+    if (!socket) return;
+
     EV_ERROR << "Error socket TCP: " << code << " (Handover LTE)" << endl;
+
+    if (socket->getState() != inet::TcpSocket::CLOSED) {
+        socket->abort();
+    }
+
+    // =================================================================
+    // SOLUCIÓN MAESTRA: Limpiar la agenda global de OMNeT++ (FES)
+    // =================================================================
+    // Buscamos cualquier mensaje que esta aplicación ya le haya enviado
+    // al módulo TCP y que esté esperando en cola para este mismo instante.
+    cFutureEventSet *fes = cSimulation::getActiveSimulation()->getFES();
+
+    for (int i = 0; i < fes->getLength(); ) {
+        cEvent *event = fes->get(i);
+        cMessage *msg = dynamic_cast<cMessage *>(event);
+
+        // Verificamos si el mensaje salió de ESTA app y tiene como destino el módulo TCP de la capa inferior
+        if (msg && msg->getSenderModule() == this && msg->getArrivalModule() == getModuleByPath("^.tcp")) {
+            EV_WARN << "Interceptado mensaje fantasma en la FES de OMNeT++: " << msg->getName() << ". Eliminando..." << endl;
+
+            fes->remove(event); // Lo sacamos de la agenda de simulación
+            delete event;       // Lo borramos de la memoria RAM
+
+            // NOTA: No incrementamos 'i' porque al remover un elemento, el siguiente toma su índice
+        } else {
+            i++;
+        }
+    }
+    // =================================================================
+
     socket_ready = false;
     socket_state_close = true; // start cooldown
     count_reTX = 0;

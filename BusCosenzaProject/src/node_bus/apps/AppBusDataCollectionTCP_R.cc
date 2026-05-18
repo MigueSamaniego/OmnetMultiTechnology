@@ -541,10 +541,11 @@ void AppBusDataCollectionTCP_R::handleMessage(cMessage *msg)
                 if(socket_ready){
 
                     if(Retry_Sent == 0){
-                        /****** Sent Message to Cloud *********************/
-                        sendDataToCloud(); // prepare and send message
-                        /**************************************************/
-
+                        if(ConnectionToAP){
+                            /****** Sent Message to Cloud *********************/
+                            sendDataToCloud(); // prepare and send message
+                            /**************************************************/
+                        }
                     }else if((Retry_Sent >= 1)&&(Retry_Sent < 4)) {
 
                             Adaptative_TCP = 1000;

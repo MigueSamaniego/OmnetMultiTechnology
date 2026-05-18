@@ -1,0 +1,187 @@
+#ifndef BUFFERS_H
+#define BUFFERS_H
+
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <omnetpp.h>
+
+using namespace omnetpp;
+
+// 1. Definición de Prioridades
+enum Priority {
+    P_EMERGENCY = 0,
+    P_TRAFFIC = 1,
+    P_AIR = 2,
+    P_GPS = 3,
+    P_OTHER = 4
+};
+
+// 2. Estructura para transportar datos (Usada por InputBuffer y SDCard)
+struct QueuedData {
+    std::string data;
+    Priority prio;
+};
+
+// 3. Estructura para reportar el estado de las colas (Usada por get_size_queues)
+struct QueueState {
+    int p1, p2, p3, p4, p5;
+};
+
+// 4. Clase SDCardBuffer
+class SDCardBuffer {
+private:
+    static const int NUM_PRIORITIES = 5;
+    static const int MAX_PER_PRIO = 2000;
+
+    struct SDEntry {
+        std::string content;
+        simtime_t arrivalTime;
+    };
+
+    SDEntry buffer[NUM_PRIORITIES][MAX_PER_PRIO];
+    int head[NUM_PRIORITIES] = {0,0,0,0,0};
+    int tail[NUM_PRIORITIES] = {0,0,0,0,0};
+    int count[NUM_PRIORITIES] = {0,0,0,0,0};
+
+    const double maxWaitTime[NUM_PRIORITIES] = {0.0, 30.0, 40.0, 50.0, 60.0};
+    const float weights[NUM_PRIORITIES] = {0, 5.0, 3.0, 1.5, 0.5};
+
+public:
+    // CORRECCIÓN: El vector es de QueuedData, no QueueState
+    void pushBatch(const std::vector<QueuedData>& batch, simtime_t now) {
+        for (const auto& item : batch) {
+            int p = (int)item.prio;
+            if (count[p] == MAX_PER_PRIO) {
+                tail[p] = (tail[p] + 1) % MAX_PER_PRIO;
+                count[p]--;
+            }
+            buffer[p][head[p]] = {item.data, now};
+            head[p] = (head[p] + 1) % MAX_PER_PRIO;
+            count[p]++;
+        }
+    }
+
+    QueueState get_size_queues() const {
+        return {count[0], count[1], count[2], count[3], count[4]};
+    }
+
+    bool hasExpiredData(simtime_t currentTime) {
+        for (int p = 0; p < NUM_PRIORITIES; p++) {
+            if (count[p] > 0) {
+                if (p == 0 || (currentTime - buffer[p][tail[p]].arrivalTime >= maxWaitTime[p]))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    std::vector<std::string> popBatch(int n, simtime_t currentTime, bool isWifi) {
+        std::vector<std::string> result;
+
+        // FASE 1: Expirados
+        for (int p = 0; p < NUM_PRIORITIES; p++) {
+            while (count[p] > 0 && result.size() < n) {
+                bool mustSend = (p == 0) || isWifi ||
+                                (currentTime - buffer[p][tail[p]].arrivalTime >= maxWaitTime[p]);
+                if (mustSend) {
+                    result.push_back(buffer[p][tail[p]].content);
+                    tail[p] = (tail[p] + 1) % MAX_PER_PRIO;
+                    count[p]--;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // FASE 2: Relleno Proporcional
+        int remaining_gap = n - result.size();
+        if (remaining_gap > 0) {
+            float total_weight = 0;
+            int quota[5] = {0, 0, 0, 0, 0};
+
+            for (int i = 1; i < 5; i++) {
+                if (count[i] > 0) total_weight += weights[i];
+            }
+
+            if (total_weight > 0) {
+                int allocated = 0;
+                for (int i = 1; i < 5; i++) {
+                    if (count[i] > 0) {
+                        quota[i] = (int)((remaining_gap * weights[i]) / total_weight);
+                        if (quota[i] > count[i]) quota[i] = count[i];
+                        allocated += quota[i];
+                    }
+                }
+
+                // Reparto de restos por redondeo
+                int still_free = remaining_gap - allocated;
+                for (int i = 1; i < 5 && still_free > 0; i++) {
+                    while (count[i] > quota[i] && still_free > 0) {
+                        quota[i]++;
+                        still_free--;
+                        allocated++;
+                    }
+                }
+
+                for (int j = 1; j < 5; j++) {
+                    while (quota[j] > 0 && count[j] > 0) {
+                        result.push_back(buffer[j][tail[j]].content);
+                        tail[j] = (tail[j] + 1) % MAX_PER_PRIO;
+                        count[j]--;
+                        quota[j]--;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    int size() const {
+        int total = 0;
+        for(int i=0; i<NUM_PRIORITIES; i++) total += count[i];
+        return total;
+    }
+};
+
+// 5. Clase InputBuffer
+class InputBuffer {
+private:
+    static const int MAX = 20;
+    std::vector<QueuedData> buffer;
+
+public:
+    bool add(const std::string& data, Priority prio) {
+        buffer.push_back({data, prio});
+        return buffer.size() >= MAX;
+    }
+
+    std::vector<QueuedData> flush() {
+        std::vector<QueuedData> temp = buffer;
+        buffer.clear();
+        return temp;
+    }
+
+    int size() const { return buffer.size(); }
+};
+
+// 6. Clase OutputBuffer
+class OutputBuffer {
+private:
+    std::vector<std::string> buffer;
+
+public:
+    void load(const std::vector<std::string>& dataVec) { buffer = dataVec; }
+    bool hasData() const { return !buffer.empty(); }
+    bool isEmpty() const { return buffer.empty(); }
+    int size() const { return buffer.size(); }
+
+    std::string getOne() {
+        if (buffer.empty()) return "";
+        std::string data = buffer.front();
+        buffer.erase(buffer.begin());
+        return data;
+    }
+};
+
+#endif

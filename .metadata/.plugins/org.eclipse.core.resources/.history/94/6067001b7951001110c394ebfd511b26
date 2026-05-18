@@ -1,0 +1,17 @@
+<config>
+    <interface hosts="eNodeB*" names="cellular" address="10.x.x.x" netmask="255.255.0.0"/>
+
+    <interface hosts="router" names="eth0" address="192.168.0.1" netmask="255.255.255.0"/>
+
+    <interface hosts="ap[*]" names="wlan0" unassigned="true"/>
+    
+    <interface hosts="*" address="15.x.x.x" netmask="255.255.255.0"/>
+    
+    <route hosts="server" destination="192.168.0.0" netmask="255.255.255.0" gateway="router"/>
+    <route hosts="server" destination="10.0.0.0" netmask="255.255.0.0" gateway="router"/>
+    
+    <route hosts="router" destination="192.168.0.0" netmask="255.255.255.0" interface="eth0"/>
+    <route hosts="router" destination="10.0.0.0" netmask="255.255.0.0" gateway="pgw"/>
+
+    <route hosts="ap[*]" destination="0.0.0.0" netmask="0.0.0.0" gateway="router"/>
+</config>

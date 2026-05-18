@@ -4,7 +4,7 @@
 #include "../apps/VeinsInetApplicationBase.h"
 #include "inet/common/INETDefs.h"
 #include "inet/common/geometry/common/Coord.h"
-#include "../sdcard/Buffers.h"
+#include "../sdcard/Buffers_Expiration.h"
 
 #include "omnetpp.h" // useful to cListener y simsignal_t
 
@@ -74,7 +74,8 @@ private:
 
     // buffer occupation
     simsignal_t inputBufferSignal;
-    simsignal_t outputBufferSignal;
+    simsignal_t outputBufferSignal_wifi;
+    simsignal_t outputBufferSignal_lte;
     simsignal_t sdcardBufferSignal;
 
     simsignal_t sdcardPercentSignal;
@@ -96,6 +97,9 @@ private:
     simtime_t nextEmissionTime;
     simtime_t nextControlTask;
 
+    int deadline;
+    simtime_t deadline_start;
+    int deadline_until;
 
     double sigma = 0.00005; // ~5-10 meters aprox
 
@@ -123,6 +127,18 @@ private:
 
     int control_all_timers = 0;
 
+    int check_timers_expired = 0;
+    bool take_time_when_find_expired_data = false;
+
+
+    // ack tcp
+    //simsignal_t tcpDataAckedSignal;
+
+    double static_currentBytes = 0.0;
+    double static_usagePercent = 0.0;
+    long static_inputBuff = 0;
+    long static_outputBuff_wifi = 0;
+    long static_outputBuff_lte = 0;
 
 protected:
     // ** MODIFICAR: Reemplazar el initialize simple por el de etapas **
@@ -132,7 +148,8 @@ protected:
     virtual bool startApplication() override;
     virtual bool stopApplication() override;
     virtual void processPacket(std::shared_ptr<inet::Packet> pk) override;
-    virtual void sendDataToCloud();
+    //virtual void sendDataToCloud();
+    virtual void sendDataToCloud(const std::string& interface_output);
     virtual void handleMessage(cMessage *msg) override;
 
     // new set methods mandatory to work with sockets
