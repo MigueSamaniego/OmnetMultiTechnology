@@ -66,8 +66,8 @@ public:
         return {count[0], count[1], count[2], count[3], count[4]};
     }
 
-    int get_number_data_on_sdcard() const {
-        return count[0]+count[1]+count[2]+count[3]+count[4];
+    long data_priority_on_sdcard() const {
+        return count[0]+count[1]+count[2]+count[3]; //count[4] --> it is not priority
     }
 
     // Verifica si hay datos que expirarán antes de llegar al próximo punto WiFi

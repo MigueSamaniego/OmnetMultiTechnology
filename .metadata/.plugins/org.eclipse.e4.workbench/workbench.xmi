@@ -59,11 +59,9 @@
           <tags>persp.newWizSC:org.omnetpp.cdt.wizards.NewOmnetppClass</tags>
           <tags>persp.perspSC:org.eclipse.ui.resourcePerspective</tags>
           <tags>persp.perspSC:org.omnetpp.main.OmnetppPerspective</tags>
-          <children xsi:type="basic:PartSashContainer" xmi:id="_Hw9cpUk5EfGndLhOOXMS9Q" selectedElement="_Hw9cpkk5EfGndLhOOXMS9Q" horizontal="true">
+          <children xsi:type="basic:PartSashContainer" xmi:id="_Hw9cpUk5EfGndLhOOXMS9Q" selectedElement="_Hw9crkk5EfGndLhOOXMS9Q" horizontal="true">
             <children xsi:type="basic:PartSashContainer" xmi:id="_Hw9cpkk5EfGndLhOOXMS9Q" containerData="2424" selectedElement="_Hw9cp0k5EfGndLhOOXMS9Q">
               <children xsi:type="basic:PartStack" xmi:id="_Hw9cp0k5EfGndLhOOXMS9Q" elementId="left" containerData="7485" selectedElement="_Hw9cqEk5EfGndLhOOXMS9Q">
-                <tags>noFocus</tags>
-                <tags>active</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_Hw9cqEk5EfGndLhOOXMS9Q" elementId="org.eclipse.ui.navigator.ProjectExplorer" ref="_Hw9fBEk5EfGndLhOOXMS9Q" closeable="true">
                   <tags>View</tags>
                   <tags>categoryTag:General</tags>
@@ -341,9 +339,10 @@
       <tags>categoryTag:Help</tags>
     </sharedElements>
     <sharedElements xsi:type="advanced:Area" xmi:id="_Hw9e1Ek5EfGndLhOOXMS9Q" elementId="org.eclipse.ui.editorss" selectedElement="_Hw9e1Uk5EfGndLhOOXMS9Q">
-      <children xsi:type="basic:PartStack" xmi:id="_Hw9e1Uk5EfGndLhOOXMS9Q" elementId="org.eclipse.e4.primaryDataStack" selectedElement="_7yqQgFKtEfGQGKocdJGeLw">
+      <children xsi:type="basic:PartStack" xmi:id="_Hw9e1Uk5EfGndLhOOXMS9Q" elementId="org.eclipse.e4.primaryDataStack" selectedElement="_Hw9e3Ek5EfGndLhOOXMS9Q">
         <tags>org.eclipse.e4.primaryDataStack</tags>
         <tags>EditorStack</tags>
+        <tags>active</tags>
         <children xsi:type="basic:Part" xmi:id="_Hw9e1kk5EfGndLhOOXMS9Q" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="omnetppTCP.ini" iconURI="platform:/plugin/org.omnetpp.inifile.editor/icons/inifile.png" closeable="true">
           <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.omnetpp.inifile.editor.editors.InifileEditor&quot; name=&quot;omnetppTCP.ini&quot; partName=&quot;omnetppTCP.ini&quot; title=&quot;omnetppTCP.ini&quot; tooltip=&quot;BusCosenzaProject/simulations/BusCosenza/cars/omnetppTCP.ini&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/simulations/BusCosenza/cars/omnetppTCP.ini&quot;/>&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
@@ -357,34 +356,24 @@
           <tags>org.eclipse.cdt.ui.editor.CEditor</tags>
         </children>
         <children xsi:type="basic:Part" xmi:id="_Hw9e3Ek5EfGndLhOOXMS9Q" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="AppBusTCP_R_StateM.cc" iconURI="platform:/plugin/org.eclipse.cdt.ui/icons/obj16/c_file_obj.gif" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;AppBusTCP_R_StateM.cc&quot; partName=&quot;AppBusTCP_R_StateM.cc&quot; title=&quot;AppBusTCP_R_StateM.cc&quot; tooltip=&quot;BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.cc&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.cc&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;36410&quot; selectionTopPixel=&quot;13613&quot;/>&#xA;&lt;/editor>"/>
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;AppBusTCP_R_StateM.cc&quot; partName=&quot;AppBusTCP_R_StateM.cc&quot; title=&quot;AppBusTCP_R_StateM.cc&quot; tooltip=&quot;BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.cc&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.cc&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;39225&quot; selectionTopPixel=&quot;15064&quot;/>&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
           <tags>removeOnHide</tags>
           <tags>org.eclipse.cdt.ui.editor.CEditor</tags>
+          <tags>active</tags>
+          <tags>activeOnClose</tags>
         </children>
         <children xsi:type="basic:Part" xmi:id="_Cc6UQFKpEfGPzZcHRqO7Yw" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="AppBusTCP_R_StateM.h" iconURI="platform:/plugin/org.eclipse.cdt.ui/icons/obj16/c_file_obj.gif" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;AppBusTCP_R_StateM.h&quot; partName=&quot;AppBusTCP_R_StateM.h&quot; title=&quot;AppBusTCP_R_StateM.h&quot; tooltip=&quot;BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.h&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.h&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;18&quot; selectionOffset=&quot;2058&quot; selectionTopPixel=&quot;1138&quot;/>&#xA;&lt;/editor>"/>
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;AppBusTCP_R_StateM.h&quot; partName=&quot;AppBusTCP_R_StateM.h&quot; title=&quot;AppBusTCP_R_StateM.h&quot; tooltip=&quot;BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.h&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.h&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;18&quot; selectionOffset=&quot;2058&quot; selectionTopPixel=&quot;671&quot;/>&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
           <tags>removeOnHide</tags>
           <tags>org.eclipse.cdt.ui.editor.CEditor</tags>
         </children>
         <children xsi:type="basic:Part" xmi:id="_hZA3gFKSEfGPzZcHRqO7Yw" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="Buffers_Expiration.h" iconURI="platform:/plugin/org.eclipse.cdt.ui/icons/obj16/c_file_obj.gif" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;Buffers_Expiration.h&quot; partName=&quot;Buffers_Expiration.h&quot; title=&quot;Buffers_Expiration.h&quot; tooltip=&quot;BusCosenzaProject/src/node_bus/sdcard/Buffers_Expiration.h&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/src/node_bus/sdcard/Buffers_Expiration.h&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;2&quot; selectionOffset=&quot;548&quot; selectionTopPixel=&quot;289&quot;/>&#xA;&lt;/editor>"/>
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;Buffers_Expiration.h&quot; partName=&quot;Buffers_Expiration.h&quot; title=&quot;Buffers_Expiration.h&quot; tooltip=&quot;BusCosenzaProject/src/node_bus/sdcard/Buffers_Expiration.h&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/src/node_bus/sdcard/Buffers_Expiration.h&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;1724&quot; selectionTopPixel=&quot;887&quot;/>&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
           <tags>removeOnHide</tags>
           <tags>org.eclipse.cdt.ui.editor.CEditor</tags>
-        </children>
-        <children xsi:type="basic:Part" xmi:id="_g87rkFKqEfGQGKocdJGeLw" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="AppBusTCP_R_StateM.ned" iconURI="platform:/plugin/org.omnetpp.ned.editor/icons/nedfile.gif" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.omnetpp.ned.editor&quot; name=&quot;AppBusTCP_R_StateM.ned&quot; partName=&quot;AppBusTCP_R_StateM.ned&quot; title=&quot;AppBusTCP_R_StateM.ned&quot; tooltip=&quot;BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.ned&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/src/node_bus/apps/AppBusTCP_R_StateM.ned&quot;/>&#xA;&lt;/editor>"/>
-          <tags>Editor</tags>
-          <tags>removeOnHide</tags>
-          <tags>org.omnetpp.ned.editor</tags>
-        </children>
-        <children xsi:type="basic:Part" xmi:id="_7yqQgFKtEfGQGKocdJGeLw" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="General.anf" iconURI="platform:/plugin/org.omnetpp.scave/icons/scavefile.png" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.omnetpp.scave.editors.ScaveEditor&quot; name=&quot;General.anf&quot; partName=&quot;General.anf&quot; title=&quot;General.anf&quot; tooltip=&quot;BusCosenzaProject/simulations/BusCosenza/cars/results/General.anf&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/BusCosenzaProject/simulations/BusCosenza/cars/results/General.anf&quot;/>&#xA;&lt;/editor>"/>
-          <tags>Editor</tags>
-          <tags>removeOnHide</tags>
-          <tags>org.omnetpp.scave.editors.ScaveEditor</tags>
         </children>
       </children>
     </sharedElements>
@@ -394,8 +383,6 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view CommonNavigator.LINKING_ENABLED=&quot;1&quot; org.eclipse.cdt.ui.cview.groupincludes=&quot;false&quot; org.eclipse.cdt.ui.cview.groupmacros=&quot;false&quot; org.eclipse.cdt.ui.editor.CUChildren=&quot;true&quot; org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets=&quot;0&quot;>&#xA;&lt;lastRecentlyUsedFilters/>&#xA;&lt;/view>"/>
       <tags>View</tags>
       <tags>categoryTag:General</tags>
-      <tags>active</tags>
-      <tags>activeOnClose</tags>
       <menus xmi:id="_Hw9fBUk5EfGndLhOOXMS9Q" elementId="org.eclipse.ui.navigator.ProjectExplorer">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -704,7 +691,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_Hw-ERUk5EfGndLhOOXMS9Q" elementId="org.eclipse.ui.workbench.file">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_lXvfcFKpEfGQGKocdJGeLw" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Print" command="_Hw_Sskk5EfGndLhOOXMS9Q"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_avXNsFK4EfGbQ6jWHNwUjA" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Print" command="_Hw_Sskk5EfGndLhOOXMS9Q"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_Hw-EU0k5EfGndLhOOXMS9Q" elementId="group.edit" toBeRendered="false">
         <tags>toolbarSeparator</tags>
@@ -717,7 +704,7 @@
         <tags>toolbarSeparator</tags>
         <children xsi:type="menu:ToolBarSeparator" xmi:id="_Hw-EWkk5EfGndLhOOXMS9Q" elementId="additions" toBeRendered="false"/>
       </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_Hw-Ehkk5EfGndLhOOXMS9Q" elementId="org.eclipse.ui.edit.text.actionSet.presentation" visible="false">
+      <children xsi:type="menu:ToolBar" xmi:id="_Hw-Ehkk5EfGndLhOOXMS9Q" elementId="org.eclipse.ui.edit.text.actionSet.presentation">
         <tags>Draggable</tags>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_Hw-Ei0k5EfGndLhOOXMS9Q" elementId="org.eclipse.debug.ui.launchActionSet">
@@ -732,7 +719,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_Hw-El0k5EfGndLhOOXMS9Q" elementId="org.eclipse.ui.workbench.navigate">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_lXyiwFKpEfGQGKocdJGeLw" elementId="org.eclipse.ui.window.pinEditor" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Pin Editor" enabled="false" type="Check" command="_Hw_SOUk5EfGndLhOOXMS9Q"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_avZp8FK4EfGbQ6jWHNwUjA" elementId="org.eclipse.ui.window.pinEditor" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Pin Editor" type="Check" command="_Hw_SOUk5EfGndLhOOXMS9Q"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_Hw-EqUk5EfGndLhOOXMS9Q" elementId="group.editor" toBeRendered="false">
         <tags>toolbarSeparator</tags>

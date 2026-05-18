@@ -512,7 +512,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                             static_inputBuff = inputBuffer.size();
 
-                            emit(inputBufferSignal, static_inputBuff);
+                            //emit(inputBufferSignal, static_inputBuff);
 
                             if (state_buff) {
 
@@ -521,8 +521,6 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 // save buffer en SDCARD
                                 auto batch = inputBuffer.flush();
-
-                                // Ahora pushBatch recibirá un vector de QueuedData (data + prio)
                                 sdcard.pushBatch(batch);
 
                                 EV_INFO << "SAVING LAST GPS" << endl;
@@ -571,7 +569,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                              static_inputBuff = inputBuffer.size();
 
-                             emit(inputBufferSignal, static_inputBuff);
+                             //emit(inputBufferSignal, static_inputBuff);
 
                              if (state_buff) {
 
@@ -580,8 +578,6 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                  // save buffer en SDCARD
                                  auto batch = inputBuffer.flush();
-
-                                 // Ahora pushBatch recibirá un vector de QueuedData (data + prio)
                                  sdcard.pushBatch(batch);
 
                                  EV_INFO << "SAVING LAST POLUTION"<< " " << counter_msg << endl;
@@ -632,7 +628,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                              static_inputBuff = inputBuffer.size();
 
-                             emit(inputBufferSignal, static_inputBuff);
+                             //emit(inputBufferSignal, static_inputBuff);
 
                              if (state_buff) {
 
@@ -641,8 +637,6 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                   // save buffer en SDCARD
                                   auto batch = inputBuffer.flush();
-
-                                  // Ahora pushBatch recibirá un vector de QueuedData (data + prio)
                                   sdcard.pushBatch(batch);
 
                                   EV_INFO << "SAVING LAST VEHICLE"<< " " << counter_msg << endl;
@@ -747,7 +741,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                            sendDataToCloud("lte"); // prepare and send message
                                            /**************************************************/
 
-                                           time_threshold_send_data = 2; // 20ms to retry
+                                           time_threshold_send_data = 4; // 20ms to retry
 
                                            if(!take_time_when_find_expired_data){
                                                // not increase the count number msg sent
@@ -894,33 +888,22 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
             EV_ERROR << "socket WIFI OK3: "<< endl;
             EV_ERROR << "recovery data on bufferOut times: "<< deadline_start << " " << deadline_until << endl;
 
-            auto batch = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
+            long data_priority_on_sd = sdcard.data_priority_on_sdcard();
 
-            // chech if OutputBuffer block is not complete because sdcard don't has more data pending
-            if ((ConnectionToAP)&&(batch.size() < 20)) {
-                if (inputBuffer.size() > 0) {
-                    EV_INFO << "SDCard vacía o sin urgencias. Haciendo bypass desde InputBuffer." << endl;
+            if(data_priority_on_sd >= 20){
+                auto batch = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
+                if(!batch.empty())
+                    outputBuffer.load(batch);
+            }else {
+                // save buffer en SDCARD
+                auto batch = inputBuffer.flush();
+                sdcard.pushBatch(batch);
 
+                auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
 
-                    std::vector<QueuedData> freshData = inputBuffer.flush();
-
-
-                    for (auto& item : freshData) {
-                        if (batch.size() < 20) {
-                            batch.push_back(item.data);
-                        } else {
-                            // if OutputBuffer was fill, the rest of data save on sdcard
-                            std::vector<QueuedData> remainder;
-                            remainder.push_back(item);
-                            sdcard.pushBatch(remainder);
-                        }
-                    }
-                }
+                if(!batch1.empty())
+                    outputBuffer.load(batch1);
             }
-
-
-            if(!batch.empty())
-                outputBuffer.load(batch);
 
             // aqui va el timer SDCARD
             int data_recovery = outputBuffer.size();
