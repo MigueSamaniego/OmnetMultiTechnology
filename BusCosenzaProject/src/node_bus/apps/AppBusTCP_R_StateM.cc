@@ -166,6 +166,13 @@ void AppBusTCP_R_StateM::initialize(int stage)
 
         RTT_ms = registerSignal("timeRTT");
 
+
+        size_priority_1 = registerSignal("buffer_priority_1");
+        size_priority_2 = registerSignal("buffer_priority_2");
+        size_priority_3 = registerSignal("buffer_priority_3");
+        size_priority_4 = registerSignal("buffer_priority_4");
+        size_priority_wifi = registerSignal("buffer_priority_wifi");
+
         // START SDCAR FILL TO 50%
         //int memory_start_with = 0;
         //sdcard.preloadHalf(memory_start_with);
@@ -803,6 +810,14 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              emit(outputBufferSignal_wifi, static_outputBuff_wifi);
                              emit(outputBufferSignal_lte, static_outputBuff_lte);
                              emit(packetSendTCPSignal, count_msg_TCP_send); // just to try
+
+                             QueueState state_priority = sdcard.get_size_queues();
+                             emit(size_priority_1, state_priority.p1);
+                             emit(size_priority_2, state_priority.p2);
+                             emit(size_priority_3, state_priority.p3);
+                             emit(size_priority_4, state_priority.p4);
+                             emit(size_priority_wifi, state_priority.p5);
+
 
                              //EV_ERROR << "msg guardados en sdcadr: "<< " " << counter_msg << endl;
 

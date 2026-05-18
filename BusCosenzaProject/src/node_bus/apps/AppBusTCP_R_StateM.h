@@ -80,6 +80,12 @@ private:
 
     simsignal_t sdcardPercentSignal;
 
+    simsignal_t size_priority_1;
+    simsignal_t size_priority_2;
+    simsignal_t size_priority_3;
+    simsignal_t size_priority_4;
+    simsignal_t size_priority_wifi;
+
     // time of working interfaces
     simtime_t connectionWiFiStart;
 

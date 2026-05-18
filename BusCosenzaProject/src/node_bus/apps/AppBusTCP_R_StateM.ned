@@ -38,6 +38,12 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
         @signal[sdcardBufferSize](type="long");
     	@signal[sdcardPercentSize](type="double");
     	
+    	@signal[buffer_priority_1](type="int");
+    	@signal[buffer_priority_2](type="int");
+    	@signal[buffer_priority_3](type="int");
+    	@signal[buffer_priority_4](type="int");
+    	@signal[buffer_priority_wifi](type="int");
+    	
     	// time connection with interfaces
     	@signal[timeWiFiStateON](type="double");
     	
@@ -59,6 +65,13 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
         @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last);
 		//@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
 		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last);
+		
+		// number of messajes on sdcard size
+		@statistic[buffer_priority_1](title="Buffer Priority Emergency"; source="buffer_priority_1"; record=vector,last);
+		@statistic[buffer_priority_2](title="Buffer Priority 2"; source="buffer_priority_2"; record=vector,last);
+		@statistic[buffer_priority_3](title="Buffer Priority 3"; source="buffer_priority_3"; record=vector,last);
+		@statistic[buffer_priority_4](title="Buffer Priority 4"; source="buffer_priority_4"; record=vector,last);
+		@statistic[buffer_priority_wifi](title="Buffer Priority WiFi"; source="buffer_priority_wifi"; record=vector,last);
         
         
         @statistic[timeWiFiStateON](title= "WiFi connection duration"; source="timeWiFiStateON"; record=vector,last,mean; interpolationmode=none);
