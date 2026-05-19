@@ -128,6 +128,8 @@ private:
     int timer_Control_Data_Emission = 0;
     int timer_Control_Data_Vehicle = 0;
     int timer_Control_Send_Data = 0;
+    int timer_Congestion_traffic = 0;
+    long timer_Control_Accident = 0;
 
     int time_threshold_send_data = 0;
 
@@ -135,6 +137,21 @@ private:
 
     int check_timers_expired = 0;
     bool take_time_when_find_expired_data = false;
+
+
+    // traffic detected variables
+    long time_bus_stop_counter = 0;
+    long time_congestion = 0;
+    long accident_start;
+    long accidentDuration;
+    bool event_accident;
+    long timer_accident;
+    bool accident_detected_app = false;
+    uint8_t state_of_accident = 0;
+    bool msg_emergency_pending = false;
+    double speed_pass = 0.0;
+    uint8_t detected_traffic_state = 0;
+    int timer_congestion_state = 0;
 
 
     // ack tcp

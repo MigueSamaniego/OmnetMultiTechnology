@@ -5,13 +5,16 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="NUM_PRIORITIES"/>
+		<item key="selection" value="static_outputBuff_wifi"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="static_outputBuff_wifi"/>
+			<item value="accident_start"/>
+			<item value="timer_accident"/>
 			<item value="NUM_PRIORITIES"/>
 			<item value="Priority"/>
 			<item value="timer_Control_Send_Data"/>
@@ -24,9 +27,6 @@
 			<item value="CELLULAR disabl"/>
 			<item value="interfaceAvailable"/>
 			<item value="forwarding"/>
-			<item value="myAddress"/>
-			<item value="host auto configuration started"/>
-			<item value="hasBridge"/>
 		</list>
 		<list key="replacehistory">
 			<item value="AppBusTCP_StateM"/>
@@ -47,8 +47,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1276"/>
-		<item key="DIALOG_Y_ORIGIN" value="451"/>
+		<item key="DIALOG_X_ORIGIN" value="1355"/>
+		<item key="DIALOG_Y_ORIGIN" value="135"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

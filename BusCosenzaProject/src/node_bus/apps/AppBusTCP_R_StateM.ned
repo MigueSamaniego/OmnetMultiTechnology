@@ -28,6 +28,10 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
 {
     parameters:
         
+        int accident_start @unit(s) = default(1s);
+        int accidentDuration @unit(s) = default(1s);
+        bool event_accident = default(false);
+        
         @display("i=block/app");
         @class(AppBusTCP_R_StateM);
         
