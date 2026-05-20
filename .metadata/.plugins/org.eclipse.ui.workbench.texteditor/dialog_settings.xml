@@ -5,13 +5,14 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="static_outputBuff_wifi"/>
+		<item key="selection" value="emit(sdcardBufferSignal"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="emit(sdcardBufferSignal"/>
 			<item value="static_outputBuff_wifi"/>
 			<item value="accident_start"/>
 			<item value="timer_accident"/>
@@ -26,7 +27,6 @@
 			<item value="number of msg send , timer_Control_Send_Data "/>
 			<item value="CELLULAR disabl"/>
 			<item value="interfaceAvailable"/>
-			<item value="forwarding"/>
 		</list>
 		<list key="replacehistory">
 			<item value="AppBusTCP_StateM"/>
