@@ -78,6 +78,11 @@ private:
     simsignal_t outputBufferSignal_lte;
     simsignal_t sdcardBufferSignal;
 
+    simsignal_t outputBytes_wifi;
+    simsignal_t outputBytes_lte;
+
+    simsignal_t GW_Battery;
+
     simsignal_t sdcardPercentSignal;
 
     simsignal_t size_priority_1;
@@ -91,6 +96,7 @@ private:
 
     simsignal_t timeWiFiWorking;
     simsignal_t timeWiFiTransfer;
+    simsignal_t timeLTEWorking;
 
     simsignal_t RTT_ms;
 
@@ -103,11 +109,31 @@ private:
     simtime_t nextEmissionTime;
     simtime_t nextControlTask;
 
-    int deadline;
+    int min_time_check;
     simtime_t deadline_start;
     int deadline_until;
 
     double sigma = 0.00005; // ~5-10 meters aprox
+
+
+    double distance_Go = 0.0;
+    simtime_t time_trip_Go = 0;
+    double distance_Return = 0.0;
+    simtime_t time_trip_Return = 0;
+    bool measure_stage = false;
+
+    bool esp_module_ON = false;
+    long timer_esp_module = 0;
+    long timer_esp_Sleep = 0;
+    long timer_esp_mqtt_module = 0;
+    long timer_GW_MICRO_INA = 0;
+    long timer_LTE_Average = 0;
+    long timer_LTE_Pico = 0;
+    long timer_LTE_Sleep = 0;
+    long timer_LTE = 0;
+
+    double GW_Battery_mAh; //mA/h
+    int timer_update_GW_Batery = 0;
 
 
 
@@ -123,6 +149,9 @@ private:
     bool socket_state_close = false;
     bool socket_ready = false;
 
+    long long_Bytes_wifi = 0;
+    long long_Bytes_LTE = 0;
+
     // ******************* GW REPLICATE Task ************************
     int timer_Control_GPS_Data = 0;
     int timer_Control_Data_Emission = 0;
@@ -130,6 +159,7 @@ private:
     int timer_Control_Send_Data = 0;
     int timer_Congestion_traffic = 0;
     long timer_Control_Accident = 0;
+    int timer_Control_Start_Scanning_WIFI = 0;
 
     int time_threshold_send_data = 0;
 

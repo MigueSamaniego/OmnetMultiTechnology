@@ -30,6 +30,7 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
         
         int accident_start @unit(s) = default(1s);
         int accidentDuration @unit(s) = default(1s);
+        double GW_Battery_mAh @unit(mAh) = default(500mAh);
         bool event_accident = default(false);
         
         @display("i=block/app");
@@ -42,6 +43,11 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
         @signal[sdcardBufferSize](type="long");
     	@signal[sdcardPercentSize](type="double");
     	
+    	@signal[outputBytesInterface_wifi](type="long");
+    	@signal[outputBytesInterface_lte](type="long");
+    	
+    	@signal[GW_Battery_level](type="double");
+    	
     	@signal[buffer_priority_1](type="int");
     	@signal[buffer_priority_2](type="int");
     	@signal[buffer_priority_3](type="int");
@@ -50,6 +56,7 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
     	
     	// time connection with interfaces
     	@signal[timeWiFiStateON](type="double");
+    	@signal[timeLTEStateON](type="double");
     	
     	// Count udp messages sent
     	@signal[numMsgTCPSend](type="int");
@@ -70,6 +77,11 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
 		//@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
 		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last);
 		
+		@statistic[outputBytesInterface_wifi](title="Total Bytes Wifi"; source="outputBytesInterface_wifi"; record=vector,last);
+		@statistic[outputBytesInterface_lte](title="Total Bytes LTE"; source="outputBytesInterface_lte"; record=vector,last);
+		
+		@statistic[GW_Battery_level](title="Battery Level mA/h"; source="GW_Battery_level"; record=vector,last);
+		
 		// number of messajes on sdcard size
 		@statistic[buffer_priority_1](title="Buffer Priority Emergency"; source="buffer_priority_1"; record=vector,last);
 		@statistic[buffer_priority_2](title="Buffer Priority 2"; source="buffer_priority_2"; record=vector,last);
@@ -78,7 +90,8 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
 		@statistic[buffer_priority_wifi](title="Buffer Priority WiFi"; source="buffer_priority_wifi"; record=vector,last);
         
         
-        @statistic[timeWiFiStateON](title= "WiFi connection duration"; source="timeWiFiStateON"; record=vector,last,mean; interpolationmode=none);
+        @statistic[timeWiFiStateON](title= "WiFi Time Tx [s]"; source="timeWiFiStateON"; record=vector,last,mean);
+        @statistic[timeLTEStateON](title= "LTE Time Tx [s]"; source="timeLTEStateON"; record=vector,last,mean);
         
         
         @statistic[numMsgTCPSend](title="TCP packet sent"; source="numMsgTCPSend"; record=vector,count,last);

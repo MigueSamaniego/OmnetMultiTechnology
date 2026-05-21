@@ -112,7 +112,7 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
     std::vector<uint8_t> bytes = bytesChunk->getBytes();
     std::string content(bytes.begin(), bytes.end());
 
-    EV_INFO << "msg received: " << content << endl;
+    EV_INFO << "msg received and process: " << content << endl;
 
     // update statistics
     bytesRcvd += pk->getByteLength();

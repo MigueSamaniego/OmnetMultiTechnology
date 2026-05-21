@@ -155,11 +155,18 @@ void AppBusTCP_R_StateM::initialize(int stage)
         outputBufferSignal_lte = registerSignal("outputBufferSize_lte");
         sdcardBufferSignal = registerSignal("sdcardBufferSize");
 
+        outputBytes_wifi = registerSignal("outputBytesInterface_wifi");
+        outputBytes_lte = registerSignal("outputBytesInterface_lte");
+
+        GW_Battery = registerSignal("GW_Battery_level");
+
         sdcardPercentSignal = registerSignal("sdcardPercentSize"); // state occupation buffer
 
 
         timeWiFiWorking = registerSignal("timeWiFiStateON");    // time from connection
         timeWiFiTransfer = registerSignal("timeWiFiTransferOK"); // time of transmission
+
+        timeLTEWorking = registerSignal("timeLTEStateON");    // time from connection
 
         packetSendTCPSignal = registerSignal("numMsgTCPSend"); // count packets sent
         packetReceiveTCPSignal = registerSignal("numMsgTCPReceive"); // count packets sent
@@ -183,6 +190,7 @@ void AppBusTCP_R_StateM::initialize(int stage)
         this->accident_start = par("accident_start").intValue();
         this->accidentDuration = par("accidentDuration").intValue();
         this->event_accident = par("event_accident").boolValue();
+        this->GW_Battery_mAh = par("GW_Battery_mAh").doubleValue();
 
 
     }
@@ -351,7 +359,11 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                         control_all_timers = 0;
 
-                        deadline = 3600;// deadline high
+                        timer_GW_MICRO_INA = 0;
+                        timer_esp_module = 0;
+                        timer_LTE = 0;
+
+                        min_time_check = 100;// deadline high
 
                         check_timers_expired = 0;
                         take_time_when_find_expired_data = false;
@@ -364,29 +376,36 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         static_outputBuff_wifi = 0;
                         static_outputBuff_lte = 0;
 
+                        long_Bytes_wifi = 0;
+                        long_Bytes_LTE = 0;
+
                         detected_traffic_state = 0;
                         timer_congestion_state = 0;
 
                         speed_pass = 0.0;
+                        measure_stage = false;
 
-                        // available event accident
+                        // ------------------ available event accident -------------------------------------
                         state_of_accident = 0; // not accident state
                         timer_Control_Accident = 0;
-                        if(event_accident){
+                        std::string vehicle = mobility->getExternalId();
+                        // check if vehicle from simulation is type Autobus
+                        if (vehicle.rfind("buses_cosenza.", 0) == 0) {
+                            if(event_accident){
 
-                            accident_detected_app = false; // set flag accident
+                                accident_detected_app = false; // set flag accident
 
-                            long timer_on_gw = 0;
-                            if(accident_start >= 7)
-                                timer_on_gw = (int)(simTime().inUnit(SIMTIME_MS))/10; // take simulation time
+                                long timer_on_gw = 0;
+                                if(accident_start >= 7)
+                                    timer_on_gw = (int)(simTime().inUnit(SIMTIME_MS))/10; // take simulation time
 
+                                timer_accident = timer_on_gw;
+                                accident_start = (accident_start*100);// + timer_on_gw; // 6.2 seconds
+                                accidentDuration = (accidentDuration*100) + accident_start; // 10 seconds
 
-                            timer_accident = timer_on_gw;
-                            accident_start = (accident_start*100);// + timer_on_gw; // 6.2 seconds
-                            accidentDuration = (accidentDuration*100) + accident_start; // 10 seconds
+                                EV_ERROR << "starting events accident " << accident_start << " " << accidentDuration << " " << timer_accident << " " << endl;
 
-                            EV_ERROR << "starting events accident " << accident_start << " " << accidentDuration << " " << timer_accident << " " << endl;
-
+                            }
                         }
 
                         //EV_INFO << "Start... GPS, EMISSION, VEHICLE, DATA: " << timer_Control_GPS_Data << " " << timer_Control_Data_Emission << " " << timer_Control_Data_Vehicle << " " << timer_Control_Send_Data << endl;
@@ -397,6 +416,9 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                     }else if (SignStateConnectAP == 3) { // GW check diferents tasks (void loop)
 
+                        // -------------------------------------------------------------------------
+                        // --------------------- events wothout delay ------------------------------
+                        // -------------------------------------------------------------------------
                         if(event_accident){
 
                             if(timer_accident == accident_start){
@@ -433,8 +455,143 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             timer_accident++;
                         }
 
+                        // ------------ Necessary control of station Near ------------------------
+                        // ----------- useful to start time average of arrive --------------------
 
 
+                        if(timer_Control_Start_Scanning_WIFI >= min_time_check){
+                            EV_INFO << "******* wifi interface ON *********" << endl;
+                            std::string vehicle = mobility->getExternalId();
+                            Coord pos = mobility->getCurrentPosition();
+
+                            Coord apUnical(3543.52, 5712.03);
+                            Coord apCosenza(5850.89, 11486.75);
+
+                            double distance_to_AP1 = pos.distance(apUnical);
+                            double distance_to_AP2 = pos.distance(apCosenza);
+
+                            EV_WARN << "Distance with ap1: " << distance_to_AP1 << endl;
+                            EV_WARN << "distance and time_trip Go: " << distance_Go << " " << time_trip_Go << endl;
+                            EV_WARN << "distance and time_trip Return: " << distance_Return << " " << time_trip_Return << endl;
+
+                            if((distance_to_AP1 < 150)||(distance_to_AP2 < 150)){
+
+                                esp_module_ON = true;
+
+                                double speed = traciVehicle->getSpeed();
+                                speed = speed * 3.6; // km/h
+
+                                if(distance_to_AP1 < 60){
+                                    if((speed < 1)&&(distance_Go == 0.0)){
+                                        distance_Go = traciVehicle->getDistanceTravelled(); // take the misure from bus station
+                                        time_trip_Go = simTime();
+                                        EV_WARN << "start trip: " << distance_Go << " " << time_trip_Go << endl;
+                                    }else if((speed < 1) &&(measure_stage)){
+                                        distance_Return = (traciVehicle->getDistanceTravelled()) - distance_Return;
+                                        time_trip_Return = simTime() - time_trip_Return;
+                                        EV_WARN << "distance and time_trip Return: " << distance_Return << " " << time_trip_Return << endl;
+                                        measure_stage = false;
+                                    }
+                                }
+
+
+                                if(distance_to_AP2 < 60){
+
+                                    if((speed < 1)&&(distance_Return == 0.0)){
+                                        distance_Return = traciVehicle->getDistanceTravelled();
+                                        time_trip_Return = simTime();
+                                        distance_Go = distance_Return - distance_Go;
+                                        time_trip_Go = time_trip_Return - time_trip_Go;
+
+                                        measure_stage = true;
+
+                                        EV_WARN << "distance and time_trip Go: " << distance_Go << " " << time_trip_Go << endl;
+
+                                    }
+                                }
+
+                                min_time_check = 30;// 300ms
+                            }else{
+                                EV_INFO << "********* wifi interface OFF **********: " << endl;
+                                esp_module_ON = false;
+                                min_time_check = 200;// 2000ms
+                            }
+
+                            timer_Control_Start_Scanning_WIFI = 0;
+
+                        }
+                        timer_Control_Start_Scanning_WIFI++;
+                        // ----------------------------------------------------------------------------------------------------
+                        // --------------------------- Integrate Energy GW --------------------------------------------------------------
+                        // ----------------------------------------------------------------------------------------------------
+
+                        timer_GW_MICRO_INA++;   // This increase any time
+
+                        if((esp_module_ON)||(ConnectionToAP)){// scaning
+                            if(socket_ready){
+                                timer_esp_mqtt_module++;
+                            }else {
+                                timer_esp_module++;
+                            }
+                        }else{
+                            timer_esp_Sleep++;
+                        }
+
+
+                        // paper show pico of 250ms durinf turn ON, the total time to attach to the network is 15,45 seconds
+                        timer_LTE++;
+                        if(timer_LTE < 645){
+                            timer_LTE_Average++;
+                        }else if((timer_LTE >= 645)&&(timer_LTE < 670)){
+                            timer_LTE_Pico++;
+                        }else if((timer_LTE >= 670)&&(timer_LTE < 1545)){
+                            timer_LTE_Average++;
+                        }else if(timer_LTE >= 1545){// finish stage turn ON module
+
+
+                            if(take_time_when_find_expired_data){
+                                timer_LTE_Average++;// here decide average or sleep
+                                timer_LTE = 1545; // evita overflow
+                            }else{
+
+                                if(timer_LTE > 1645){// sleep by hardware
+                                    timer_LTE_Sleep++;
+                                    timer_LTE = 1646; // evita overflow
+                                }else{
+                                    timer_LTE_Average++;// time to pass in sleep mode
+                                }
+
+                            }
+
+
+                        }
+
+                        //EV_ERROR << "lte counter, general " << timer_LTE << " average: " << timer_LTE_Average << " pico: " << timer_LTE_Pico << endl;
+
+                        if(timer_update_GW_Batery >= 100){
+
+                            double battery = 0;
+
+                            battery = GW_Battery_mAh
+                                      - ((double)((timer_GW_MICRO_INA*10)*(116.0817))/3600000.0)    // GW+GPS+BLE+XBEE
+                                      - ((double)((timer_esp_module*10)*(19.1913))/3600000.0)       // ESP SCANNING
+                                      - ((double)((timer_esp_Sleep*10)*(0.8))/3600000.0)            // ESP SLEEP MODE
+                                      - ((double)((timer_esp_mqtt_module*10)*(29.6824))/3600000.0)  // ESP CONNECTED TO MQTT
+                                      - ((double)((timer_LTE_Pico*10)*(302.4700))/3600000.0)        // LTE pico during turn ON
+                                      - ((double)((timer_LTE_Average*10)*(45.5237))/3600000.0)      // LTE average
+                                      - ((double)((timer_LTE_Sleep*10)*(13.14))/3600000.0);         // LTE sleep mode
+
+                            //EV_ERROR << "cALCULO bATT: " << GW_Battery_mAh << " " << ((double)((timer_GW_MICRO_INA*10)*(48.2586))/3600000.0) << " " << ((double)((timer_esp_module*10)*(19.1913))/3600000.0) << " " << ((double)((timer_esp_mqtt_module*10)*(29.6824))/3600000.0) << endl;
+
+                            emit(GW_Battery, battery);
+
+
+                            timer_update_GW_Batery = 0;
+                        }
+                        timer_update_GW_Batery++;
+
+                        //------------------------------------------------------------------------
+                        // ------------------- Loop Algorith -------------------------------------
                         if(control_all_timers >= delay_sdcard){
                                 delay_sdcard = 0;
                                 control_all_timers = 0;
@@ -539,24 +696,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              ************************************************************************************************************************
                              ************************************************************************************************************************/
 
-                            // ------------ Necessary control of station Near ------------------------
-                            // ----------- useful to start time average of arrive --------------------
 
-                            if(ConnectionToAP){
-                                std::string vehicle = mobility->getExternalId();
-                                Coord pos = mobility->getCurrentPosition();
-
-                                Coord ap0(3543.52, 5712.03);
-
-                                double distance_to_AP1 = pos.distance(ap0);
-
-                                if(distance_to_AP1 < 20){// time to next bus statition is necesary 23:38 min
-                                    EV_INFO << "Distancia al AP autostation: " << distance_to_AP1 << " metros" << endl;
-                                    deadline = 1538;// i must calculate the time
-                                }
-                            }
-
-                            //------------------------------------------------------------------------
 
 
 
@@ -582,7 +722,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 counter_msg++;
                                 EV_INFO << "NEW GPS, msg_num" << data << " " << counter_msg << endl;
 
-                                bool state_buff = inputBuffer.add(data, Priority_wifi, simTime());
+                                bool state_buff = inputBuffer.add(data, Priority_3, simTime());
 
                                 static_inputBuff = inputBuffer.size();
 
@@ -639,7 +779,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                  counter_msg++;
                                  EV_INFO << "NEW POLLUTION, msg_num" << data<< " " << counter_msg  << endl;
 
-                                 bool state_buff = inputBuffer.add(data, Priority_wifi, simTime());
+                                 bool state_buff = inputBuffer.add(data, Priority_3, simTime());
 
                                  static_inputBuff = inputBuffer.size();
 
@@ -683,7 +823,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
 
                             if (timer_Control_Data_Vehicle >= 100) {// control of traffic congestion
-                                std::string vehicle = mobility->getExternalId();
+                                //std::string vehicle = mobility->getExternalId();
 
                                 double speed = traciVehicle->getSpeed();
                                 double accel = traciVehicle->getAcceleration();
@@ -702,7 +842,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                  counter_msg++;
                                  EV_INFO << "NEW VEHICLE, msg_num : " << data<< " " << counter_msg << endl;
 
-                                 bool state_buff = inputBuffer.add(data, Priority_wifi, simTime());
+                                 bool state_buff = inputBuffer.add(data, Priority_3, simTime());
 
                                  static_inputBuff = inputBuffer.size();
 
@@ -748,9 +888,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 // 1 speed medium
                                 // 2 stop detected
 
-
                                 double speed = traciVehicle->getSpeed();
-                                int sensibility = 10;// 5s
+                                int sensibility = 30;// 15s with speed under 15km is detected like traffic
 
                                 speed = speed * 3.6; // km/h
 
@@ -779,7 +918,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                     }else{
                                         // traffic detected
                                         timer_congestion_state++;
-                                        int periodic_nitification = 20; // 10s
+                                        int periodic_nitification = 20; // each 10s save a data on sdcard
 
                                         EV_INFO << "bus stop timer: " << timer_congestion_state << endl;
 
@@ -922,7 +1061,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                                 sendDataToCloud("wifi"); // prepare and send message
                                                /**************************************************/
 
-                                               time_threshold_send_data = 2; // 20ms to retry
+                                               time_threshold_send_data = 10; // 100ms to retry
 
                                             //}
 
@@ -968,7 +1107,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                                    sendDataToCloud("lte"); // prepare and send message
                                                    /**************************************************/
 
-                                                   time_threshold_send_data = 4; // 20ms to retry
+                                                   time_threshold_send_data = 15; // 150ms to retry
 
                                                    if(!take_time_when_find_expired_data){
                                                        // not increase the count number msg sent
@@ -1109,6 +1248,12 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              emit(size_priority_4, state_priority.p4);
                              emit(size_priority_wifi, state_priority.p5);
 
+                             emit(timeWiFiWorking, (double)(((timer_esp_module+timer_esp_mqtt_module)*10)/1000));// time on seconds
+                             emit(timeLTEWorking, (double)(((timer_LTE_Average+timer_LTE_Pico)*10)/1000));// time on seconds
+
+                             emit(outputBytes_wifi, long_Bytes_wifi);
+                             emit(outputBytes_lte, long_Bytes_LTE);
+
 
                              //EV_ERROR << "msg guardados en sdcadr: "<< " " << counter_msg << endl;
 
@@ -1174,6 +1319,8 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
         count_reTX = 0;
         // ----------------------------------------------------------
         return;
+    }else{
+        EV_ERROR << "estado actual del Socket : " << socket.getState() << endl;
     }
 
     //EV_ERROR << "socket WIFI OK2: "<< endl;
@@ -1253,11 +1400,15 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
 
             if (interface_output == "wifi") {
                 // use wifi
+                long_Bytes_wifi += static_cast<long>(data.size());
+
                 static_outputBuff_wifi = outputBuffer.size();
                 emit(outputBufferSignal_wifi, static_outputBuff_wifi);
             }
             else if (interface_output == "lte") {
                 // use lte
+                long_Bytes_LTE += static_cast<long>(data.size());
+
                 static_outputBuff_lte = outputBuffer.size();
                 emit(outputBufferSignal_lte, static_outputBuff_lte);
             }
@@ -1278,7 +1429,7 @@ void AppBusTCP_R_StateM::interfaceAvailable(){
 
     if(ConnectionToAP){
         //------------------ start counter time --------------------
-        connectionWiFiStart = simTime();
+        //connectionWiFiStart = simTime();
         //----------------------------------------------------------
 
         coun_msg_sent++;
@@ -1312,13 +1463,13 @@ void AppBusTCP_R_StateM::interfaceAvailable(){
 
     }else {
 
-        simtime_t duration = simTime() - connectionWiFiStart;
+        //simtime_t duration = simTime() - connectionWiFiStart;
 
         // Save only the connection is greater that;
-        if (duration > 1) { // time minimum to establish connection with WIFI ***** pain attention, really we must to check if there are connection
-            emit(timeWiFiWorking, duration.dbl()); // we Emit with double variable type
-            //EV_INFO << "Desconectado. Duración de la conexión: " << duration << " segundos." << endl;
-        }
+//        if (duration > 1) { // time minimum to establish connection with WIFI ***** pain attention, really we must to check if there are connection
+//            emit(timeWiFiWorking, duration.dbl()); // we Emit with double variable type
+//            //EV_INFO << "Desconectado. Duración de la conexión: " << duration << " segundos." << endl;
+//        }
 
         celular->setState(NetworkInterface::State::UP);
         wifi->setState(NetworkInterface::State::DOWN);
@@ -1492,6 +1643,7 @@ void AppBusTCP_R_StateM::printSocketInfo() {
 // --- Implementación de ICallback para evitar clase abstracta ---
 
 void AppBusTCP_R_StateM::socketDataArrived(inet::TcpSocket *socket, inet::Packet *packet, bool urgent) {
+    EV_INFO << "socket error 8" << endl;
     // extract the contents of the package
     auto bytesChunk = packet->peekAllAsBytes();
 
@@ -1562,15 +1714,16 @@ void AppBusTCP_R_StateM::socketDataArrived(inet::TcpSocket *socket, inet::Packet
 }
 
 void AppBusTCP_R_StateM::socketAvailable(inet::TcpSocket *socket, inet::TcpAvailableInfo *availableInfo) {
-    //EV_INFO << "socker available 1." << endl;
+    EV_INFO << "socket error 7" << endl;
     delete availableInfo; // Liberar memoria si no se usa
 }
 
 void AppBusTCP_R_StateM::socketEstablished(inet::TcpSocket *socket) {
-    EV_INFO << "Connexion TCP successful." << endl;
+    EV_INFO << "socket error 6" << endl;
 }
 
 void AppBusTCP_R_StateM::socketPeerClosed(inet::TcpSocket *socket) {
+    EV_INFO << "socket error 5" << endl;
     if (socket->getState() == inet::TcpSocket::CONNECTED) socket->close();
     socket_ready = false;
     socket_state_close = true; // start cooldown
@@ -1578,13 +1731,15 @@ void AppBusTCP_R_StateM::socketPeerClosed(inet::TcpSocket *socket) {
 }
 
 void AppBusTCP_R_StateM::socketClosed(inet::TcpSocket *socket) {
-    EV_INFO << "Connection TCP close." << endl;
+    EV_INFO << "socket error 4" << endl;
     socket_ready = false;
     socket_state_close = true; // start cooldown
     count_reTX = 0;
 }
 
 void AppBusTCP_R_StateM::socketFailure(inet::TcpSocket *socket, int code) {
+    EV_INFO << "socket error 3" << endl;
+
     if (!socket) return;
 
     EV_ERROR << "Error socket TCP: " << code << " (Handover LTE)" << endl;
@@ -1624,11 +1779,11 @@ void AppBusTCP_R_StateM::socketFailure(inet::TcpSocket *socket, int code) {
 }
 
 void AppBusTCP_R_StateM::socketStatusArrived(inet::TcpSocket *socket, inet::TcpStatusInfo *status) {
-    EV_INFO << "socket status arrived" << endl;
+    EV_INFO << "socket error 2" << endl;
     delete status;
 }
 
 void AppBusTCP_R_StateM::socketDeleted(inet::TcpSocket *socket) {
-    EV_INFO << "socket deleted." << endl;
+    EV_INFO << "socket error 1." << endl;
     // No hacer nada o limpiar punteros si fuera necesario
 }

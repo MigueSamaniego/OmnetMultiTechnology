@@ -15,6 +15,7 @@ import inet.networklayer.ipv4.RoutingTableRecorder;
 import inet.node.inet.AdhocHost;
 import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
+import inet.node.wireless.AccessPoint;
 import inet.node.ethernet.Eth10G;
 import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211RadioMedium;
 import inet.physicallayer.wireless.ieee80211.packetlevel.Ieee80211DimensionalRadioMedium;
@@ -143,13 +144,13 @@ network HighwayTCP
         bus[0]: BusGW;
         
         //# wireless AP
+        ap[numAPs]: AccessPoint {
+            @display("p=210,250;is=vs;i=veins/sign/yellowdiamond");
+        }
+        
         //ap[numAPs]: StandardHost {
         //    @display("p=210,250;is=vs;i=veins/sign/yellowdiamond");
         //}
-        
-        ap[numAPs]: StandardHost {
-            @display("p=210,250;is=vs;i=veins/sign/yellowdiamond");
-        }
 
 
     connections allowunconnected:

@@ -5,30 +5,33 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="emit(sdcardBufferSignal"/>
+		<item key="selection" value="StandardHost"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="emit(sdcardBufferSignal"/>
-			<item value="static_outputBuff_wifi"/>
+			<item value="StandardHost"/>
+			<item value="switch"/>
+			<item value="GW_Battery_mAh"/>
+			<item value="GW_Battery"/>
+			<item value="GW_Battery_Ah"/>
 			<item value="accident_start"/>
-			<item value="timer_accident"/>
-			<item value="NUM_PRIORITIES"/>
-			<item value="Priority"/>
-			<item value="timer_Control_Send_Data"/>
-			<item value="time_threshold_send_data"/>
-			<item value="socket.send"/>
-			<item value="socket.send(packet)"/>
-			<item value="sendDataToCloud"/>
-			<item value="Retry_Sent"/>
-			<item value="number of msg send , timer_Control_Send_Data "/>
-			<item value="CELLULAR disabl"/>
-			<item value="interfaceAvailable"/>
+			<item value="emit("/>
+			<item value="long_Bytes_LTE"/>
+			<item value="outputBufferSignal_lte"/>
+			<item value="timer_LTE_Average"/>
+			<item value="timer_esp_module"/>
+			<item value="timeWiFiWorking"/>
+			<item value="take_time_when_find_expired_data"/>
+			<item value="esp_module_ON"/>
+			<item value="connectionWiFiStart"/>
 		</list>
 		<list key="replacehistory">
+			<item value="GW_Battery_mAh"/>
+			<item value="GW_Battery"/>
+			<item value="Priority_3"/>
 			<item value="AppBusTCP_StateM"/>
 			<item value="AppBusTCP_R_StateM"/>
 			<item value="time_threshold_send_data"/>
@@ -41,14 +44,11 @@
 			<item value="TcpSinkApp"/>
 			<item value="TcpSinkAppServer"/>
 			<item value="AppBusDataCollectionTCP"/>
-			<item value="0.00"/>
-			<item value="10.00"/>
-			<item value="AppBusDataCollectionUDP"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1355"/>
-		<item key="DIALOG_Y_ORIGIN" value="135"/>
+		<item key="DIALOG_X_ORIGIN" value="1371"/>
+		<item key="DIALOG_Y_ORIGIN" value="346"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

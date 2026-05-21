@@ -1,0 +1,92 @@
+//
+// Copyright (C) 2018 Christoph Sommer <sommer@ccs-labs.org>
+//
+// Documentation for these modules is at http://veins.car2x.org/
+//
+// SPDX-License-Identifier: GPL-2.0-or-later
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+
+package src.node_bus.apps;
+
+import org.car2x.veins.subprojects.veins_inet.VeinsInetApplicationBase;
+
+simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
+{
+    parameters:
+        
+        int accident_start @unit(s) = default(1s);
+        int accidentDuration @unit(s) = default(1s);
+        bool event_accident = default(false);
+        
+        @display("i=block/app");
+        @class(AppBusTCP_R_StateM);
+        
+        // Declaración de señales
+        @signal[inputBufferSize](type="long");
+        @signal[outputBufferSize_wifi](type="long");
+        @signal[outputBufferSize_lte](type="long");
+        @signal[sdcardBufferSize](type="long");
+    	@signal[sdcardPercentSize](type="double");
+    	
+    	@signal[buffer_priority_1](type="int");
+    	@signal[buffer_priority_2](type="int");
+    	@signal[buffer_priority_3](type="int");
+    	@signal[buffer_priority_4](type="int");
+    	@signal[buffer_priority_wifi](type="int");
+    	
+    	// time connection with interfaces
+    	@signal[timeWiFiStateON](type="double");
+    	
+    	// Count udp messages sent
+    	@signal[numMsgTCPSend](type="int");
+    	@signal[numMsgTCPReceive](type="int");
+    	
+    	// RTT
+    	@signal[timeRTT](type="double");
+    	
+    	// TCP ACK
+    	//@signal[packetDataAcked](type="long");
+    	
+    	
+        // Configuración de estadísticas para que se graben como vectores
+        @statistic[inputBufferSize](title="Input Buffer Size"; source="inputBufferSize"; record=vector,last);
+        @statistic[outputBufferSize_wifi](title="Output Buffer Size Wifi"; source="outputBufferSize_wifi"; record=vector,last);
+        @statistic[outputBufferSize_lte](title="Output Buffer Size LTE"; source="outputBufferSize_lte"; record=vector,last);
+        @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last);
+		//@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
+		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last);
+		
+		// number of messajes on sdcard size
+		@statistic[buffer_priority_1](title="Buffer Priority Emergency"; source="buffer_priority_1"; record=vector,last);
+		@statistic[buffer_priority_2](title="Buffer Priority 2"; source="buffer_priority_2"; record=vector,last);
+		@statistic[buffer_priority_3](title="Buffer Priority 3"; source="buffer_priority_3"; record=vector,last);
+		@statistic[buffer_priority_4](title="Buffer Priority 4"; source="buffer_priority_4"; record=vector,last);
+		@statistic[buffer_priority_wifi](title="Buffer Priority WiFi"; source="buffer_priority_wifi"; record=vector,last);
+        
+        
+        @statistic[timeWiFiStateON](title= "WiFi connection duration"; source="timeWiFiStateON"; record=vector,last,mean; interpolationmode=none);
+        
+        
+        @statistic[numMsgTCPSend](title="TCP packet sent"; source="numMsgTCPSend"; record=vector,count,last);
+        @statistic[numMsgTCPReceive](title="TCP packet received"; source="numMsgTCPReceive"; record=vector,count,last);
+        
+        @statistic[timeRTT](title="RTT (ms)"; source="timeRTT"; record=vector,count,last);
+        
+    gates:
+
+        
+}
