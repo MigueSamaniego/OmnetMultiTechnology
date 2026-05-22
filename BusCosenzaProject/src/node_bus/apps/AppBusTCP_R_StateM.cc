@@ -238,6 +238,18 @@ void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID,
 bool AppBusTCP_R_StateM::startApplication()
 {
     // this function is like 'main fuction'
+
+    std::string vehicle = mobility->getExternalId();
+
+    // check if vehicle from simulation is type Autobus
+    if (vehicle.rfind("buses_cosenza.", 0) == 0) {
+
+        getParentModule()->getDisplayString().setTagArg("i", 0, "node/bus");// name
+        getParentModule()->getDisplayString().setTagArg("i", 2, "s");
+        Vehicle_With_Interface = true;
+    }
+
+
     // here we can start timers
     if (!Control_Task_Timer) {
         // we are programming a message called 'controlTimer' it start a timer of 1 second,
@@ -297,7 +309,9 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
     }
 
 
-        if (msg->isSelfMessage()) {
+
+
+    if (msg->isSelfMessage()) {
 
             if (msg == Control_Task_Timer) {
 
@@ -329,16 +343,6 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         update_timer = false;
 
                     }else if (SignStateConnectAP == 2) { // CONFIGURATION DATA RECOVERED GW READY
-
-                        if(!Vehicle_With_Interface){
-                            std::string vehicle = mobility->getExternalId();
-
-                            // check if vehicle from simulation is type Autobus
-                            if (vehicle.rfind("buses_cosenza.", 0) == 0) {
-                                getParentModule()->getDisplayString().setTagArg("i", 1, "green");
-                                Vehicle_With_Interface = true;
-                            }
-                        }
 
                         // ***************************************************************
                         // ******* considerate that control task is each 10ms ************
@@ -390,7 +394,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         timer_Control_Accident = 0;
                         std::string vehicle = mobility->getExternalId();
                         // check if vehicle from simulation is type Autobus
-                        if (vehicle.rfind("buses_cosenza.", 0) == 0) {
+                        if ((vehicle.rfind("buses_cosenza.0", 0) == 0)) {
                             if(event_accident){
 
                                 accident_detected_app = false; // set flag accident
@@ -427,8 +431,10 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 accident_detected_app = true; // set flag to advertise 1 accident
                                 std::string vehicle = mobility->getExternalId();
                                 // check if vehicle from simulation is type Autobus
-                                if (vehicle.rfind("buses_cosenza.", 0) == 0) {
-                                    getParentModule()->getDisplayString().setTagArg("i", 1, "red");
+                                if (vehicle.rfind("buses_cosenza.0", 0) == 0) {
+                                    //getParentModule()->getDisplayString().setTagArg("i", 1, "red");
+                                    getParentModule()->getDisplayString().setTagArg("i", 0, "node/crash");
+                                    getParentModule()->getDisplayString().setTagArg("i", 2, "s");
                                     traciVehicle->setSpeedMode(0);
 
                                     traciVehicle->setSpeed(0);
@@ -439,11 +445,13 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 EV_ERROR << "accident finished" << endl;
 
-                                std::string vehicle = mobility->getExternalId();
                                 accident_detected_app = false; // reset flag to indicate accident was finish
+                                std::string vehicle = mobility->getExternalId();
                                 // check if vehicle from simulation is type Autobus
-                                if (vehicle.rfind("buses_cosenza.", 0) == 0) {
-                                    getParentModule()->getDisplayString().setTagArg("i", 1, "green");
+                                if (vehicle.rfind("buses_cosenza.0", 0) == 0) {
+                                    //getParentModule()->getDisplayString().setTagArg("i", 1, "green");
+                                    getParentModule()->getDisplayString().setTagArg("i", 0, "node/bus");
+                                    getParentModule()->getDisplayString().setTagArg("i", 2, "s");
                                     traciVehicle->setSpeedMode(31);
 
                                     traciVehicle->setSpeed(-1);
@@ -1163,6 +1171,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             packet->insertAtBack(payload);
                                             EV_ERROR << "test emergency sent to WIFI: "<< endl;
                                             socket.send(packet);
+                                            //socket.requestStatus();
 
                                             msg_emergency_pending = false;
 
@@ -1186,6 +1195,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             packet->insertAtBack(payload);
                                             EV_ERROR << "test emergency send using LTE: "<< endl;
                                             socket.send(packet);
+                                            //socket.requestStatus();
 
                                             msg_emergency_pending = false;
 
@@ -1393,6 +1403,7 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
             packet->insertAtBack(payload);
             EV_ERROR << "test1: "<< endl;
             socket.send(packet);
+            //socket.requestStatus();
 
             EV_ERROR << "PACKET SENT to SERVER: "<< endl;
 
@@ -1778,12 +1789,29 @@ void AppBusTCP_R_StateM::socketFailure(inet::TcpSocket *socket, int code) {
     count_reTX = 0;
 }
 
-void AppBusTCP_R_StateM::socketStatusArrived(inet::TcpSocket *socket, inet::TcpStatusInfo *status) {
-    EV_INFO << "socket error 2" << endl;
-    delete status;
+void AppBusTCP_R_StateM::socketStatusArrived(inet::TcpSocket *socket, inet::TcpStatusInfo *statusInfo) {
+    EV_INFO << "socket error 2." << endl;
+    // Calculamos matemáticamente si hay bytes en tránsito esperando confirmación
+    unsigned int bytesEnVuelo = statusInfo->getSnd_nxt() - statusInfo->getSnd_una();
+
+    if (bytesEnVuelo == 0) {
+        EV_INFO << "✅ ¡Confirmación exitosa! Snd_nxt es igual a Snd_una. El servidor ha confirmado TODO hasta el momento." << endl;
+
+        // AQUÍ ACTÚAS: Tu cola de respaldo local de la aplicación ya se puede vaciar de forma segura.
+
+    } else {
+        EV_INFO << "⏳ Paquete en tránsito. Quedan " << bytesEnVuelo << " bytes en el aire esperando ACK..." << endl;
+
+        // Como todavía hay datos en vuelo, programamos una nueva consulta para dentro de 100 milisegundos
+        // usando un mensaje propio (self-message) o un temporizador para volver a llamar a:
+        // socket.requestStatus();
+    }
+
 }
 
 void AppBusTCP_R_StateM::socketDeleted(inet::TcpSocket *socket) {
     EV_INFO << "socket error 1." << endl;
     // No hacer nada o limpiar punteros si fuera necesario
 }
+
+

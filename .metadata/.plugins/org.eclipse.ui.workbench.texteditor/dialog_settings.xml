@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="StandardHost"/>
+		<item key="selection" value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;,"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="StandardHost"/>
-			<item value="switch"/>
-			<item value="GW_Battery_mAh"/>
-			<item value="GW_Battery"/>
-			<item value="GW_Battery_Ah"/>
-			<item value="accident_start"/>
-			<item value="emit("/>
-			<item value="long_Bytes_LTE"/>
-			<item value="outputBufferSignal_lte"/>
-			<item value="timer_LTE_Average"/>
-			<item value="timer_esp_module"/>
-			<item value="timeWiFiWorking"/>
-			<item value="take_time_when_find_expired_data"/>
-			<item value="esp_module_ON"/>
-			<item value="connectionWiFiStart"/>
+			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;,"/>
+			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;"/>
+			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;, 2,"/>
+			<item value="vehicle.rfind(&quot;buses_cosenza"/>
+			<item value="vehicle.rfind(&quot;buses_cosenza.0&quot;"/>
+			<item value="vehicle.rfind(&quot;buses_cosenza."/>
+			<item value="Vehicle_With_Interface"/>
+			<item value="bus_vl"/>
+			<item value="if (vehicle.rfind(&quot;buses_cosenza.&quot;, 0) == 0) {"/>
+			<item value="socket.send(packet);"/>
+			<item value="socket.send("/>
+			<item value="handleMessage"/>
+			<item value="socket error 4"/>
+			<item value="socketData"/>
+			<item value="socket.setOutputGate"/>
 		</list>
 		<list key="replacehistory">
 			<item value="GW_Battery_mAh"/>
@@ -47,8 +47,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1371"/>
-		<item key="DIALOG_Y_ORIGIN" value="346"/>
+		<item key="DIALOG_X_ORIGIN" value="1332"/>
+		<item key="DIALOG_Y_ORIGIN" value="200"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

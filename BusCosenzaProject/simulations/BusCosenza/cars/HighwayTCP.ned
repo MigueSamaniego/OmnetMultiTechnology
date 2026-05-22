@@ -138,20 +138,17 @@ network HighwayTCP
             @display("p=280,313;is=vl");
         }
 
-
+    	//# wireless AP
+        ap[numAPs]: AccessPoint {
+            @display("p=210,250;is=s;i=node/wifiAntenna");
+            //@display("p=210,250;is=vs;i=veins/sign/yellowdiamond");
+        }
 
         //# submodule vector to store all cars - will be filled dynamically during simulations
         bus[0]: BusGW;
         
-        //# wireless AP
-        ap[numAPs]: AccessPoint {
-            @display("p=210,250;is=vs;i=veins/sign/yellowdiamond");
-        }
         
-        //ap[numAPs]: StandardHost {
-        //    @display("p=210,250;is=vs;i=veins/sign/yellowdiamond");
-        //}
-
+        
 
     connections allowunconnected:
 //        server.pppg++ <--> MyDelayLink <--> router.pppg++;

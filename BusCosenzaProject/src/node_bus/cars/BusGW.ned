@@ -36,7 +36,7 @@ module BusGW extends Ue
 {
     parameters:
         int numWlanInterfaces = default(0);
-        @display("i=device/bus");
+        @display("is=s;i=node/car");
 
         mobility.typename = default("VeinsInetMobility");
 
