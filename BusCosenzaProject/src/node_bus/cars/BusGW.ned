@@ -36,15 +36,13 @@ module BusGW extends Ue
 {
     parameters:
         int numWlanInterfaces = default(0);
+        
+        // ¡NUEVO PARÁMETRO! Por defecto los buses sí tendrán celular
+        //bool hasCellular = default(true);
+        
         @display("is=s;i=node/car");
 
         mobility.typename = default("VeinsInetMobility");
-
-        //ipv4.configurator.typename = "HostAutoConfigurator";
-        //ipv4.configurator.typename = "DualStackAutoConfigurator";
-        //ipv4.configurator.interfaces = "cellular lo0 wlan0";
-        //ipv4.configurator.lteNetwork = "10.0.1";
-		//ipv4.configurator.wifiNetwork = "192.168.1";
 
         *.interfaceTableModule = default(absPath(".interfaceTable"));
         *.routingTableModule = default("^.^.ipv4.routingTable");
@@ -57,15 +55,8 @@ module BusGW extends Ue
         wlan[numWlanInterfaces]: <default("Ieee80211Interface")> like IWirelessInterface {
             	@display("p=283.764,495.92398,row,150;q=queue");
         }
-        //# network layer
-        //nuevo configurador solo para WiFi
-//        wifiConfigurator: HostAutoConfigurator {
-//            parameters:
-//                interfaces = "wlan0";
-//                addressBase = "192.168.1.1";
-//                netmask = "255.255.0.0";
-//                @display("p=200,350");
-//        }
+
+
     connections allowunconnected:
         // conexiones WiFi
         for i=0..numWlanInterfaces-1 {

@@ -147,6 +147,10 @@ network HighwayTCP
         //# submodule vector to store all cars - will be filled dynamically during simulations
         bus[0]: BusGW;
         
+        trafficCar[0]: BusGW {
+            @display("p=350,200");
+        }
+        
         
         
 

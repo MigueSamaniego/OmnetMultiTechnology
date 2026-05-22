@@ -41,6 +41,8 @@
     
 	<vType id="CONSORZIO_AUTOLINEE_DUE" vClass="bus" speedFactor="1.2" speedDev="0.2" color="red"/>
 	
+	<vType id="vehiculo_normal" vClass="passenger" color="white" maxSpeed="13.88"/>
+	
 	<vType id="car_vip" vClass="vip" color="blue" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="13.88" speedFactor="1.65" speedDev="0.1"/>
 	<vType id="car_authority" vClass="authority" color="blue" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="10.00" speedFactor="1.65" speedDev="0.1"/>
 	<vType id="car_private" vClass="private" color="yellow" minGap="2.5" accel="4.5" decel="7.5" sigma="0.2" tau="1.0" maxSpeed="13.88" speedFactor="1.65" speedDev="0.1"/>
@@ -113,7 +115,7 @@
 																45849800#1 45849800#2 45849800#3 45849800#4 45849800#5 45849800#6 45849800#7 45849800#8 45849800#9 45849800#10 45849800#11 45849800#12 45849800#13 45849800#14 45849800#15 45849800#16 45849800#17 45849800#18 45849800#19
 																121823451 30924737#2 30924737#0 121823455 -45849800#19 -45849800#18 -45849800#17 -45849800#16 -45849800#15 -45849800#14 -45849800#13 -45849800#12 -45849800#11 -45849800#10 -45849800#9 -45849800#8 -45849800#7
 																-45849800#6 -45849800#5 -45849800#4 -45849800#3 -45849800#2 -45849800#1 -45849800#0 860834233 120516824#0 120516823#0" color="red">
-
+																
 
 		
 		<stop busStop="Unical_Terminal_Start" duration="60.00"/>
@@ -177,7 +179,9 @@
 	
 	
 	
-	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="3500" period="3010.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
+	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="3500" period="900.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
+	
+	<flow id="cars_9" type="car_private" begin="5.00" end="150.00" period="50.00" from="30504132#1" to="-30504102"/>
 	
 	<!--
 	<vehicle id="bus2" type="CONSORZIO_AUTOLINEE_DUE" depart="10.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>

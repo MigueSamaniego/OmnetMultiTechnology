@@ -244,8 +244,9 @@ bool AppBusTCP_R_StateM::startApplication()
     // check if vehicle from simulation is type Autobus
     if (vehicle.rfind("buses_cosenza.", 0) == 0) {
 
-        getParentModule()->getDisplayString().setTagArg("i", 0, "node/bus");// name
-        getParentModule()->getDisplayString().setTagArg("i", 2, "s");
+        //getParentModule()->getDisplayString().setTagArg("i", 0, "node/bus");// name
+        getParentModule()->getDisplayString().setTagArg("i", 0, "node/bus_vs");
+        getParentModule()->getDisplayString().setTagArg("is", 0, "");
         Vehicle_With_Interface = true;
     }
 
@@ -433,8 +434,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 // check if vehicle from simulation is type Autobus
                                 if (vehicle.rfind("buses_cosenza.0", 0) == 0) {
                                     //getParentModule()->getDisplayString().setTagArg("i", 1, "red");
-                                    getParentModule()->getDisplayString().setTagArg("i", 0, "node/crash");
-                                    getParentModule()->getDisplayString().setTagArg("i", 2, "s");
+                                    getParentModule()->getDisplayString().setTagArg("i", 0, "node/crash_s");
+                                    getParentModule()->getDisplayString().setTagArg("is", 0, "");
                                     traciVehicle->setSpeedMode(0);
 
                                     traciVehicle->setSpeed(0);
@@ -450,8 +451,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 // check if vehicle from simulation is type Autobus
                                 if (vehicle.rfind("buses_cosenza.0", 0) == 0) {
                                     //getParentModule()->getDisplayString().setTagArg("i", 1, "green");
-                                    getParentModule()->getDisplayString().setTagArg("i", 0, "node/bus");
-                                    getParentModule()->getDisplayString().setTagArg("i", 2, "s");
+                                    getParentModule()->getDisplayString().setTagArg("i", 0, "node/bus_vs");
+                                    getParentModule()->getDisplayString().setTagArg("is", 0, "");
                                     traciVehicle->setSpeedMode(31);
 
                                     traciVehicle->setSpeed(-1);

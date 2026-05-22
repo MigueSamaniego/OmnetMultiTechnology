@@ -513,7 +513,6 @@ void TraCIScenarioManager::updateModulePosition(cModule* mod, const Coord& p, co
 // name: host;Car;i=vehicle.gif
 void TraCIScenarioManager::addModule(std::string nodeId, std::string type, std::string name, std::string displayString, const Coord& position, std::string road_id, double speed, Heading heading, VehicleSignalSet signals, double length, double height, double width)
 {
-
     if (hosts.find(nodeId) != hosts.end()) throw cRuntimeError("tried adding duplicate module");
 
     double option1 = hosts.size() / (hosts.size() + unEquippedHosts.size() + 1.0);

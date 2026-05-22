@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;,"/>
+		<item key="selection" value="emit("/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;,"/>
+			<item value="emit("/>
+			<item value="dataArrived"/>
+			<item value="ICellularNic"/>
+			<item value="myAddress:"/>
+			<item value="No such interface"/>
+			<item value="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
+			<item value="addModule"/>
+			<item value="typename"/>
+			<item value="applType"/>
+			<item value="opMode"/>
+			<item value="CONSORZIO_AUTOLINEE_DUE"/>
+			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;"/>
 			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;"/>
+			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;,"/>
 			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;, 2,"/>
-			<item value="vehicle.rfind(&quot;buses_cosenza"/>
-			<item value="vehicle.rfind(&quot;buses_cosenza.0&quot;"/>
-			<item value="vehicle.rfind(&quot;buses_cosenza."/>
-			<item value="Vehicle_With_Interface"/>
-			<item value="bus_vl"/>
-			<item value="if (vehicle.rfind(&quot;buses_cosenza.&quot;, 0) == 0) {"/>
-			<item value="socket.send(packet);"/>
-			<item value="socket.send("/>
-			<item value="handleMessage"/>
-			<item value="socket error 4"/>
-			<item value="socketData"/>
-			<item value="socket.setOutputGate"/>
 		</list>
 		<list key="replacehistory">
 			<item value="GW_Battery_mAh"/>
