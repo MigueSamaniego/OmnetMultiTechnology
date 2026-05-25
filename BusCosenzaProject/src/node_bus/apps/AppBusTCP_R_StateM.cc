@@ -7,8 +7,13 @@
 #include "inet/common/TimeTag_m.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/common/L3AddressTag_m.h"
-//#include "inet/transportlayer/contract/udp/UdpControlInfo_m.h"    // DELETE
 #include "inet/transportlayer/contract/tcp/TcpCommand_m.h"
+
+//#include "inet/common/packet/Packet.h"
+//#include "stack/phy/packet/LteAirFrame.h"
+//#include "inet/physicallayer/wireless/common/contract/packetlevel/SignalTag_m.h"
+// Si tu versión de INET separa las indicaciones de recepción, usa también:
+//#include "inet/physicallayer/wireless/common/base/packetlevel/ReceptionResult.h"
 
 
 
@@ -148,6 +153,7 @@ void AppBusTCP_R_StateM::initialize(int stage)
 
         //EV_INFO << "Inicializando AppBusTCP_R_StateM en stage " << stage << endl;
         stateAssociationSignalId = registerSignal("stateAssociationSignal");
+        RSSI_WIFI_iD = registerSignal("RSSI_WIFI_Signal");
 
         // buffer occupation
         inputBufferSignal = registerSignal("inputBufferSize");
@@ -210,26 +216,51 @@ void AppBusTCP_R_StateM::initialize(int stage)
 // ----------------------------------------------------------------------
 void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details)
 {
-    //EV_INFO << "INFO: receiveSignal: "<< l << endl;
+    EV_INFO << "INFO--: receiveSignal: "<< l << endl;
 
     if (signalID == stateAssociationSignalId) {
         if(l){
-            EV_INFO << "INFO: Connect to WIFI: "<< endl;
+            EV_INFO << "INFO--: Connect to WIFI: "<< endl;
         }else{
-            EV_INFO << "INFO: Disconnected of AP: " << endl;
+            EV_INFO << "INFO--: Disconnected of AP: " << endl;
         }
         //EV_INFO << "🟢 Señal RECIBIDA (Long): Disociado (sin AP). Valor: " << l << " Fuente: " << source->getFullPath() << endl;
         ConnectionToAP = l;
-    }/*else if (signalID == tcpDataAckedSignal) {
-        // En INET, l suele ser el número de bytes que el receptor confirmó
-        EV_INFO << "¡ACK de TCP Recibido! El nodo destino confirmó " << l << " bytes." << endl;
-
-        // Aquí es donde confirmas que el mensaje llegó al nodo (Capa 4)
-        // aunque el servidor aún no haya respondido el "Echo".
-
-
-    }*/
+    }
 }
+
+void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details)
+{
+    if (signalID == RSSI_WIFI_iD && obj != nullptr)
+        {
+            // Convertimos el objeto recibido a un Arreglo de Valores
+            cValueArray *metricsArray = dynamic_cast<cValueArray *>(obj);
+
+            if (metricsArray != nullptr && metricsArray->size() >= 2)
+            {
+                // Extraemos los doubles por su índice de posición (igual que un vector de C++)
+                double snr_lineal = metricsArray->get(0).doubleValue();
+                double ber_actual = metricsArray->get(1).doubleValue();
+
+                // === ASIGNACIÓN DIRECTA A TU VARIABLE GLOBAL ===
+                if (snr_lineal > 0) {
+                    RSSI_WIFI_SIGNAL_TEST = 10 * log10(snr_lineal) - 95;
+                } else {
+                    RSSI_WIFI_SIGNAL_TEST = -110.0;
+                }
+
+                //currentRssiWiFi = RSSI_WIFI_SIGNAL_TEST;
+
+                std::cout << "🎯 [VARIABLE GLOBAL ACTUALIZADA - MODO VECTOR]" << std::endl;
+                std::cout << "   -> RSSI_WIFI_SIGNAL_TEST: " << RSSI_WIFI_SIGNAL_TEST << " dBm" << std::endl;
+                std::cout << "   -> BER: " << ber_actual << std::endl;
+            }
+        }
+    //RSSI_WIFI_SIGNAL_TEST = l;
+}
+
+
+
 
 // *****************************************************************
 // 3. functions on the application layers
@@ -260,7 +291,9 @@ bool AppBusTCP_R_StateM::startApplication()
 
     }
 
+    //if(Vehicle_With_Interface){
 
+    //}
 
     return true;
 }
@@ -298,10 +331,8 @@ void AppBusTCP_R_StateM::processPacket(std::shared_ptr<inet::Packet> pk)
 
 
 void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
-{   // update variables in real time
-    //sdcardCount = sdcard.size();
-    //inputCount = inputBuffer.size();
-    //outputCount = outputBuffer.size();
+{
+
 
     if (msg->getArrivalGate() == gate("socketIn")) {
 
@@ -317,7 +348,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
             if (msg == Control_Task_Timer) {
 
                 if(ConnectionToAP){
-                    EV_INFO << "Connected to WIFI " << endl;
+                    EV_INFO << "Connected to WIFI SIGNAL: " << RSSI_WIFI_SIGNAL_TEST << endl;
                 }else{
                     EV_INFO << "Connecting to LTE " << endl;
                 }
@@ -598,6 +629,11 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             timer_update_GW_Batery = 0;
                         }
                         timer_update_GW_Batery++;
+
+
+
+                        //------------------------------------------------------------------------
+
 
                         //------------------------------------------------------------------------
                         // ------------------- Loop Algorith -------------------------------------
@@ -1313,6 +1349,27 @@ void AppBusTCP_R_StateM::subscriptionSignalState(){
     }
 
 
+    //-----------------------------------------------------------------------------
+    // === 2. NUEVA LÓGICA PARA LA SEÑAL RSSI DEL MODELO DE ERROR ===
+    EV_INFO << "Try Subscription to Signal RSSI WIFI..." << endl;
+
+    // Buscamos el componente que emite la señal (el contexto que usa el NistErrorModel)
+    // Según tu log, el emisor activo es el submódulo 'radio' de la interfaz wlan[0]
+    cModule *wlanRadio = nullptr;
+    std::string radioPath = host->getFullPath() + ".wlan[0].radio";
+    wlanRadio = getSystemModule()->findModuleByPath(radioPath.c_str());
+
+    if (wlanRadio) {
+        // Nos suscribimos usando el ID que ya registraste en el initialize()
+        wlanRadio->subscribe(RSSI_WIFI_iD, this);
+
+        EV_INFO << "🟢 Suscripción exitosa a señal RSSI_WIFI_Signal en " << wlanRadio->getFullPath() << endl;
+        // Opcional: Puedes crearte un flag en tu .h (ej. SignRssiWiFi = 1;) si quieres controlar el éxito
+    } else {
+        EV_WARN << "静态 ADVERTENCIA: Módulo RADIO no encontrado para RSSI. Reintentando en el siguiente ciclo." << endl;
+    }
+
+
 }
 
 
@@ -1655,6 +1712,9 @@ void AppBusTCP_R_StateM::printSocketInfo() {
 // --- Implementación de ICallback para evitar clase abstracta ---
 
 void AppBusTCP_R_StateM::socketDataArrived(inet::TcpSocket *socket, inet::Packet *packet, bool urgent) {
+
+
+
     EV_INFO << "socket error 8" << endl;
     // extract the contents of the package
     auto bytesChunk = packet->peekAllAsBytes();

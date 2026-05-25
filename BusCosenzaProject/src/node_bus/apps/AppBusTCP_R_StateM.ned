@@ -68,6 +68,15 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
     	// TCP ACK
     	//@signal[packetDataAcked](type="long");
     	
+    	// --- REGISTRO OBLIGATORIO DE SEÑALES ---
+        // 1. Señal para el RSRP Celular (Simu5G emite un tipo double)
+        //@signal[servingCellRsrp](type="double");
+
+        // 2. Señal para el WiFi Dimensional (INET emite un objeto tipo cObject)
+        //@signal[receptionResult](type="omnetpp::cObject");
+
+        
+    	
     	
         // Configuración de estadísticas para que se graben como vectores
         @statistic[inputBufferSize](title="Input Buffer Size"; source="inputBufferSize"; record=vector,last);
@@ -98,6 +107,10 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
         @statistic[numMsgTCPReceive](title="TCP packet received"; source="numMsgTCPReceive"; record=vector,count,last);
         
         @statistic[timeRTT](title="RTT (ms)"; source="timeRTT"; record=vector,count,last);
+        
+        // (Opcional) Si quieres que OMNeT++ guarde las gráficas .vec automáticamente:
+        //@statistic[servingCellRsrp](title="Celular RSRP"; source="servingCellRsrp"; record=vector);
+        //@statistic[receptionPower](title="WiFi RSSI"; source="receptionPower"; record=vector);
         
     gates:
 

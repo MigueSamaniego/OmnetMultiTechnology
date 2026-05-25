@@ -26,6 +26,9 @@ namespace physicallayer {
  */
 class INET_API Ieee80211NistErrorModel : public Ieee80211ErrorModelBase
 {
+  public:
+    static simsignal_t RSSI_WIFI_Signal;
+
   protected:
     double calculatePe(double p, uint32_t bValue) const;
     double getBpskBer(double snr) const;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="completion_proposal_size">
-		<item key="size.x" value="472"/>
-		<item key="size.y" value="326"/>
+		<item key="size.x" value="886"/>
+		<item key="size.y" value="542"/>
 	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration">
 	</section>
@@ -27,5 +27,13 @@
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration.internal">
 		<item key="size.width" value="806"/>
 		<item key="size.height" value="180"/>
+	</section>
+	<section name="PDOMSearchPage">
+		<item key="caseSensitive" value="false"/>
+		<item key="searchFlags" value="227191"/>
+		<list key="previousPatterns">
+			<item value="Ieee80211AgentSta"/>
+			<item value="Ieee80211NistErrorModel"/>
+		</list>
 	</section>
 </section>

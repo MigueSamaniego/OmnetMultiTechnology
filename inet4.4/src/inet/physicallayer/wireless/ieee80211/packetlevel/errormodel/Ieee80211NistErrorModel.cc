@@ -29,11 +29,32 @@ namespace physicallayer {
 
 Define_Module(Ieee80211NistErrorModel);
 
+simsignal_t Ieee80211NistErrorModel::RSSI_WIFI_Signal = registerSignal("RSSI_WIFI_Signal");
+
 double Ieee80211NistErrorModel::getBpskBer(double snr) const
 {
     double z = sqrt(snr);
     double ber = 0.5 * erfc(z);
     EV << "bpsk snr=" << snr << " ber=" << ber << "\n";
+    EV << "GENERANDO SENALE WITH VALUE: " << snr;
+
+    // === SOLUCIÓN AL ERROR DE EMIT ===
+    omnetpp::cModule *contextModule = omnetpp::cSimulation::getActiveSimulation()->getContextModule();
+
+    if (contextModule != nullptr) {
+        // Creamos un arreglo/vector nativo de OMNeT++ (No requiere ningún include nuevo)
+        omnetpp::cValueArray *metricsArray = new omnetpp::cValueArray("RadioMetrics");
+
+        // Insertamos los dos doubles directamente como en un vector común
+        metricsArray->add((double)snr); // Posición 0
+        metricsArray->add((double)ber); // Posición 1
+
+        // Emitimos el vector completo
+        contextModule->emit(RSSI_WIFI_Signal, metricsArray);
+
+        delete metricsArray;
+    }
+
     return ber;
 }
 

@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="emit("/>
+		<item key="selection" value="currentRssiWiFi"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="currentRssiWiFi"/>
+			<item value="RSSI_WIFI_Signal"/>
+			<item value="subscriptionSignalState"/>
+			<item value="stateAssociationSignalId"/>
+			<item value="stateAssociationSignal"/>
+			<item value="EV_INFO"/>
+			<item value="bpsk"/>
+			<item value="receptionPower"/>
+			<item value="obtenerRssiWiFiActual"/>
+			<item value="IdealWirelessNic"/>
+			<item value="[RSSI REALTIME]"/>
+			<item value="wifi interface ON"/>
+			<item value="cooldown"/>
+			<item value="socketDataArrived"/>
 			<item value="emit("/>
-			<item value="dataArrived"/>
-			<item value="ICellularNic"/>
-			<item value="myAddress:"/>
-			<item value="No such interface"/>
-			<item value="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
-			<item value="addModule"/>
-			<item value="typename"/>
-			<item value="applType"/>
-			<item value="opMode"/>
-			<item value="CONSORZIO_AUTOLINEE_DUE"/>
-			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;"/>
-			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;"/>
-			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;,"/>
-			<item value="getParentModule()-&gt;getDisplayString().setTagArg(&quot;i&quot;, 2,"/>
 		</list>
 		<list key="replacehistory">
 			<item value="GW_Battery_mAh"/>
@@ -47,8 +47,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1332"/>
-		<item key="DIALOG_Y_ORIGIN" value="200"/>
+		<item key="DIALOG_X_ORIGIN" value="1315"/>
+		<item key="DIALOG_Y_ORIGIN" value="472"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
