@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="currentRssiWiFi"/>
+		<item key="selection" value="long_Bytes_wifi"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="currentRssiWiFi"/>
-			<item value="RSSI_WIFI_Signal"/>
-			<item value="subscriptionSignalState"/>
+			<item value="long_Bytes_wifi"/>
+			<item value="long_Bytes_LTE"/>
+			<item value="emit(inputBufferSignal"/>
+			<item value="GW_Battery"/>
+			<item value="RSSI_WIFI_SIGNAL_TEST"/>
 			<item value="stateAssociationSignalId"/>
+			<item value="RSSI_WIFI_iD"/>
 			<item value="stateAssociationSignal"/>
-			<item value="EV_INFO"/>
-			<item value="bpsk"/>
-			<item value="receptionPower"/>
-			<item value="obtenerRssiWiFiActual"/>
-			<item value="IdealWirelessNic"/>
-			<item value="[RSSI REALTIME]"/>
-			<item value="wifi interface ON"/>
-			<item value="cooldown"/>
-			<item value="socketDataArrived"/>
-			<item value="emit("/>
+			<item value="broadcast frame from"/>
+			<item value="Ue "/>
+			<item value="Ue"/>
+			<item value="updatePositionHistory"/>
+			<item value="LteRealisticChannelModel::getSINR"/>
+			<item value="recvPwr"/>
+			<item value="RSSI"/>
 		</list>
 		<list key="replacehistory">
 			<item value="GW_Battery_mAh"/>

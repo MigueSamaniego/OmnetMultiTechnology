@@ -32,6 +32,11 @@
 		<item key="caseSensitive" value="false"/>
 		<item key="searchFlags" value="227191"/>
 		<list key="previousPatterns">
+			<item value="GETSINR"/>
+			<item value="broadcastframefrom"/>
+			<item value="LteRealisticChannelModel::getSINR"/>
+			<item value="LtePhyBase::handleMessage"/>
+			<item value="LtePhyUe"/>
 			<item value="Ieee80211AgentSta"/>
 			<item value="Ieee80211NistErrorModel"/>
 		</list>

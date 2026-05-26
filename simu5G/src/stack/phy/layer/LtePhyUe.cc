@@ -34,6 +34,9 @@ LtePhyUe::~LtePhyUe()
     delete das_;
 }
 
+
+simsignal_t LtePhyUe::RSSI_LTE_Signal = registerSignal("RSSI_LTE_Signal");
+
 void LtePhyUe::initialize(int stage)
 {
     LtePhyBase::initialize(stage);
@@ -287,6 +290,13 @@ void LtePhyUe::handoverHandler(LteAirFrame* frame, UserControlInfo* lteInfo)
     }
 
     EV << "UE " << nodeId_ << " broadcast frame from " << lteInfo->getSourceId() << " with RSSI: " << rssi << " at " << simTime() << endl;
+
+    // ------------------------------------ Generating Signal RSSI LTE ------------------------------------------------------------------
+
+    emit(RSSI_LTE_Signal, (double)rssi);
+
+    // ----------------------------------------------------------------------------------------------------------------------------------
+
 
     if (lteInfo->getSourceId() != masterId_ && rssi < minRssi_)
     {

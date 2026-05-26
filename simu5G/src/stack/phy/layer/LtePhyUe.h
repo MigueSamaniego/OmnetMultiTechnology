@@ -134,6 +134,9 @@ class LtePhyUe : public LtePhyBase
     virtual void doHandover();
 
   public:
+
+    static simsignal_t RSSI_LTE_Signal;
+
     LtePhyUe();
     virtual ~LtePhyUe();
     DasFilter *getDasFilter();

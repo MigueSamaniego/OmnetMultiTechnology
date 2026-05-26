@@ -24,9 +24,11 @@ protected:
     bool ConnectionToAP_Pass = false;
 
     double RSSI_WIFI_SIGNAL_TEST = 0.0;
+    double RSSI_LTE_SIGNAL_TEST = 0.0;
 
     simsignal_t stateAssociationSignalId;
     simsignal_t RSSI_WIFI_iD;
+    simsignal_t RSSI_LTE_iD;
 
 private:
     bool Vehicle_With_Interface = false;
@@ -85,6 +87,9 @@ private:
     simsignal_t outputBytes_lte;
 
     simsignal_t GW_Battery;
+
+    simsignal_t RSSI_WIFI_state;
+    simsignal_t RSSI_LTE_state;
 
     simsignal_t sdcardPercentSignal;
 
@@ -230,7 +235,7 @@ protected:
     virtual inet::Coord convertXYtoLatLon(inet::Coord pos);
     virtual void receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) override;
     virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
-    //virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, double l, cObject *details) override;
     virtual bool stablishTCP(bool Use_Netwok);
     virtual void printSocketInfo();
 

@@ -154,6 +154,7 @@ void AppBusTCP_R_StateM::initialize(int stage)
         //EV_INFO << "Inicializando AppBusTCP_R_StateM en stage " << stage << endl;
         stateAssociationSignalId = registerSignal("stateAssociationSignal");
         RSSI_WIFI_iD = registerSignal("RSSI_WIFI_Signal");
+        RSSI_LTE_iD = registerSignal("RSSI_LTE_Signal");
 
         // buffer occupation
         inputBufferSignal = registerSignal("inputBufferSize");
@@ -165,6 +166,9 @@ void AppBusTCP_R_StateM::initialize(int stage)
         outputBytes_lte = registerSignal("outputBytesInterface_lte");
 
         GW_Battery = registerSignal("GW_Battery_level");
+
+        RSSI_WIFI_state = registerSignal("RSSI_WIFI_level");
+        RSSI_LTE_state = registerSignal("RSSI_LTE_level");
 
         sdcardPercentSignal = registerSignal("sdcardPercentSize"); // state occupation buffer
 
@@ -216,7 +220,9 @@ void AppBusTCP_R_StateM::initialize(int stage)
 // ----------------------------------------------------------------------
 void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details)
 {
-    EV_INFO << "INFO--: receiveSignal: "<< l << endl;
+    // --> inet/linklayer/ieee80211/mgmt/Ieee80211AgentSta
+
+    //EV_INFO << "INFO--: receiveSignal: "<< l << endl;
 
     if (signalID == stateAssociationSignalId) {
         if(l){
@@ -231,6 +237,8 @@ void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID,
 
 void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details)
 {
+    // --> inet/physicallayer/wireless/ieee80211/packetlevel/errormodel/Ieee80211NistErrorModel
+
     if (signalID == RSSI_WIFI_iD && obj != nullptr)
         {
             // Convertimos el objeto recibido a un Arreglo de Valores
@@ -251,16 +259,41 @@ void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID,
 
                 //currentRssiWiFi = RSSI_WIFI_SIGNAL_TEST;
 
-                std::cout << "🎯 [VARIABLE GLOBAL ACTUALIZADA - MODO VECTOR]" << std::endl;
-                std::cout << "   -> RSSI_WIFI_SIGNAL_TEST: " << RSSI_WIFI_SIGNAL_TEST << " dBm" << std::endl;
-                std::cout << "   -> BER: " << ber_actual << std::endl;
+                //std::cout << "🎯 [VARIABLE GLOBAL ACTUALIZADA - MODO VECTOR]" << std::endl;
+                //std::cout << "   -> RSSI_WIFI_SIGNAL_TEST: " << RSSI_WIFI_SIGNAL_TEST << " dBm" << std::endl;
+                //std::cout << "   -> BER: " << ber_actual << std::endl;
             }
         }
-    //RSSI_WIFI_SIGNAL_TEST = l;
 }
 
 
+void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID, double d, cObject *details)
+{
+    // --> stack/phy/layer/LtePhyBase
 
+    //EV_INFO << "INFO--: receiveSignal: "<< d << endl;
+
+    if (signalID == RSSI_LTE_iD) {
+        double simu5g_rssi = d;
+
+        // CONTROL DEL -840: Si cae por debajo de -30, el autobús está en zona muerta sin señal
+        if (simu5g_rssi < -30.0) {
+            RSSI_LTE_SIGNAL_TEST = -120.0; // Corte total de señal (Mínimo comercial)
+        }
+        else {
+            // === NUEVA FÓRMULA CALIBRADA RECALCULADA (Límites -27 a 32) ===
+            RSSI_LTE_SIGNAL_TEST = -94.83 + (simu5g_rssi * 0.9322);
+
+            // Acotación por seguridad física
+            if (RSSI_LTE_SIGNAL_TEST > -65.0)  RSSI_LTE_SIGNAL_TEST = -65.0;
+            if (RSSI_LTE_SIGNAL_TEST < -120.0) RSSI_LTE_SIGNAL_TEST = -120.0;
+        }
+
+        //std::cout << "🎯 [CELULAR AJUSTADO] Crudo Simu5G: " << simu5g_rssi
+        //          << " | RSRP Calibrado: " << RSSI_LTE_SIGNAL_TEST << " dBm" << std::endl;
+    }
+
+}
 
 // *****************************************************************
 // 3. functions on the application layers
@@ -312,14 +345,29 @@ bool AppBusTCP_R_StateM::stopApplication()
 
 void AppBusTCP_R_StateM::finish()
 {
-    // Llama a la función finish base
+    // 1. Llama a la función finish base de Veins/INET
     veins::VeinsInetApplicationBase::finish();
 
+    cModule *host = getParentModule();
+
     if (SignStateConnectAP != 0) {
-        cModule *wlanAgent = getParentModule()->findModuleByPath("wlan[0].agent");
+        cModule *wlanAgent = host->findModuleByPath(".wlan[0].agent");
         if (wlanAgent) {
-             wlanAgent->unsubscribe(stateAssociationSignalId, this);
+            wlanAgent->unsubscribe(stateAssociationSignalId, this);
+            EV_INFO << "Cancelada suscripción de Asociación en " << wlanAgent->getFullPath() << endl;
         }
+    }
+
+    cModule *wlanRadio = host->findModuleByPath(".wlan[0].radio");
+    if (wlanRadio) {
+        wlanRadio->unsubscribe(RSSI_WIFI_iD, this);
+        EV_INFO << "Cancelada suscripción de RSSI WiFi en " << wlanRadio->getFullPath() << endl;
+    }
+
+    cModule *ltePhy = host->findModuleByPath(".cellularNic.phy");
+    if (ltePhy) {
+        ltePhy->unsubscribe(RSSI_LTE_iD, this);
+        EV_INFO << "Cancelada suscripción de RSSI LTE en " << ltePhy->getFullPath() << endl;
     }
 }
 
@@ -350,8 +398,10 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                 if(ConnectionToAP){
                     EV_INFO << "Connected to WIFI SIGNAL: " << RSSI_WIFI_SIGNAL_TEST << endl;
                 }else{
-                    EV_INFO << "Connecting to LTE " << endl;
+                    EV_INFO << "Connecting to LTE SIGNAL: " << RSSI_LTE_SIGNAL_TEST << endl;
                 }
+                emit(RSSI_WIFI_state, RSSI_WIFI_SIGNAL_TEST);
+                emit(RSSI_LTE_state, RSSI_LTE_SIGNAL_TEST);
 
                 bool update_timer = true;
 
@@ -561,6 +611,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                         }
                         timer_Control_Start_Scanning_WIFI++;
+
                         // ----------------------------------------------------------------------------------------------------
                         // --------------------------- Integrate Energy GW --------------------------------------------------------------
                         // ----------------------------------------------------------------------------------------------------
@@ -1208,7 +1259,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             packet->insertAtBack(payload);
                                             EV_ERROR << "test emergency sent to WIFI: "<< endl;
                                             socket.send(packet);
-                                            //socket.requestStatus();
+
+                                            long_Bytes_wifi += static_cast<long>(data.size());
 
                                             msg_emergency_pending = false;
 
@@ -1232,7 +1284,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             packet->insertAtBack(payload);
                                             EV_ERROR << "test emergency send using LTE: "<< endl;
                                             socket.send(packet);
-                                            //socket.requestStatus();
+
+                                            long_Bytes_LTE += static_cast<long>(data.size());
 
                                             msg_emergency_pending = false;
 
@@ -1326,50 +1379,55 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
 void AppBusTCP_R_StateM::subscriptionSignalState(){
 
-    // subscription signal to get the state AP connection
-
+    // === 1. LÓGICA EXISTENTE PARA EL AGENT ===
     EV_INFO << "Try Subscription to Signal AGENT..." << endl;
 
     cModule *host = getParentModule();
     cModule *wlanAgent = nullptr;
 
-    // 1. Obtener la ruta completa del MAC
     std::string macPath = host->getFullPath() + ".wlan[0].agent";
     wlanAgent = getSystemModule()->findModuleByPath(macPath.c_str());
     if (wlanAgent) {
-
         wlanAgent->subscribe(stateAssociationSignalId, this);
-
         EV_INFO << "🟢 Suscripción exitosa a señales de gestión de asociación en " << wlanAgent->getFullPath() << endl;
-        SignStateConnectAP = 1; // flag to indicate subscription to signal 'stateAssociationSignalId' successful
+        SignStateConnectAP = 1;
     } else {
-        // Reintentará en el siguiente ciclo del timer (cada 1s)
         EV_WARN << "🟡 ADVERTENCIA: Módulo AGENT no encontrado. Reintentando en el siguiente ciclo." << endl;
-        //SignStateConnectAP = false;
     }
 
-
     //-----------------------------------------------------------------------------
-    // === 2. NUEVA LÓGICA PARA LA SEÑAL RSSI DEL MODELO DE ERROR ===
+    // === 2. LÓGICA EXISTENTE PARA LA SEÑAL RSSI WIFI ===
     EV_INFO << "Try Subscription to Signal RSSI WIFI..." << endl;
 
-    // Buscamos el componente que emite la señal (el contexto que usa el NistErrorModel)
-    // Según tu log, el emisor activo es el submódulo 'radio' de la interfaz wlan[0]
     cModule *wlanRadio = nullptr;
     std::string radioPath = host->getFullPath() + ".wlan[0].radio";
     wlanRadio = getSystemModule()->findModuleByPath(radioPath.c_str());
 
     if (wlanRadio) {
-        // Nos suscribimos usando el ID que ya registraste en el initialize()
         wlanRadio->subscribe(RSSI_WIFI_iD, this);
-
         EV_INFO << "🟢 Suscripción exitosa a señal RSSI_WIFI_Signal en " << wlanRadio->getFullPath() << endl;
-        // Opcional: Puedes crearte un flag en tu .h (ej. SignRssiWiFi = 1;) si quieres controlar el éxito
     } else {
-        EV_WARN << "静态 ADVERTENCIA: Módulo RADIO no encontrado para RSSI. Reintentando en el siguiente ciclo." << endl;
+        EV_WARN << "🟡 ADVERTENCIA: Módulo RADIO no encontrado para RSSI WiFi. Reintentando en el siguiente ciclo." << endl;
     }
 
+    //-----------------------------------------------------------------------------
+    // === 3. NUEVA LÓGICA PARA LA SEÑAL RSSI CELULAR (SIMU5G) ===
+    EV_INFO << "Try Subscription to Signal RSSI LTE..." << endl;
 
+    cModule *ltePhy = nullptr;
+    // En Simu5G, la capa física del dispositivo móvil está en .cellularNic.phy
+    std::string ltePath = host->getFullPath() + ".cellularNic.phy";
+    ltePhy = getSystemModule()->findModuleByPath(ltePath.c_str());
+
+    if (ltePhy) {
+        // Nos suscribimos a la física celular usando tu nuevo ID
+        ltePhy->subscribe(RSSI_LTE_iD, this);
+
+        EV_INFO << "🟢 Suscripción exitosa a señal RSSI_LTE_Signal en " << ltePhy->getFullPath() << endl;
+        // Opcional: flag de éxito para tu control en el .h (ej: SignRssiLte = 1;)
+    } else {
+        EV_WARN << "🟡 ADVERTENCIA: Módulo PHY CELULAR no encontrado. Reintentando en el siguiente ciclo." << endl;
+    }
 }
 
 

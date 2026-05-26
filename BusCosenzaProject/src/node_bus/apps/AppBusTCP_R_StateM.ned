@@ -48,6 +48,9 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
     	
     	@signal[GW_Battery_level](type="double");
     	
+    	@signal[RSSI_WIFI_level](type="double");
+    	@signal[RSSI_LTE_level](type="double");
+    	
     	@signal[buffer_priority_1](type="int");
     	@signal[buffer_priority_2](type="int");
     	@signal[buffer_priority_3](type="int");
@@ -90,6 +93,9 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
 		@statistic[outputBytesInterface_lte](title="Total Bytes LTE"; source="outputBytesInterface_lte"; record=vector,last);
 		
 		@statistic[GW_Battery_level](title="Battery Level mA/h"; source="GW_Battery_level"; record=vector,last);
+		
+		@statistic[RSSI_WIFI_level](title="RSSI WIFI [dBm]"; source="RSSI_WIFI_level"; record=vector,last);
+		@statistic[RSSI_LTE_level](title="RSSI LTE [dBm]"; source="RSSI_LTE_level"; record=vector,last);
 		
 		// number of messajes on sdcard size
 		@statistic[buffer_priority_1](title="Buffer Priority Emergency"; source="buffer_priority_1"; record=vector,last);
