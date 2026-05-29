@@ -10,6 +10,8 @@
 #include "inet/transportlayer/tcp/Tcp.h"
 #include "inet/transportlayer/tcp/TcpSackRexmitQueue.h"
 
+static omnetpp::simsignal_t layer4AckSignal = omnetpp::cComponent::registerSignal("Layer4_TCP_ACK_Arrived");
+
 namespace inet {
 namespace tcp {
 
@@ -478,6 +480,12 @@ void TcpBaseAlg::receivedDataAck(uint32_t firstSeqAcked)
         if (rexmitTimer->isScheduled()) {
             EV_INFO << "ACK acks all outstanding segments, cancel REXMIT timer\n";
             cancelEvent(rexmitTimer);
+
+            // -------------------------------------------------------------------
+            conn->getTcpMain()->emit(layer4AckSignal, (double)conn->getSocketId());
+            //conn->tcpMain->emit(...)
+            // -------------------------------------------------------------------
+
         }
         else
             EV_INFO << "There were no outstanding segments, nothing new in this ACK.\n";

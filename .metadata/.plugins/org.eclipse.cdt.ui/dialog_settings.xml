@@ -32,6 +32,16 @@
 		<item key="caseSensitive" value="false"/>
 		<item key="searchFlags" value="227191"/>
 		<list key="previousPatterns">
+			<item value="TcpReno"/>
+			<item value="receivedDataAck"/>
+			<item value="processAck"/>
+			<item value="outstandingsegments"/>
+			<item value="processTcpAck"/>
+			<item value="processAckInDataTransferState"/>
+			<item value="tcp"/>
+			<item value="inet::Packet"/>
+			<item value="ACKacksalloutstandingsegments"/>
+			<item value="INFOTcpConnectionHighwayTCPbus0tcpconn3510"/>
 			<item value="GETSINR"/>
 			<item value="broadcastframefrom"/>
 			<item value="LteRealisticChannelModel::getSINR"/>

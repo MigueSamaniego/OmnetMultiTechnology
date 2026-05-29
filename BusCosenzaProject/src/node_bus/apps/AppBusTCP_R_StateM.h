@@ -29,6 +29,10 @@ protected:
     simsignal_t stateAssociationSignalId;
     simsignal_t RSSI_WIFI_iD;
     simsignal_t RSSI_LTE_iD;
+    simsignal_t L4_ACK_iD;
+
+    simsignal_t Consumption_WIFI;
+    simsignal_t Consumption_LTE;
 
 private:
     bool Vehicle_With_Interface = false;
@@ -134,11 +138,15 @@ private:
     long timer_esp_module = 0;
     long timer_esp_Sleep = 0;
     long timer_esp_mqtt_module = 0;
+    double Esp_Consumption = 0.0;
     long timer_GW_MICRO_INA = 0;
     long timer_LTE_Average = 0;
     long timer_LTE_Pico = 0;
     long timer_LTE_Sleep = 0;
     long timer_LTE = 0;
+    double LTE_Consuption = 0.0;
+    bool flag_tx_wifi = false;
+    bool flag_tx_lte = false;
 
     double GW_Battery_mAh; //mA/h
     int timer_update_GW_Batery = 0;

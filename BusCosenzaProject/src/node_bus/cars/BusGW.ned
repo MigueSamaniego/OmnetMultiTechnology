@@ -25,6 +25,8 @@ import inet.common.MessageDispatcher;
 //import src.node_bus.Ue;
 import src.node_bus.cars.Ue;
 
+//import inet.power.contract.ICcEnergyStorage;
+
 //import src.node_bus.configurators.DualStackAutoConfigurator;
 
 import org.car2x.veins.base.modules.*;
@@ -51,6 +53,10 @@ module BusGW extends Ue
         input wlanRadioIn[numWlanInterfaces] @directIn;  // nuevo gate solo para WiFi
 
     submodules:
+        // El tanque de energía en Joules (Este SÍ lo tienes en tu captura)
+//        energyStorage: <default("")> like ICcEnergyStorage {
+//            @display("p=80,80;is=s");
+//        }
         
         wlan[numWlanInterfaces]: <default("Ieee80211Interface")> like IWirelessInterface {
             	@display("p=283.764,495.92398,row,150;q=queue");

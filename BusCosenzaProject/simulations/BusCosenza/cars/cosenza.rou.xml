@@ -180,9 +180,9 @@
 	
 	
 	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="3500" period="900.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
-	
+	<!--
 	<flow id="cars_9" type="car_private" begin="5.00" end="150.00" period="50.00" from="30504132#1" to="-30504102"/>
-	
+	-->
 	<!--
 	<vehicle id="bus2" type="CONSORZIO_AUTOLINEE_DUE" depart="10.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
 	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="1000" period="100.00"/probability="0.01" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>

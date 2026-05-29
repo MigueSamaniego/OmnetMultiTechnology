@@ -46,7 +46,7 @@ private:
     int count[NUM_PRIORITIES] = {0,0,0,0,0};
 
     // Tiempos máximos de espera por prioridad
-    const double maxWaitTime[NUM_PRIORITIES] = {0.0, 60.0, 1800.0, 500.0, 650.0};
+    const double maxWaitTime[NUM_PRIORITIES] = {0.0, 60.0, 600.0, 500.0, 650.0};
 
 public:
     void pushBatch(const std::vector<QueuedData>& batch) {

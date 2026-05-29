@@ -1,0 +1,78 @@
+// 
+//                  Simu5G
+//
+// Authors: Giovanni Nardini, Giovanni Stea, Antonio Virdis (University of Pisa)
+// 
+// This file is part of a software released under the license included in file
+// "license.pdf". Please read LICENSE and README files before using it.
+// The above files and the present reference are part of the software itself, 
+// and cannot be removed from it.
+// 
+
+
+package src.node_bus.cars;
+
+import inet.applications.contract.IApp;
+import inet.mobility.contract.IMobility;
+import inet.linklayer.contract.IWirelessInterface;
+import inet.networklayer.common.InterfaceTable;
+import inet.networklayer.contract.IRoutingTable;
+import inet.networklayer.contract.INetworkLayer;
+//import inet.networklayer.configurator.ipv4.HostAutoConfigurator;
+import inet.transportlayer.tcp.Tcp;
+import inet.transportlayer.udp.Udp;
+import inet.common.MessageDispatcher;
+//import src.node_bus.Ue;
+import src.node_bus.cars.Ue;
+
+import inet.power.contract.ICcEnergyStorage;
+
+//import src.node_bus.configurators.DualStackAutoConfigurator;
+
+import org.car2x.veins.base.modules.*;
+
+// 
+// Car Module
+//
+module BusGW extends Ue
+{
+    parameters:
+        int numWlanInterfaces = default(0);
+        
+        // ¡NUEVO PARÁMETRO! Por defecto los buses sí tendrán celular
+        //bool hasCellular = default(true);
+        
+        @display("is=s;i=node/car");
+
+        mobility.typename = default("VeinsInetMobility");
+
+        *.interfaceTableModule = default(absPath(".interfaceTable"));
+        *.routingTableModule = default("^.^.ipv4.routingTable");
+
+    gates:
+        input wlanRadioIn[numWlanInterfaces] @directIn;  // nuevo gate solo para WiFi
+
+    submodules:
+        // El tanque de energía en Joules (Este SÍ lo tienes en tu captura)
+        energyStorage: <default("")> like ICcEnergyStorage {
+            @display("p=80,80;is=s");
+        }
+
+        // El consumidor base para la electrónica del GW
+        gwConsumer: <default("")> like ICcEnergyConsumer {
+            @display("p=80,160;is=s");
+        }
+        
+        wlan[numWlanInterfaces]: <default("Ieee80211Interface")> like IWirelessInterface {
+            	@display("p=283.764,495.92398,row,150;q=queue");
+        }
+
+
+    connections allowunconnected:
+        // conexiones WiFi
+        for i=0..numWlanInterfaces-1 {
+            wlanRadioIn[i] --> wlan[i].radioIn;
+            wlan[i].upperLayerOut --> nl.in++;
+            wlan[i].upperLayerIn <-- nl.out++;
+        }
+}

@@ -155,6 +155,10 @@ void AppBusTCP_R_StateM::initialize(int stage)
         stateAssociationSignalId = registerSignal("stateAssociationSignal");
         RSSI_WIFI_iD = registerSignal("RSSI_WIFI_Signal");
         RSSI_LTE_iD = registerSignal("RSSI_LTE_Signal");
+        L4_ACK_iD = registerSignal("Layer4_TCP_ACK_Arrived");
+
+        Consumption_WIFI = registerSignal("Consumption_WIFI_Battery");
+        Consumption_LTE = registerSignal("Consumption_LTE_Battery");
 
         // buffer occupation
         inputBufferSignal = registerSignal("inputBufferSize");
@@ -253,6 +257,10 @@ void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID,
                 // === ASIGNACIÓN DIRECTA A TU VARIABLE GLOBAL ===
                 if (snr_lineal > 0) {
                     RSSI_WIFI_SIGNAL_TEST = 10 * log10(snr_lineal) - 95;
+
+                    if(RSSI_WIFI_SIGNAL_TEST > -60)
+                        RSSI_WIFI_SIGNAL_TEST = -60;
+
                 } else {
                     RSSI_WIFI_SIGNAL_TEST = -110.0;
                 }
@@ -291,6 +299,15 @@ void AppBusTCP_R_StateM::receiveSignal(cComponent *source, simsignal_t signalID,
 
         //std::cout << "🎯 [CELULAR AJUSTADO] Crudo Simu5G: " << simu5g_rssi
         //          << " | RSRP Calibrado: " << RSSI_LTE_SIGNAL_TEST << " dBm" << std::endl;
+    }
+    else if (signalID == L4_ACK_iD) {
+
+
+        //std::cout << "🚀 [CONEXIÓN] ¡ACK físico detectado en TcpBaseAlg!" << std::endl;
+        //std::cout << "   -> El buffer de red está vacío. Permiso para enviar el siguiente mensaje." << std::endl;
+
+        // Desbloqueas tu máquina de estados
+        //puedoEnviarSiguienteMensaje = true;
     }
 
 }
@@ -380,7 +397,17 @@ void AppBusTCP_R_StateM::processPacket(std::shared_ptr<inet::Packet> pk)
 
 void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 {
+    if (msg->getKind() == inet::TCP_I_DATA)
+    {
+        std::cout << "🚀 [APLICACIÓN] ¡El servidor ha respondido al mensaje de accidente!" << std::endl;
+        std::cout << "   -> Confirmación de extremo a extremo recibida. Canal libre." << std::endl;
 
+        // Liberamos el semáforo para permitir que la máquina de estados envíe el siguiente
+        //puedoEnviarSiguienteMensaje = true;
+
+        delete msg; // Limpiamos el mensaje recibido para evitar fugas de memoria
+        return;
+    }
 
     if (msg->getArrivalGate() == gate("socketIn")) {
 
@@ -616,46 +643,126 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         // --------------------------- Integrate Energy GW --------------------------------------------------------------
                         // ----------------------------------------------------------------------------------------------------
 
+                        // ---------------------------- WIFI MODULE -------------------------
                         timer_GW_MICRO_INA++;   // This increase any time
+//
+//                        if((esp_module_ON)||(ConnectionToAP)){// scanning
+//                           if(socket_ready){
+//                                timer_esp_mqtt_module++;// WIFI CONNECTED TO MQTT
+//                            }else {
+//                                timer_esp_module++;// WIFI SCANNING
+//                            }
+//                        }else{
+//                            //timer_esp_Sleep++;
+//                            timer_esp_module++;// WIFI ON ALL TIME SCANNING
+//                        }
 
-                        if((esp_module_ON)||(ConnectionToAP)){// scaning
-                            if(socket_ready){
-                                timer_esp_mqtt_module++;
-                            }else {
-                                timer_esp_module++;
+                        double Esp_Consumption_temp = 0.0;
+                        if(esp_module_ON){// turn On module
+                            if(ConnectionToAP){ //  Association to mqtt
+                                if((socket_ready)&&(flag_tx_wifi)){// tx data
+                                    Esp_Consumption_temp = ((7*((-3.5*RSSI_WIFI_SIGNAL_TEST)-130))+(2*((-3.35*RSSI_WIFI_SIGNAL_TEST)-21))+(1*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40)))/3600000.0;// 180-247mA paper register
+                                    flag_tx_wifi = false;
+                                    EV_INFO << "wifi_4" << endl;
+                                }else if((socket_ready)&&(!flag_tx_wifi)){// connected to mqtt
+                                    Esp_Consumption_temp = (10*((-3.5*RSSI_WIFI_SIGNAL_TEST)-130))/3600000.0;// 80-150mA
+                                    EV_INFO << "wifi_3" << endl;
+                                }
+                            }else{  // scanning 97mA
+                                Esp_Consumption_temp = (10*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40))/3600000.0;// 80-120mA
+                                EV_INFO << "wifi_2" << endl;
                             }
-                        }else{
-                            timer_esp_Sleep++;
+
+                        }else{// sleep mode
+                            Esp_Consumption_temp = (10*(0.8))/3600000.0;
+                            EV_INFO << "wifi_1" << endl;
                         }
+                        emit(Consumption_WIFI,Esp_Consumption_temp);
+                        Esp_Consumption += Esp_Consumption_temp;
+
+                        // ---------------------------------------------------------------------
 
 
                         // paper show pico of 250ms durinf turn ON, the total time to attach to the network is 15,45 seconds
+//                        timer_LTE++;
+//                        if(timer_LTE < 645){
+//                            timer_LTE_Average++;
+//                        }else if((timer_LTE >= 645)&&(timer_LTE < 670)){
+//                            timer_LTE_Pico++;
+//                        }else if((timer_LTE >= 670)&&(timer_LTE < 1545)){
+//                            timer_LTE_Average++;
+//                        }else if(timer_LTE >= 1545){// finish stage turn ON module
+//
+//
+//                            if(take_time_when_find_expired_data){
+//                                timer_LTE_Average++;// here decide average or sleep
+//                                timer_LTE = 1545; // evita overflow
+//                            }else{
+//
+//                                if(timer_LTE > 1645){// sleep by hardware
+//                                    //timer_LTE_Sleep++;
+//                                    timer_LTE_Average++; // LTE TURN ON ALL TIME
+//                                    timer_LTE = 1646; // avoid overflow
+//                                }else{
+//                                    timer_LTE_Average++;
+//                                }
+//
+//                            }
+//
+//
+//                        }
+
+
                         timer_LTE++;
-                        if(timer_LTE < 645){
-                            timer_LTE_Average++;
+                        double LTE_Consuption_temp = 0.0;
+                        if(timer_LTE < 645){// turn On A7670 (20 a 80)
+                            LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
+                            EV_INFO << "lte_7" << endl;
                         }else if((timer_LTE >= 645)&&(timer_LTE < 670)){
-                            timer_LTE_Pico++;
+                            LTE_Consuption_temp = (10*(159.3))/3600000.0;
+                            EV_INFO << "lte_6" << endl;
                         }else if((timer_LTE >= 670)&&(timer_LTE < 1545)){
-                            timer_LTE_Average++;
+                            LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
+                            EV_INFO << "lte_5" << endl;
                         }else if(timer_LTE >= 1545){// finish stage turn ON module
 
 
                             if(take_time_when_find_expired_data){
-                                timer_LTE_Average++;// here decide average or sleep
-                                timer_LTE = 1545; // evita overflow
+                                if((socket_ready)&&(flag_tx_lte)){          // Tx data with cellular (200 a 500mA) // and received (100–300mA)
+                                    LTE_Consuption_temp = ((7*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))+(2*((-5.45*RSSI_LTE_SIGNAL_TEST)-154.54))+(1*((-3.63*RSSI_LTE_SIGNAL_TEST)-136.36)))/3600000.0;
+                                    flag_tx_lte = false;
+                                    timer_LTE = 1545;
+                                    EV_INFO << "lte_4" << endl;
+                                }else if((socket_ready)&&(!flag_tx_lte)){   // connected to mqtt
+                                    LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
+                                    timer_LTE = 1545;
+                                    EV_INFO << "lte_3" << endl;
+                                }
+
                             }else{
 
                                 if(timer_LTE > 1645){// sleep by hardware
-                                    timer_LTE_Sleep++;
-                                    timer_LTE = 1646; // evita overflow
-                                }else{
-                                    timer_LTE_Average++;// time to pass in sleep mode
+
+                                    //LTE_Consuption += (10*(13.4))/3600000.0; // LTE TURN ON ALL TIME
+                                    LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
+                                    timer_LTE = 1646; // avoid overflow
+                                    EV_INFO << "lte_2" << endl;
+                                }else{// time before sleep mode
+
+                                    LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
+                                    EV_INFO << "lte_1" << endl;
+
                                 }
 
                             }
 
 
                         }
+                        emit(Consumption_LTE,LTE_Consuption_temp);
+                        LTE_Consuption += LTE_Consuption_temp;
+
+
+
 
                         //EV_ERROR << "lte counter, general " << timer_LTE << " average: " << timer_LTE_Average << " pico: " << timer_LTE_Pico << endl;
 
@@ -663,18 +770,22 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                             double battery = 0;
 
-                            battery = GW_Battery_mAh
-                                      - ((double)((timer_GW_MICRO_INA*10)*(116.0817))/3600000.0)    // GW+GPS+BLE+XBEE
-                                      - ((double)((timer_esp_module*10)*(19.1913))/3600000.0)       // ESP SCANNING
-                                      - ((double)((timer_esp_Sleep*10)*(0.8))/3600000.0)            // ESP SLEEP MODE
-                                      - ((double)((timer_esp_mqtt_module*10)*(29.6824))/3600000.0)  // ESP CONNECTED TO MQTT
-                                      - ((double)((timer_LTE_Pico*10)*(302.4700))/3600000.0)        // LTE pico during turn ON
-                                      - ((double)((timer_LTE_Average*10)*(45.5237))/3600000.0)      // LTE average
-                                      - ((double)((timer_LTE_Sleep*10)*(13.14))/3600000.0);         // LTE sleep mode
+//                            battery = GW_Battery_mAh
+//                                      - ((double)((timer_GW_MICRO_INA*10)*(116.0817))/3600000.0)    // GW+GPS+BLE+XBEE
+//                                      - ((double)((timer_esp_module*10)*(19.1913))/3600000.0)       // ESP SCANNING
+//                                      - ((double)((timer_esp_Sleep*10)*(0.8))/3600000.0)            // ESP SLEEP MODE
+//                                      - ((double)((timer_esp_mqtt_module*10)*(29.6824))/3600000.0)  // ESP CONNECTED TO MQTT
+//                                      - ((double)((timer_LTE_Pico*10)*(302.4700))/3600000.0)        // LTE pico during turn ON
+//                                      - ((double)((timer_LTE_Average*10)*(45.5237))/3600000.0)      // LTE average
+//                                      - ((double)((timer_LTE_Sleep*10)*(13.14))/3600000.0);         // LTE sleep mode
 
                             //EV_ERROR << "cALCULO bATT: " << GW_Battery_mAh << " " << ((double)((timer_GW_MICRO_INA*10)*(48.2586))/3600000.0) << " " << ((double)((timer_esp_module*10)*(19.1913))/3600000.0) << " " << ((double)((timer_esp_mqtt_module*10)*(29.6824))/3600000.0) << endl;
 
+                            battery = GW_Battery_mAh - ((double)((timer_GW_MICRO_INA*10)*(116.0817))/3600000.0) - Esp_Consumption - LTE_Consuption;
+
                             emit(GW_Battery, battery);
+                            //emit(GW_Battery, Esp_Consumption);
+                            //emit(GW_Battery, LTE_Consuption);
 
 
                             timer_update_GW_Batery = 0;
@@ -1155,6 +1266,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                                 deadline_until = 600;
                                                /****** Sent Message to Cloud *********************/
                                                 sendDataToCloud("wifi"); // prepare and send message
+                                                flag_tx_wifi = true;
                                                /**************************************************/
 
                                                time_threshold_send_data = 10; // 100ms to retry
@@ -1201,6 +1313,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                                 //if(Retry_Sent == 0){
                                                    /****** Sent Message to Cloud *********************/
                                                    sendDataToCloud("lte"); // prepare and send message
+                                                   flag_tx_lte = true;
                                                    /**************************************************/
 
                                                    time_threshold_send_data = 15; // 150ms to retry
@@ -1259,6 +1372,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             packet->insertAtBack(payload);
                                             EV_ERROR << "test emergency sent to WIFI: "<< endl;
                                             socket.send(packet);
+                                            flag_tx_wifi=true;
 
                                             long_Bytes_wifi += static_cast<long>(data.size());
 
@@ -1284,6 +1398,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             packet->insertAtBack(payload);
                                             EV_ERROR << "test emergency send using LTE: "<< endl;
                                             socket.send(packet);
+                                            flag_tx_lte = false;
 
                                             long_Bytes_LTE += static_cast<long>(data.size());
 
@@ -1428,6 +1543,26 @@ void AppBusTCP_R_StateM::subscriptionSignalState(){
     } else {
         EV_WARN << "🟡 ADVERTENCIA: Módulo PHY CELULAR no encontrado. Reintentando en el siguiente ciclo." << endl;
     }
+
+
+    //-----------------------------------------------------------------------------
+    // === 4. NUEVA LÓGICA PARA ack desde nivel de transporte L4 ===
+    EV_INFO << "Try Subscription to Signal L4 ACK..." << endl;
+
+    cModule *host1 = getParentModule();
+    cModule *localTcp = host1->findModuleByPath(".tcp");
+
+    if (localTcp) {
+        // Nos suscribimos a la física celular usando tu nuevo ID
+        localTcp->subscribe(L4_ACK_iD, this);
+
+        EV_INFO << "🟢 Suscripción exitosa a señal L4_ACK_Signal en " << localTcp->getFullPath() << endl;
+        // Opcional: flag de éxito para tu control en el .h (ej: SignRssiLte = 1;)
+    } else {
+        EV_WARN << "🟡 ADVERTENCIA: L4 ACK no encontrado. Reintentando en el siguiente ciclo." << endl;
+    }
+
+
 }
 
 
