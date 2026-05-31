@@ -30,7 +30,8 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
         
         int accident_start @unit(s) = default(1s);
         int accidentDuration @unit(s) = default(1s);
-        double GW_Battery_mAh @unit(mAh) = default(500mAh);
+        double GW_Battery_Capacity_mAh @unit(mAh) = default(500mAh);
+        int GW_Battery_Level_Start = default(100);
         bool event_accident = default(false);
         
         @display("i=block/app");

@@ -90,7 +90,7 @@ private:
     simsignal_t outputBytes_wifi;
     simsignal_t outputBytes_lte;
 
-    simsignal_t GW_Battery;
+    simsignal_t GW_Battery_signal;
 
     simsignal_t RSSI_WIFI_state;
     simsignal_t RSSI_LTE_state;
@@ -139,17 +139,36 @@ private:
     long timer_esp_Sleep = 0;
     long timer_esp_mqtt_module = 0;
     double Esp_Consumption = 0.0;
-    long timer_GW_MICRO_INA = 0;
+
     long timer_LTE_Average = 0;
     long timer_LTE_Pico = 0;
     long timer_LTE_Sleep = 0;
     long timer_LTE = 0;
     double LTE_Consuption = 0.0;
+    double GPS_Consumption = 0.0;
+    double BLE_Consumption = 0.0;
+    double GNSS_Consumption = 0.0;
+    double XBEE_Consumption = 0.0;
+    double GW_MICRO_INA_Consumption = 0.0;
     bool flag_tx_wifi = false;
     bool flag_tx_lte = false;
+    bool flag_Rx_GPS = false;
+    uint8_t flag_Rx_BLE = 0;
+    uint8_t flag_Rx_XBee = 0;
+    uint8_t flag_Rx_GNSS = 0;
+    uint8_t State_Machine_BLE = 0;
+    uint8_t State_Machine_XBee = 0;
+    int timer_Machine_BLE = 0;
+    int timer_Machine_XBee = 0;
+    int Packets_Machine_BLE = 0;
+    double timer_TxRx_BLE = 0;
+    double timer_TxRx_XBee = 0;
 
-    double GW_Battery_mAh; //mA/h
+    double GW_Battery_Capacity_mAh; //mA/h
+    int GW_Battery_Level_Start;
+    bool GW_Battery_died = false;
     int timer_update_GW_Batery = 0;
+    double Battery_Available = 0.0;
 
 
 

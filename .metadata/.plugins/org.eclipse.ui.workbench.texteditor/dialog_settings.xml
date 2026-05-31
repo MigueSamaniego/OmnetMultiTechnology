@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="L4_ACK_iD"/>
+		<item key="selection" value="timeWiFiStateON"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="timeWiFiStateON"/>
+			<item value="timeWiFiWorking"/>
+			<item value="timer_LTE_Average"/>
+			<item value="timeLTEWorking"/>
+			<item value="timer_LTE_Pico"/>
+			<item value="timeLTEState"/>
+			<item value="Battery_Available"/>
+			<item value="GW_Battery_Level"/>
+			<item value="update_timer"/>
+			<item value="GW_Battery_Capacity_mAh"/>
+			<item value="GW_Battery_mAh"/>
+			<item value="timer_TxRx_XBee"/>
+			<item value="GW_Battery"/>
 			<item value="L4_ACK_iD"/>
 			<item value="flag_tx_wifi"/>
-			<item value="RSSI_LTE_SIGNAL_TEST"/>
-			<item value="RSSI_WIFI_SIGNAL_TEST"/>
-			<item value="ACK físico detectado en TcpBaseAlg"/>
-			<item value="GW_Battery"/>
-			<item value="take_time_when_find_expired_data"/>
-			<item value="receiverReceivingCurrentConsumption"/>
-			<item value="El buffer de red está vacío. Permiso para enviar el siguiente mensaje"/>
-			<item value="RSSI_LTE_iD"/>
-			<item value="ACK acks all outstanding segments"/>
-			<item value="TcpReno"/>
-			<item value="state-&gt;snd_una = tcpHeader-&gt;getAckNo();"/>
-			<item value="Updating send window"/>
-			<item value="Measured RTT"/>
 		</list>
 		<list key="replacehistory">
 			<item value="GW_Battery_mAh"/>
