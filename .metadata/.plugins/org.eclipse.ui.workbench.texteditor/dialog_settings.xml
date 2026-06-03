@@ -5,30 +5,32 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="timeWiFiStateON"/>
+		<item key="selection" value="Priority_w"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="timeWiFiStateON"/>
-			<item value="timeWiFiWorking"/>
-			<item value="timer_LTE_Average"/>
-			<item value="timeLTEWorking"/>
-			<item value="timer_LTE_Pico"/>
-			<item value="timeLTEState"/>
-			<item value="Battery_Available"/>
-			<item value="GW_Battery_Level"/>
-			<item value="update_timer"/>
-			<item value="GW_Battery_Capacity_mAh"/>
-			<item value="GW_Battery_mAh"/>
-			<item value="timer_TxRx_XBee"/>
-			<item value="GW_Battery"/>
-			<item value="L4_ACK_iD"/>
-			<item value="flag_tx_wifi"/>
+			<item value="Priority_W"/>
+			<item value="Priority_3"/>
+			<item value="Priority_w"/>
+			<item value="Priority_2"/>
+			<item value="Priority_4"/>
+			<item value="detected_traffic_state"/>
+			<item value="accident_detected_app"/>
+			<item value="emit("/>
+			<item value="Consumption_LTE"/>
+			<item value="event_accident"/>
+			<item value="std::string vehicle = mobility-&gt;getExternalId();"/>
+			<item value="starting events accident"/>
+			<item value="timer_Control_Accident"/>
+			<item value="acci"/>
+			<item value="emit(Consumption_WIFI"/>
 		</list>
 		<list key="replacehistory">
+			<item value="//std::string vehicle = mobility-&gt;getExternalId();"/>
+			<item value="vehicle"/>
 			<item value="GW_Battery_mAh"/>
 			<item value="GW_Battery"/>
 			<item value="Priority_3"/>
@@ -42,8 +44,6 @@
 			<item value="content"/>
 			<item value="TcpServerBusApp"/>
 			<item value="TcpSinkApp"/>
-			<item value="TcpSinkAppServer"/>
-			<item value="AppBusDataCollectionTCP"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

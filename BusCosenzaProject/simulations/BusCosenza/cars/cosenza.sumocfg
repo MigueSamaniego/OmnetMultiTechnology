@@ -23,18 +23,9 @@
 		<step-length value="0.1"/>
     </time>
 	
-	<!--tripinfos>
-    <tripinfo id="VEHICLE_ID"
-			  depart="DEPARTURE_TIME" departLane="DEPARTURE_LANE_ID"
-			  departPos="DEPARTURE_POSITION" departSpeed="DEPARTURE_SPEED" 
-			  departDelay="DEPARTURE_DELAY" 
-			  arrival="ARRIVAL_TIME" arrivalLane="DEPARTURE_LANE_ID" 
-			  arrivalPos="ARRIVAL_POSITION" arrivalSpeed="ARRIVAL_SPEED"
-			  duration="TRAVEL_TIME" routeLength="ROUTE_LENGTH"
-			  waitingTime="SECONDS_WAITING_FOR_TRAFFIC"
-              waitingCount="NUMBER_OF_WAITING_EPISODES"
-			  rerouteNo="REROUTE_NUMBER" 
-			  devices="DEVICE_LIST" vtype="VEHICLE_TYPE_ID"/>
-	</tripinfos-->
+	<processing>
+        <time-to-teleport value="-1"/>
+        <collision.action value="none"/>
+    </processing>
 
 </configuration>

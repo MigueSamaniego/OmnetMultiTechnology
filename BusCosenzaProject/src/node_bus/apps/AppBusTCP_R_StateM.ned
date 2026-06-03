@@ -52,6 +52,8 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
     	@signal[Consumption_WIFI_Battery](type="double");
     	@signal[Consumption_LTE_Battery](type="double");
     	
+    	@signal[Time_ETA_Signal](type="double");
+    	
     	@signal[RSSI_WIFI_level](type="double");
     	@signal[RSSI_LTE_level](type="double");
     	
@@ -100,6 +102,8 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
 		
 		@statistic[Consumption_WIFI_Battery](title="Current mA/h"; source="Consumption_WIFI_Battery"; record=vector,last);
 		@statistic[Consumption_LTE_Battery](title="Current mA/h"; source="Consumption_LTE_Battery"; record=vector,last);
+		
+		@statistic[Time_ETA_Signal](title="ETA [s]"; source="Time_ETA_Signal"; record=vector,last);
 		
 		@statistic[RSSI_WIFI_level](title="RSSI WIFI [dBm]"; source="RSSI_WIFI_level"; record=vector,last);
 		@statistic[RSSI_LTE_level](title="RSSI LTE [dBm]"; source="RSSI_LTE_level"; record=vector,last);

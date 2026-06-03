@@ -12,10 +12,10 @@ using namespace omnetpp;
 
 enum Priority {
     Priority_1 = 0, // 1: Inmediato
-    Priority_2 = 1,   // 2: 30s
-    Priority_3 = 2,       // 3: 40s (ajustado según tu último mensaje)
-    Priority_4 = 3,       // 4: 50s
-    Priority_wifi = 4      // 5: 60s
+    Priority_2 = 1,   // 2: 60s
+    Priority_3 = 2,       // 3: 10min (ajustado según tu último mensaje)
+    Priority_4 = 3,       // 4: 00s no used
+    Priority_wifi = 4      // 5: just wifi interface
 };
 
 struct QueuedData {
@@ -46,7 +46,7 @@ private:
     int count[NUM_PRIORITIES] = {0,0,0,0,0};
 
     // Tiempos máximos de espera por prioridad
-    const double maxWaitTime[NUM_PRIORITIES] = {0.0, 60.0, 600.0, 500.0, 650.0};
+    const double maxWaitTime[NUM_PRIORITIES] = {0.0, 60.0, 600.0, 9600.0, 9650.0};
 
 public:
     void pushBatch(const std::vector<QueuedData>& batch) {
@@ -90,8 +90,8 @@ public:
         while (result.size() < n && foundAny) {
             foundAny = false;
             if(isWifi){
-                // ************** recovery al ata to send ******************************************
-                for (int p = 0; p < NUM_PRIORITIES; p++) {
+                // ************** FIRST recovery data priority to send ******************************************
+                for (int p = 0; p < NUM_PRIORITIES-1; p++) {
                     if (count[p] > 0) {
                         simtime_t expirationTime = buffer[p][tail[p]].arrivalTime + maxWaitTime[p];
 
@@ -107,6 +107,25 @@ public:
                         }
                     }
                 }
+                //************** if WIFI continue available recovery data without priority to send **************
+                if ((count[0] == 0)&&(count[1] == 0)&&(count[2] == 0)&&(count[3] == 0)) {
+                    uint8_t p = NUM_PRIORITIES-1;
+                    if (count[p] > 0) {
+                        simtime_t expirationTime = buffer[p][tail[p]].arrivalTime + maxWaitTime[p];
+
+                        // Criterio de extracción: P1, WiFi activo o Caducidad inminente
+                        bool mustSend = (p == 0) || isWifi || (expirationTime <= horizon);
+
+                        if (mustSend) {
+                            result.push_back(buffer[p][tail[p]].content);
+                            tail[p] = (tail[p] + 1) % MAX_PER_PRIO;
+                            count[p]--;
+                            foundAny = true;
+                            if (result.size() >= n) return result;
+                        }
+                    }
+                }
+
             }else {
                 // ********************** recovery only data with priority ***********************
                 for (int p = 0; p < (NUM_PRIORITIES-1); p++) {

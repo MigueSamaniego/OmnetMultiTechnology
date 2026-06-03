@@ -34,6 +34,8 @@ protected:
     simsignal_t Consumption_WIFI;
     simsignal_t Consumption_LTE;
 
+    simsignal_t Time_ETA;
+
 private:
     bool Vehicle_With_Interface = false;
     int coun_msg_sent = 0;
@@ -133,6 +135,13 @@ private:
     double distance_Return = 0.0;
     simtime_t time_trip_Return = 0;
     bool measure_stage = false;
+    bool flag_time_start_trip_return = false;
+    uint8_t bus_station_section = 0;
+    double distance_trip_section[2] = {9954.38,(9954.38+11860.3)};// distance on meters
+    double ETA = 0.0;
+    double alpha = 0.05;
+    double emaSpeed = 0.0;
+    bool emaInit = false;
 
     bool esp_module_ON = false;
     long timer_esp_module = 0;
@@ -205,12 +214,14 @@ private:
 
 
     // traffic detected variables
+
     long time_bus_stop_counter = 0;
     long time_congestion = 0;
     long accident_start;
     long accidentDuration;
     bool event_accident;
     long timer_accident;
+    bool flag_change_state_accident = false;
     bool accident_detected_app = false;
     uint8_t state_of_accident = 0;
     bool msg_emergency_pending = false;

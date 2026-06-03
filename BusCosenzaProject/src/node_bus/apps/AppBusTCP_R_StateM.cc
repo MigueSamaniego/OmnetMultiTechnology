@@ -160,6 +160,8 @@ void AppBusTCP_R_StateM::initialize(int stage)
         Consumption_WIFI = registerSignal("Consumption_WIFI_Battery");
         Consumption_LTE = registerSignal("Consumption_LTE_Battery");
 
+        Time_ETA = registerSignal("Time_ETA_Signal");
+
         // buffer occupation
         inputBufferSignal = registerSignal("inputBufferSize");
         outputBufferSignal_wifi = registerSignal("outputBufferSize_wifi");
@@ -610,6 +612,14 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                         distance_Go = traciVehicle->getDistanceTravelled(); // take the misure from bus station
                                         time_trip_Go = simTime();
                                         EV_WARN << "start trip: " << distance_Go << " " << time_trip_Go << endl;
+                                        flag_time_start_trip_return = true;
+                                        bus_station_section = 0; // indicate the number of section between bus stations 0 --> from bus station 0 to 1
+                                    }else if((speed > 1) &&(flag_time_start_trip_return)){
+                                        flag_time_start_trip_return = false;
+                                        time_trip_Go = simTime();// real time when bus start again
+                                        ETA = 0.0; // RESET ETA
+                                        emaInit = false;
+                                        EV_WARN << "start first time: " << time_trip_Go << endl;
                                     }else if((speed < 1) &&(measure_stage)){
                                         distance_Return = (traciVehicle->getDistanceTravelled()) - distance_Return;
                                         time_trip_Return = simTime() - time_trip_Return;
@@ -629,17 +639,104 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                         measure_stage = true;
 
-                                        EV_WARN << "distance and time_trip Go: " << distance_Go << " " << time_trip_Go << endl;
-
+                                        EV_WARN << "distance and time_trip Go: " << distance_Go << " " << time_trip_Go << " false time: "<< time_trip_Return <<endl;
+                                        flag_time_start_trip_return = true;
+                                        bus_station_section = 1; // indicate the number of section between bus stations 1 --> from bus station 1 to 2
+                                    }else if((speed > 1)&&(flag_time_start_trip_return)){
+                                        flag_time_start_trip_return = false;
+                                        time_trip_Return = simTime();// real time when bus start again
+                                        EV_WARN << "start second time: " << time_trip_Return << endl;
+                                        ETA = 0.0;
+                                        emaInit = false;
                                     }
                                 }
 
-                                min_time_check = 30;// 300ms
+                                min_time_check = 50;// 500ms
                             }else{
                                 EV_INFO << "********* wifi interface OFF **********: " << endl;
                                 esp_module_ON = false;
-                                min_time_check = 200;// 2000ms
+                                min_time_check = 100;// 1000ms
+
                             }
+
+                            //--------------------------------------------------------------------------------------------
+                            //-------------------------- Calculate the ETA -----------------------------------------------
+                            //--------------------------------------------------------------------------------------------
+                            if(!ConnectionToAP){// when WIFI is not found
+                                double distance_trip_curruntly = 0.0;
+                                double distance_set_point = 54.8598; // this is the distance when bus is in bus station Unical.
+                                //double alpha = 0.01;// slow reaction
+                                double current_speed = (traciVehicle->getSpeed())*3.6;// km/h
+                                double max_time_trip = 5000.0;
+                                double emaSpeed_to_seep_low = 1.5;
+
+                                distance_trip_curruntly = traciVehicle->getDistanceTravelled() - distance_set_point;
+
+                                if(distance_trip_curruntly > 0){
+
+                                    //if(current_speed > 0.0){
+//                                        if (!emaInit) {
+//                                            emaSpeed = current_speed/3.6;   // inicialización
+//                                            emaInit = true;
+//                                            //EV_INFO << "ETA ACCIDENT1: " << ETA << " "<< emaSpeed << " "<< emaInit << " "<< current_speed/3.6<< distance_trip_curruntly <<endl;
+//                                        } else {
+//
+//                                            alpha = 0.001;// default
+//
+//                                            emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
+//
+//                                            ETA = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+//
+//                                        }
+
+
+                                    //}else if(current_speed == 0.0){
+                                        if((accident_detected_app)){
+                                            ETA = max_time_trip;
+                                            emaInit = false;
+                                            emaSpeed = 0.0;
+                                            //EV_INFO << "ETA ACCIDENT: " << ETA << " "<< emaSpeed << " "<< emaInit << " "<< distance_trip_curruntly << endl;
+                                            //EV_INFO << "ETA ACCIDENT2: " << endl;
+                                        }else if(detected_traffic_state){
+                                            alpha = 0.002;//ETA increase very slow OR CAN BE 0.005
+                                            emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
+                                            ETA = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+                                            //emaInit = false;
+                                            //EV_INFO << "ETA ACCIDENT1: " << endl;
+                                        }else if(!detected_traffic_state){
+                                           //ETA IT MUST CONSTANT
+                                           // EV_INFO << "ETA ACCIDENT3: " << endl;
+                                            if (!emaInit) {
+                                                emaSpeed = current_speed/3.6;   // inicialización
+                                                emaInit = true;
+                                                //EV_INFO << "ETA ACCIDENT1: " << ETA << " "<< emaSpeed << " "<< emaInit << " "<< current_speed/3.6<< distance_trip_curruntly <<endl;
+                                            } else {
+
+                                                alpha = 0.001;// default
+
+                                                emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
+
+                                                ETA = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+
+                                            }
+                                        }
+                                    //}
+
+                                    if(ETA > 0){
+
+                                        EV_INFO << "ESTIMATION TIME ARRIVE: "<< ETA << " speed: " << current_speed <<endl;
+                                        emit(Time_ETA,ETA);
+                                    }
+
+                                }
+                            }else{
+                                ETA = 0.0;
+                                emit(Time_ETA,ETA);
+                            }
+                            //--------------------------------------------------------------------------------------------
+                            //--------------------------------------------------------------------------------------------
+                            //--------------------------------------------------------------------------------------------
+
 
                             timer_Control_Start_Scanning_WIFI = 0;
 
@@ -854,9 +951,11 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
 
 
-                        //------------------------------------------------------------------------
-                        //------------------------------------------------------------------------
-                        // ------------------- Loop Algorith -------------------------------------
+                        //------------------------------------------------------------------------------------------------------------------------
+                        //------------------------------------------------------------------------------------------------------------------------
+                        // ------------------- Loop Algorith -------------------------------------------------------------------------------------
+                        //------------------------------------------------------------------------------------------------------------------------
+                        //------------------------------------------------------------------------------------------------------------------------
 
                         if(control_all_timers >= delay_sdcard){
                                 delay_sdcard = 0;
@@ -1117,7 +1216,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                  counter_msg++;
                                  EV_INFO << "NEW VEHICLE, msg_num : " << data<< " " << counter_msg << endl;
 
-                                 bool state_buff = inputBuffer.add(data, Priority_3, simTime());
+                                 bool state_buff = inputBuffer.add(data, Priority_wifi, simTime());
 
                                  static_inputBuff = inputBuffer.size();
 
@@ -1164,7 +1263,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 // 2 stop detected
 
                                 double speed = traciVehicle->getSpeed();
-                                int sensibility = 30;// 15s with speed under 15km is detected like traffic
+                                int sensibility = 60;// 30s with speed under 15km is detected like traffic (bus stations)
 
                                 speed = speed * 3.6; // km/h
 
@@ -1193,7 +1292,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                     }else{
                                         // traffic detected
                                         timer_congestion_state++;
-                                        int periodic_nitification = 20; // each 10s save a data on sdcard
+                                        int periodic_nitification = 20; // each 10s save a data on sdcard with deadline
 
                                         EV_INFO << "bus stop timer: " << timer_congestion_state << endl;
 
@@ -1528,7 +1627,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              emit(size_priority_1, state_priority.p1);
                              emit(size_priority_2, state_priority.p2);
                              emit(size_priority_3, state_priority.p3);
-                             emit(size_priority_4, state_priority.p4);
+                             //emit(size_priority_4, state_priority.p4);
                              emit(size_priority_wifi, state_priority.p5);
 
                              emit(timeWiFiWorking, (double)(((timer_esp_module)*10)/1000));// time on seconds
