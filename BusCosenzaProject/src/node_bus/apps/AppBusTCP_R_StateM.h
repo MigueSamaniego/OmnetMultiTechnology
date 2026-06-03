@@ -139,8 +139,9 @@ private:
     uint8_t bus_station_section = 0;
     double distance_trip_section[2] = {9954.38,(9954.38+11860.3)};// distance on meters
     double ETA = 0.0;
-    double alpha = 0.05;
+    //double alpha = 0.05;
     double emaSpeed = 0.0;
+    double traffic_vel_pass = 0.0;
     bool emaInit = false;
 
     bool esp_module_ON = false;

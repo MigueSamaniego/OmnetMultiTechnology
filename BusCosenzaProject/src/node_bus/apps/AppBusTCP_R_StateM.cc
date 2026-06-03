@@ -485,7 +485,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         timer_esp_module = 0;
                         timer_LTE = 0;
 
-                        min_time_check = 100;// deadline high
+                        min_time_check = 20;// deadline high
 
                         check_timers_expired = 0;
                         take_time_when_find_expired_data = false;
@@ -600,6 +600,10 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             EV_WARN << "distance and time_trip Go: " << distance_Go << " " << time_trip_Go << endl;
                             EV_WARN << "distance and time_trip Return: " << distance_Return << " " << time_trip_Return << endl;
 
+
+                            //--------------------------------------------------------------------------------------------
+                            //-------------------------- Calculate DISTANCE between APs ----------------------------------
+                            //--------------------------------------------------------------------------------------------
                             if((distance_to_AP1 < 150)||(distance_to_AP2 < 150)){
 
                                 esp_module_ON = true;
@@ -651,7 +655,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                     }
                                 }
 
-                                min_time_check = 50;// 500ms
+                                min_time_check = 100;// 500ms
                             }else{
                                 EV_INFO << "********* wifi interface OFF **********: " << endl;
                                 esp_module_ON = false;
@@ -665,54 +669,38 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             if(!ConnectionToAP){// when WIFI is not found
                                 double distance_trip_curruntly = 0.0;
                                 double distance_set_point = 54.8598; // this is the distance when bus is in bus station Unical.
-                                //double alpha = 0.01;// slow reaction
+                                double alpha = 0.001;// slow reaction
                                 double current_speed = (traciVehicle->getSpeed())*3.6;// km/h
                                 double max_time_trip = 5000.0;
-                                double emaSpeed_to_seep_low = 1.5;
+                                double emaSpeed_to_seep_low = 0.5;
 
                                 distance_trip_curruntly = traciVehicle->getDistanceTravelled() - distance_set_point;
+                                EV_WARN << "SPEED: " << current_speed << " DISTANCE: " << distance_trip_curruntly << endl;
 
                                 if(distance_trip_curruntly > 0){
 
-                                    //if(current_speed > 0.0){
-//                                        if (!emaInit) {
-//                                            emaSpeed = current_speed/3.6;   // inicialización
-//                                            emaInit = true;
-//                                            //EV_INFO << "ETA ACCIDENT1: " << ETA << " "<< emaSpeed << " "<< emaInit << " "<< current_speed/3.6<< distance_trip_curruntly <<endl;
-//                                        } else {
-//
-//                                            alpha = 0.001;// default
-//
-//                                            emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
-//
-//                                            ETA = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
-//
-//                                        }
-
-
-                                    //}else if(current_speed == 0.0){
                                         if((accident_detected_app)){
                                             ETA = max_time_trip;
-                                            emaInit = false;
-                                            emaSpeed = 0.0;
-                                            //EV_INFO << "ETA ACCIDENT: " << ETA << " "<< emaSpeed << " "<< emaInit << " "<< distance_trip_curruntly << endl;
-                                            //EV_INFO << "ETA ACCIDENT2: " << endl;
-                                        }else if(detected_traffic_state){
-                                            alpha = 0.002;//ETA increase very slow OR CAN BE 0.005
-                                            emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
-                                            ETA = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
                                             //emaInit = false;
-                                            //EV_INFO << "ETA ACCIDENT1: " << endl;
+                                            //emaSpeed = 0.0;
+                                        }else if(detected_traffic_state){
+                                            // ******** ETA ​= max(ETApass​+Δt, ​d/veff​)​; ************************
+                                            emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
+
+                                            // restriction
+
+                                            //double ETA_max = 15 *
+                                            if(current_speed == 0.0){
+                                                ETA += (( min_time_check * 10 ) / 1000);
+                                            }else{
+                                                ETA = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+                                            }
+
                                         }else if(!detected_traffic_state){
-                                           //ETA IT MUST CONSTANT
-                                           // EV_INFO << "ETA ACCIDENT3: " << endl;
                                             if (!emaInit) {
                                                 emaSpeed = current_speed/3.6;   // inicialización
                                                 emaInit = true;
-                                                //EV_INFO << "ETA ACCIDENT1: " << ETA << " "<< emaSpeed << " "<< emaInit << " "<< current_speed/3.6<< distance_trip_curruntly <<endl;
                                             } else {
-
-                                                alpha = 0.001;// default
 
                                                 emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
 
@@ -720,15 +708,14 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                             }
                                         }
-                                    //}
 
                                     if(ETA > 0){
 
                                         EV_INFO << "ESTIMATION TIME ARRIVE: "<< ETA << " speed: " << current_speed <<endl;
                                         emit(Time_ETA,ETA);
                                     }
-
                                 }
+
                             }else{
                                 ETA = 0.0;
                                 emit(Time_ETA,ETA);
@@ -872,7 +859,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             }
 
                         }else{// sleep mode
-                            Esp_Consumption_temp = (10*(0.8))/3600000.0;
+                            //Esp_Consumption_temp = (10*(0.8))/3600000.0;// sleep
+                            Esp_Consumption_temp = (10*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40))/3600000.0;// 80-120mA// not sleep
                             //timer_esp_module++; // here it is in sleep mode not count timer
                         }
                         emit(Consumption_WIFI,Esp_Consumption_temp);
@@ -899,8 +887,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                             if(take_time_when_find_expired_data){
                                 timer_LTE_Average++;
-                                if((socket_ready)&&(flag_tx_lte)){          // Tx data with cellular (200 a 500mA) // and received (100–300mA)
-                                    LTE_Consuption_temp = ((7*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))+(2*((-5.45*RSSI_LTE_SIGNAL_TEST)-154.54))+(1*((-3.63*RSSI_LTE_SIGNAL_TEST)-136.36)))/3600000.0;
+                                if((socket_ready)&&(flag_tx_lte)){          //base,  Tx data with cellular (200 a 500mA) // and received (100–300mA)
+                                    LTE_Consuption_temp = ((3*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))+(5*((-5.45*RSSI_LTE_SIGNAL_TEST)-154.54))+(2*((-3.63*RSSI_LTE_SIGNAL_TEST)-136.36)))/3600000.0;
                                     flag_tx_lte = false;
                                     timer_LTE = 1545;
                                 }else if((socket_ready)&&(!flag_tx_lte)){   // connected to mqtt
@@ -912,7 +900,12 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 if(timer_LTE > 1645){// sleep by hardware
 
-                                    LTE_Consuption += (10*(13.4))/3600000.0; // LTE TURN ON ALL TIME
+                                    //LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+                                    if(ConnectionToAP){
+                                        LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+                                    }else{
+                                        LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
+                                    }
                                     //LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
                                     timer_LTE = 1646; // avoid overflow
                                     //timer_LTE_Average++; // ***************aqui no cuenta el tiempo de sleep****************
