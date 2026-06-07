@@ -71,7 +71,7 @@ std::string AppBusTCP_R_StateM::buildDataString(const std::vector<double>& value
 
     // add dynamic values
     for (size_t i = 0; i < values.size(); i++) {
-        if (i < 2) { // lat y lon
+        if (i < 3) { // lat y lon
             oss << "/" << std::fixed << std::setprecision(5) << values[i];
         } else {
             oss << "/" << std::fixed << std::setprecision(2) << values[i];
@@ -160,7 +160,7 @@ void AppBusTCP_R_StateM::initialize(int stage)
         Consumption_WIFI = registerSignal("Consumption_WIFI_Battery");
         Consumption_LTE = registerSignal("Consumption_LTE_Battery");
 
-        Time_ETA = registerSignal("Time_ETA_Signal");
+        Time_TTD = registerSignal("Time_TTD_Signal");
 
         // buffer occupation
         inputBufferSignal = registerSignal("inputBufferSize");
@@ -485,12 +485,12 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         timer_esp_module = 0;
                         timer_LTE = 0;
 
-                        min_time_check = 20;// deadline high
+                        min_time_check = 100;// deadline high
 
                         check_timers_expired = 0;
                         take_time_when_find_expired_data = false;
                         deadline_start = simTime() + 3600; // 1h
-                        deadline_until = 3600; // 1h
+                        deadline_until = 300; // 5min
 
                         static_currentBytes = 0.0;
                         static_usagePercent = 0.0;
@@ -506,6 +506,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                         speed_pass = 0.0;
                         measure_stage = false;
+
+                        windows_fix = false; // i use adaptative windows
 
                         // ------------------ available event accident -------------------------------------
                         state_of_accident = 0; // not accident state
@@ -621,7 +623,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                     }else if((speed > 1) &&(flag_time_start_trip_return)){
                                         flag_time_start_trip_return = false;
                                         time_trip_Go = simTime();// real time when bus start again
-                                        ETA = 0.0; // RESET ETA
+                                        TTD = 0.0; // RESET TTD
                                         emaInit = false;
                                         EV_WARN << "start first time: " << time_trip_Go << endl;
                                     }else if((speed < 1) &&(measure_stage)){
@@ -650,12 +652,12 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                         flag_time_start_trip_return = false;
                                         time_trip_Return = simTime();// real time when bus start again
                                         EV_WARN << "start second time: " << time_trip_Return << endl;
-                                        ETA = 0.0;
+                                        TTD = 0.0;
                                         emaInit = false;
                                     }
                                 }
 
-                                min_time_check = 100;// 500ms
+                                min_time_check = 100;// 1000ms
                             }else{
                                 EV_INFO << "********* wifi interface OFF **********: " << endl;
                                 esp_module_ON = false;
@@ -664,62 +666,106 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             }
 
                             //--------------------------------------------------------------------------------------------
-                            //-------------------------- Calculate the ETA -----------------------------------------------
+                            //-------------------------- Calculate the TTD -----------------------------------------------
                             //--------------------------------------------------------------------------------------------
+                            double distance_set_point = 54.8598; // this is the distance when bus is in bus station Unical.
+                            double max_time_trip = 5000.0;
+                            double distance_trip_curruntly = traciVehicle->getDistanceTravelled() - distance_set_point;
+                            double current_speed = (traciVehicle->getSpeed())*3.6;// km/h
+                            double emaSpeed_to_seep_low = 0.5;
+                            double alpha = 0.0001;// slow reaction 0.0001, 0.005
                             if(!ConnectionToAP){// when WIFI is not found
-                                double distance_trip_curruntly = 0.0;
-                                double distance_set_point = 54.8598; // this is the distance when bus is in bus station Unical.
-                                double alpha = 0.001;// slow reaction
-                                double current_speed = (traciVehicle->getSpeed())*3.6;// km/h
-                                double max_time_trip = 5000.0;
-                                double emaSpeed_to_seep_low = 0.5;
 
-                                distance_trip_curruntly = traciVehicle->getDistanceTravelled() - distance_set_point;
+
+
                                 EV_WARN << "SPEED: " << current_speed << " DISTANCE: " << distance_trip_curruntly << endl;
 
                                 if(distance_trip_curruntly > 0){
 
                                         if((accident_detected_app)){
-                                            ETA = max_time_trip;
+                                            TTD = max_time_trip;
                                             //emaInit = false;
                                             //emaSpeed = 0.0;
                                         }else if(detected_traffic_state){
-                                            // ******** ETA ​= max(ETApass​+Δt, ​d/veff​)​; ************************
-                                            emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
 
                                             // restriction
+                                            //if(current_speed < 0.5){
+                                            //    alpha = 0.0005;  //   aumenta mucho mas rapido el TTD 0.001
+                                            //}else{
+                                                alpha = 0.001;//0.0005
+                                            //}
+                                            emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
+                                            TTD = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+                                            TTD_pass = TTD;
 
-                                            //double ETA_max = 15 *
-                                            if(current_speed == 0.0){
-                                                ETA += (( min_time_check * 10 ) / 1000);
-                                            }else{
-                                                ETA = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
-                                            }
 
                                         }else if(!detected_traffic_state){
                                             if (!emaInit) {
-                                                emaSpeed = current_speed/3.6;   // inicialización
+                                                //emaSpeed = current_speed/3.6;   // inicialización
+                                                emaSpeed = 24.98/3.6;
                                                 emaInit = true;
                                             } else {
 
                                                 emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
 
-                                                ETA = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+                                                TTD = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+
+                                                TTD_pass = TTD;
 
                                             }
                                         }
 
-                                    if(ETA > 0){
+                                    if(TTD > 0){
 
-                                        EV_INFO << "ESTIMATION TIME ARRIVE: "<< ETA << " speed: " << current_speed <<endl;
-                                        emit(Time_ETA,ETA);
+                                        EV_INFO << "ESTIMATION TIME ARRIVE: "<< TTD << " speed: " << current_speed <<endl;
+                                        emit(Time_TTD,TTD);
                                     }
                                 }
 
                             }else{
-                                ETA = 0.0;
-                                emit(Time_ETA,ETA);
+
+                                if((bus_station_section==1)&&((distance_trip_section[bus_station_section] - distance_trip_curruntly) < 3000.0)){
+                                    if((accident_detected_app)){
+                                        TTD = max_time_trip;
+                                    }else if(detected_traffic_state){
+
+                                        // restriction
+
+                                        //if(current_speed < 0.5){
+                                        //    alpha = 0.01;  //   aumenta mucho mas rapido el TTD
+                                        //}else{
+                                            alpha = 0.001;
+                                        //}
+
+                                        emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
+                                        TTD = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+                                        TTD_pass = TTD;
+
+
+                                    }else if(!detected_traffic_state){
+                                        if (!emaInit) {
+                                            //emaSpeed = current_speed/3.6;   // inicialización
+                                            emaSpeed = 24.98/3.6;
+                                            emaInit = true;
+                                        } else {
+
+                                            emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
+
+                                            TTD = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
+
+                                            TTD_pass = TTD;
+
+                                        }
+                                    }
+                                }else{
+                                    TTD = 0.0;
+
+                                }
+
+
+                                emit(Time_TTD,TTD);
                             }
+
                             //--------------------------------------------------------------------------------------------
                             //--------------------------------------------------------------------------------------------
                             //--------------------------------------------------------------------------------------------
@@ -859,8 +905,13 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             }
 
                         }else{// sleep mode
-                            //Esp_Consumption_temp = (10*(0.8))/3600000.0;// sleep
-                            Esp_Consumption_temp = (10*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40))/3600000.0;// 80-120mA// not sleep
+
+
+                            if(windows_fix == true){
+                                Esp_Consumption_temp = (10*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40))/3600000.0;// 80-120mA// not sleep
+                            }else{
+                                Esp_Consumption_temp = (10*(0.8))/3600000.0;// sleep
+                            }
                             //timer_esp_module++; // here it is in sleep mode not count timer
                         }
                         emit(Consumption_WIFI,Esp_Consumption_temp);
@@ -1067,20 +1118,17 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 double lat = geo.y;
                                 double lon = geo.x;
-
-                    //            EV_INFO << std::fixed << std::setprecision(6)
-                    //            << "LAT: " << lat
-                    //            << " | LON: " << lon
-                    //            << std::defaultfloat << endl;
+                                deadline_on_SERVER = simTime().dbl();
 
                                 // ---------- Build format of DATA ------------
-                                std::vector<double> gps = {lat, lon};
+                                std::vector<double> gps = {deadline_on_SERVER,lat, lon};
                                 std::string data = buildDataString(gps);
                                 // --------------------------------------------
                                 counter_msg++;
                                 EV_INFO << "NEW GPS, msg_num" << data << " " << counter_msg << endl;
+                                //2026-06-07-17-01-31/8.24000/39.35595/16.22719/$
 
-                                bool state_buff = inputBuffer.add(data, Priority_3, simTime());
+                                bool state_buff = inputBuffer.add(data, Priority_3, deadline_on_SERVER);
 
                                 static_inputBuff = inputBuffer.size();
 
@@ -1090,6 +1138,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                     delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                     EV_INFO << "NEW GPS time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
+
 
                                     // save buffer en SDCARD
                                     auto batch = inputBuffer.flush();
@@ -1126,10 +1175,11 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 double co = traciVehicle->getCOEmissions();
                                 double nox = traciVehicle->getNOxEmissions();
                                 double pmx = traciVehicle->getPMxEmissions();
+                                deadline_on_SERVER = simTime().dbl();
 
                                 // -------- OTHER TYPE SENSORS ----------------
                                  std::vector<double> sensor = {
-                                     co2, co, nox, pmx
+                                         deadline_on_SERVER, co2, co, nox, pmx
                                  };
 
                                  std::string data = buildDataString(sensor);
@@ -1141,7 +1191,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                  counter_msg++;
                                  EV_INFO << "NEW POLLUTION, msg_num" << data<< " " << counter_msg  << endl;
 
-                                 bool state_buff = inputBuffer.add(data, Priority_3, simTime());
+                                 bool state_buff = inputBuffer.add(data, Priority_3, deadline_on_SERVER);
 
                                  static_inputBuff = inputBuffer.size();
 
@@ -1192,11 +1242,12 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 double Decaccel = traciVehicle->getDeccel();
                                 double fuel = traciVehicle->getFuelConsumption();
                                 double time_trip = traciVehicle->getDistanceTravelled();
+                                deadline_on_SERVER = simTime().dbl();
 
 
                                 // -------- OTHER TYPE SENSORS ----------------
                                  std::vector<double> sensor = {
-                                     speed, accel, Decaccel, fuel, time_trip
+                                         deadline_on_SERVER, speed, accel, Decaccel, fuel, time_trip
                                  };
 
                                  std::string data = buildDataString(sensor);
@@ -1209,7 +1260,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                  counter_msg++;
                                  EV_INFO << "NEW VEHICLE, msg_num : " << data<< " " << counter_msg << endl;
 
-                                 bool state_buff = inputBuffer.add(data, Priority_wifi, simTime());
+                                 bool state_buff = inputBuffer.add(data, Priority_wifi, deadline_on_SERVER);
 
                                  static_inputBuff = inputBuffer.size();
 
@@ -1256,7 +1307,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 // 2 stop detected
 
                                 double speed = traciVehicle->getSpeed();
-                                int sensibility = 60;// 30s with speed under 15km is detected like traffic (bus stations)
+                                int sensibility = 120;// 60s with speed under 15km is detected like traffic (bus stations)
 
                                 speed = speed * 3.6; // km/h
 
@@ -1264,7 +1315,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 if(detected_traffic_state==0){
 
-                                    if(speed <= 15.0) {
+                                    if(speed <= 10.8) {//15
 
                                         timer_congestion_state++;
                                         EV_INFO << "bus detect timer: " << timer_congestion_state << endl;
@@ -1279,11 +1330,17 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 }else if (detected_traffic_state==1){
 
-                                    if(speed > 15.0) {
-                                        detected_traffic_state = 0;
-                                        timer_congestion_state = 0;
+                                    if(speed > 10.8) {
+                                        timer_congestion_state_out++;
+                                        if(timer_congestion_state_out >= 20){// 10 segundos de velocidad sale de trafico
+                                            detected_traffic_state = 0;
+                                            timer_congestion_state = 0;
+                                            timer_congestion_state_out = 0;
+                                        }
+
                                     }else{
                                         // traffic detected
+                                        timer_congestion_state_out = 0;
                                         timer_congestion_state++;
                                         int periodic_nitification = 20; // each 10s save a data on sdcard with deadline
 
@@ -1300,16 +1357,17 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                             double lat = geo.y;
                                             double lon = geo.x;
+                                            deadline_on_SERVER = simTime().dbl();
 
                                              std::vector<double> event_traffic = {
-                                                 (double)(periodic_nitification/2), lat, lon
+                                                     deadline_on_SERVER, (double)(periodic_nitification/2), lat, lon
                                              };
 
                                              std::string data = buildDataString(event_traffic);
                                              // --------------------------------------------
                                              counter_msg++;
 
-                                             bool state_buff = inputBuffer.add(data, Priority_2, simTime());// deadline 5minutes.
+                                             bool state_buff = inputBuffer.add(data, Priority_2, deadline_on_SERVER);// deadline 5minutes.
 
                                              static_inputBuff = inputBuffer.size();
 
@@ -1423,8 +1481,9 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             //if(Retry_Sent == 0){
 
                                                 deadline_start = simTime(); // update this time each call function is sufficient to empty data from SDCARD
-                                                deadline_until = 600;
-                                               /****** Sent Message to Cloud *********************/
+                                                //deadline_until = 600;
+
+                                                /****** Sent Message to Cloud *********************/
                                                 sendDataToCloud("wifi"); // prepare and send message
                                                 flag_tx_wifi = true;
                                                /**************************************************/
@@ -1456,8 +1515,13 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             // DATA PENDING TO SEND BEFORE BECOMING UNUSABLE
                                             //EV_ERROR << "DATA EXPIRED PREPARE LTE TO SEND: "<< endl;
                                             deadline_start = simTime();
-                                            deadline_until = 300; // 5min (calculate the time remaining for the next bus stop)
-                                            EV_ERROR << "DATA EXPIRED PREPARE LTE TO SEND data from range: "<< deadline_start+2 << " " << deadline_start+deadline_until << endl;
+                                            // ----------------- fix windows data send -----------------------------
+                                            //deadline_until = 600; defaul is 5min using a windows fix
+                                            // ------------------ conciente batching data to send -----------------------------
+                                            if(windows_fix == false)
+                                                deadline_until = (int)(TTD); // MORE 10 SECONDS TO ERROR
+
+                                            EV_ERROR << "DATA EXPIRED PREPARE LTE TO SEND data from range: "<< deadline_start+2 << " " << deadline_start+deadline_until << " TTD: " << TTD << endl;
                                             take_time_when_find_expired_data = true;
                                         }
 
@@ -1513,61 +1577,83 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 double lat = geo.y;
                                 double lon = geo.x;
+                                deadline_on_SERVER = simTime().dbl();
 
-                                std::vector<double> gps = {(double)state_of_accident,lat, lon};
+
+                                std::vector<double> gps = {deadline_on_SERVER, (double)state_of_accident,lat, lon};
                                 std::string data = buildDataString(gps);
 
                                 if(msg_emergency_pending){
 
                                     if(ConnectionToAP){ // WIFI available
 
-                                        if(socket_ready){
+                                        if (socket.getState() != inet::TcpSocket::CONNECTED) {
+                                            EV_ERROR << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
+                                            // ------------------- restart socket -----------------------
+                                            socket_ready = false;
+                                            socket_state_close = true;
+                                            count_reTX = 0;
+                                            // ----------------------------------------------------------
+                                        }else{
 
-                                            auto packet = new inet::Packet("accident_car_test_TCP");
+                                            if(socket_ready){
 
-                                            auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
+                                                auto packet = new inet::Packet("accident_car_test_TCP");
 
-                                            timestampPayload(payload);
+                                                auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
 
-                                            packet->insertAtBack(payload);
-                                            EV_ERROR << "test emergency sent to WIFI: "<< endl;
-                                            socket.send(packet);
-                                            flag_tx_wifi=true;
+                                                timestampPayload(payload);
 
-                                            long_Bytes_wifi += static_cast<long>(data.size());
+                                                packet->insertAtBack(payload);
+                                                EV_ERROR << "test emergency sent to WIFI: "<< endl;
+                                                socket.send(packet);
+                                                flag_tx_wifi=true;
 
-                                            msg_emergency_pending = false;
+                                                long_Bytes_wifi += static_cast<long>(data.size());
 
-                                            emit(outputBufferSignal_wifi, 1);
+                                                msg_emergency_pending = false;
 
-                                            count_msg_TCP_send++;
+                                                emit(outputBufferSignal_wifi, 1);
 
+                                                count_msg_TCP_send++;
+
+                                            }
                                         }
 
 
                                     }else{ // send to LTE interface
 
-                                        if(socket_ready){
+                                        if (socket.getState() != inet::TcpSocket::CONNECTED) {
+                                            EV_ERROR << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
+                                            // ------------------- restart socket -----------------------
+                                            socket_ready = false;
+                                            socket_state_close = true;
+                                            count_reTX = 0;
+                                            // ----------------------------------------------------------
+                                        }else{
 
-                                            auto packet = new inet::Packet("accident_car_test_TCP");
+                                            if(socket_ready){
 
-                                            auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
+                                                auto packet = new inet::Packet("accident_car_test_TCP");
 
-                                            timestampPayload(payload);
+                                                auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
 
-                                            packet->insertAtBack(payload);
-                                            EV_ERROR << "test emergency send using LTE: "<< endl;
-                                            socket.send(packet);
-                                            flag_tx_lte = false;
+                                                timestampPayload(payload);
 
-                                            long_Bytes_LTE += static_cast<long>(data.size());
+                                                packet->insertAtBack(payload);
+                                                EV_ERROR << "test emergency send using LTE: "<< endl;
+                                                socket.send(packet);
+                                                flag_tx_lte = false;
 
-                                            msg_emergency_pending = false;
+                                                long_Bytes_LTE += static_cast<long>(data.size());
 
-                                            emit(outputBufferSignal_lte, 1);
+                                                msg_emergency_pending = false;
 
-                                            count_msg_TCP_send++;
+                                                emit(outputBufferSignal_lte, 1);
 
+                                                count_msg_TCP_send++;
+
+                                            }
                                         }
 
                                     }
@@ -1862,6 +1948,8 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
 
                 static_outputBuff_wifi = outputBuffer.size();
                 emit(outputBufferSignal_wifi, static_outputBuff_wifi);
+                static_outputBuff_lte = 0; // LTE regresa a 0 continua wifi
+                emit(outputBufferSignal_lte, static_outputBuff_lte);
             }
             else if (interface_output == "lte") {
                 // use lte
@@ -1869,6 +1957,8 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
 
                 static_outputBuff_lte = outputBuffer.size();
                 emit(outputBufferSignal_lte, static_outputBuff_lte);
+                static_outputBuff_wifi = 0;// wifi regresa a 0 LTE continua
+                emit(outputBufferSignal_wifi, static_outputBuff_wifi);// LTE continue, wifi return to 0
             }
 
 

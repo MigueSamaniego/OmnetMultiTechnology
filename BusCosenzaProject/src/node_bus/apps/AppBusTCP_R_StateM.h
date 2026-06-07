@@ -34,7 +34,7 @@ protected:
     simsignal_t Consumption_WIFI;
     simsignal_t Consumption_LTE;
 
-    simsignal_t Time_ETA;
+    simsignal_t Time_TTD;
 
 private:
     bool Vehicle_With_Interface = false;
@@ -127,6 +127,9 @@ private:
     simtime_t deadline_start;
     int deadline_until;
 
+    // deadline to control on server
+    double deadline_on_SERVER;
+
     double sigma = 0.00005; // ~5-10 meters aprox
 
 
@@ -138,7 +141,8 @@ private:
     bool flag_time_start_trip_return = false;
     uint8_t bus_station_section = 0;
     double distance_trip_section[2] = {9954.38,(9954.38+11860.3)};// distance on meters
-    double ETA = 0.0;
+    double TTD = 0.0;
+    double TTD_pass = 0.0;
     //double alpha = 0.05;
     double emaSpeed = 0.0;
     double traffic_vel_pass = 0.0;
@@ -197,6 +201,8 @@ private:
     long long_Bytes_wifi = 0;
     long long_Bytes_LTE = 0;
 
+    bool windows_fix = true;
+
     // ******************* GW REPLICATE Task ************************
     int timer_Control_GPS_Data = 0;
     int timer_Control_Data_Emission = 0;
@@ -229,6 +235,7 @@ private:
     double speed_pass = 0.0;
     uint8_t detected_traffic_state = 0;
     int timer_congestion_state = 0;
+    int timer_congestion_state_out = 0;
 
 
     // ack tcp
