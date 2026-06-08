@@ -17,7 +17,7 @@
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
 	</section>
 	<section name="ChartEditForm">
-		<item key="active-tab" value="Bars"/>
+		<item key="active-tab" value="Lines"/>
 	</section>
 	<section name="org.omnetpp.scave.editors.ui.ConfigureChartDialog">
 		<item key="DIALOG_X_ORIGIN" value="105"/>

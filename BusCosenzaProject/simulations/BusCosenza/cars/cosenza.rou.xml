@@ -140,7 +140,7 @@
 		<!--<stop busStop="Viale_Paolo_Borsellino_71_A" duration="0.00"/>-->
 		<stop busStop="Viale_Paolo_Borsellino_1_A" duration="15.00"/>
 		<!--<stop busStop="Viale_Falcone_11_A" duration="0.00"/>-->
-		<stop busStop="Autostazione_Corsia_N7_Finish" duration="240.00"/> <!-- 4min offloading DATA in the finish first trip  /-->
+		<stop busStop="Autostazione_Corsia_N7_Finish" duration="600.00"/> <!-- 5min offloading DATA in the finish first trip  /-->
 		
 
 		
@@ -187,9 +187,9 @@
 	<flow id="cars_11" type="car_private" begin="321.00" end="400.00" period="2.00" from="44290792" to="1157743484#0"/>
 	-->
 	
-	<!-- Light Traffic -->
+	<!-- Light Traffic 
 	<flow id="cars_9" type="car_private" begin="10.00" end="250.00" period="10.00" from="518769704" to="813233242#0"/>
-	<flow id="cars_11" type="car_private2" begin="252.00" end="400.00" period="2.00" from="44290792" to="1157743484#0"/> 
+	<flow id="cars_11" type="car_private2" begin="252.00" end="400.00" period="2.00" from="44290792" to="1157743484#0"/> -->
 	<!-- Light Traffic 
 	<flow id="cars_10" type="car_private" begin="251.00" end="400.00" period="5.00" from="-1159480147#1" to="-479000717"/>-->
 	

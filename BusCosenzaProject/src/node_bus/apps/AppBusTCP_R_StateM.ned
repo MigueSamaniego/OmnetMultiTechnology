@@ -44,6 +44,9 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
         @signal[sdcardBufferSize](type="long");
     	@signal[sdcardPercentSize](type="double");
     	
+    	@signal[Packet_lose_deadline_signal](type="long");
+    	@signal[Byte_lose_deadline_signal](type="long");
+    	
     	@signal[outputBytesInterface_wifi](type="long");
     	@signal[outputBytesInterface_lte](type="long");
     	
@@ -56,6 +59,9 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
     	
     	@signal[RSSI_WIFI_level](type="double");
     	@signal[RSSI_LTE_level](type="double");
+    	
+    	@signal[Cost_Data_wifi_signal](type="double");
+    	@signal[Cost_Data_lte_signal](type="double");
     	
     	@signal[buffer_priority_1](type="int");
     	@signal[buffer_priority_2](type="int");
@@ -98,6 +104,9 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
 		@statistic[outputBytesInterface_wifi](title="Total Bytes Wifi"; source="outputBytesInterface_wifi"; record=vector,last);
 		@statistic[outputBytesInterface_lte](title="Total Bytes LTE"; source="outputBytesInterface_lte"; record=vector,last);
 		
+		@statistic[Packet_lose_deadline_signal](title="Number Packet Lose"; source="Packet_lose_deadline_signal"; record=vector,last);
+		@statistic[Byte_lose_deadline_signal](title="Bytes Lose [B]"; source="Byte_lose_deadline_signal"; record=vector,last);
+		
 		@statistic[GW_Battery_level](title="Battery Level mA/h"; source="GW_Battery_level"; record=vector,last);
 		
 		@statistic[Consumption_WIFI_Battery](title="Current mA/h"; source="Consumption_WIFI_Battery"; record=vector,last);
@@ -107,6 +116,9 @@ simple AppBusTCP_R_StateM extends VeinsInetApplicationBase
 		
 		@statistic[RSSI_WIFI_level](title="RSSI WIFI [dBm]"; source="RSSI_WIFI_level"; record=vector,last);
 		@statistic[RSSI_LTE_level](title="RSSI LTE [dBm]"; source="RSSI_LTE_level"; record=vector,last);
+		
+		@statistic[Cost_Data_wifi_signal](title="Cost WIFI [€]"; source="Cost_Data_wifi_signal"; record=vector,last);
+		@statistic[Cost_Data_lte_signal](title="Cost LTE [€]"; source="Cost_Data_lte_signal"; record=vector,last);
 		
 		// number of messajes on sdcard size
 		@statistic[buffer_priority_1](title="Buffer Priority Emergency"; source="buffer_priority_1"; record=vector,last);

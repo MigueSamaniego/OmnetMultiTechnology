@@ -33,7 +33,7 @@ struct QueueState {
 class SDCardBuffer {
 private:
     static const int NUM_PRIORITIES = 5;
-    static const int MAX_PER_PRIO = 4000;
+    static const int MAX_PER_PRIO = 2000;
 
     struct SDEntry {
         std::string content;
@@ -46,7 +46,7 @@ private:
     int count[NUM_PRIORITIES] = {0,0,0,0,0};
 
     // Tiempos máximos de espera por prioridad
-    const double maxWaitTime[NUM_PRIORITIES] = {0.0, 60.0, 900.0, 9600.0, 9650.0};
+    const double maxWaitTime[NUM_PRIORITIES] = {2.0, 60.0, 900.0, 9600.0, 9650.0};
 
 public:
     void pushBatch(const std::vector<QueuedData>& batch) {

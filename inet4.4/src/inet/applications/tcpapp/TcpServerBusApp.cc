@@ -41,6 +41,8 @@ void TcpServerBusApp::initialize(int stage)
         WATCH(bytesRcvd);
         EV_INFO << "App SERVER without Re-Try msg"<<endl;
 
+
+
         global_msg_counter = 0;
 
     }
@@ -85,6 +87,13 @@ void TcpServerBusAppThread::initialize(int stage)
     if (stage == INITSTAGE_LOCAL) {
         bytesRcvd = 0;
         WATCH(bytesRcvd);
+
+        fresh_priority_1 = registerSignal("fresh_AoI_priority_1");
+        fresh_priority_2 = registerSignal("fresh_AoI_priority_2");
+        fresh_priority_3 = registerSignal("fresh_AoI_priority_3");
+        fresh_priority_4 = registerSignal("fresh_AoI_priority_4");
+        fresh_priority_wifi = registerSignal("fresh_AoI_priority_wifi");
+
     }
 }
 
@@ -113,6 +122,79 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
     std::string content(bytes.begin(), bytes.end());
 
     EV_INFO << "msg received and process: " << content << endl;
+
+    // =========================================================================
+    // NUEVO: Descomposición del String usando std::stringstream
+    // =========================================================================
+    std::stringstream ss(content);
+    std::string token;
+
+    // Variables donde guardaremos los datos extraídos
+    std::string fechaStr;
+    int tipoMensaje = 0;
+    double time_created = 0.0;
+
+    try {
+        // 1. Extraer primer segmento: La fecha (antes de la primera /)
+        if (std::getline(ss, token, '/')) fechaStr = token;
+
+        // 2. Extraer segundo segmento: El tipo de mensaje (ej: "2.0000")
+        if (std::getline(ss, token, '/')) {
+            // std::stoi convierte a entero. Al pasarle "2.0000",
+            // se detiene en el punto decimal y guarda un 2 perfecto.
+            tipoMensaje = std::stoi(token);
+        }
+
+        // 3. Extraer tercer segmento: El deadline (ej: "8.24000")
+        if (std::getline(ss, token, '/')) {
+            time_created = std::stod(token); // Convierte a double
+        }
+
+        // --- Mostrar los resultados en la consola de OMNeT++ ---
+        EV_INFO << "[PARSER] Tipo de Mensaje obtenido (int): " << tipoMensaje << "\n";
+        EV_INFO << "[PARSER] Deadline obtenido (double): " << time_created << " segundos.\n";
+
+        //const double maxWaitTime[NUM_PRIORITIES] = {2.0, 60.0, 900.0, 9600.0, 9650.0};
+
+        double AoI1 = 0.0;
+        double AoI2 = 0.0;
+        double AoI3 = 0.0;
+        double AoI4 = 0.0;
+        double AoIwifi = 0.0;
+
+        if(tipoMensaje == 0){// priority 1
+
+            AoI1 = simTime().dbl() - time_created;
+            emit(fresh_priority_1, AoI1);
+
+        }else if(tipoMensaje == 1){// priority 2
+
+            AoI2 = simTime().dbl() - time_created;
+            emit(fresh_priority_2, AoI2);
+
+        }else if(tipoMensaje == 2){// priority 3
+
+            AoI3 = simTime().dbl() - time_created;
+            emit(fresh_priority_3, AoI3);
+
+        }else if(tipoMensaje == 3){// priority 4
+
+            AoI4 = simTime().dbl() - time_created;
+            emit(fresh_priority_4, AoI4);
+
+        }else if(tipoMensaje == 4){// priority wifi
+
+            AoIwifi = simTime().dbl() - time_created;
+            emit(fresh_priority_wifi, AoIwifi);
+
+        }
+
+
+
+    } catch (const std::exception& e) {
+        EV_ERROR << "Error al procesar los componentes del string: " << e.what() << "\n";
+    }
+    // =========================================================================
 
     // update statistics
     bytesRcvd += pk->getByteLength();

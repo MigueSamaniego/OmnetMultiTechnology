@@ -89,8 +89,14 @@ private:
     simsignal_t outputBufferSignal_lte;
     simsignal_t sdcardBufferSignal;
 
+    simsignal_t Packet_lose_deadline;
+    simsignal_t Byte_lose_deadline;
+
     simsignal_t outputBytes_wifi;
     simsignal_t outputBytes_lte;
+
+    simsignal_t Cost_Data_wifi;
+    simsignal_t Cost_Data_lte;
 
     simsignal_t GW_Battery_signal;
 
@@ -126,6 +132,9 @@ private:
     int min_time_check;
     simtime_t deadline_start;
     int deadline_until;
+
+    long number_packet_lose = 0;
+    long number_bytes_lose = 0;
 
     // deadline to control on server
     double deadline_on_SERVER;
@@ -200,8 +209,16 @@ private:
 
     long long_Bytes_wifi = 0;
     long long_Bytes_LTE = 0;
+    long long_Bytes_wifi_Header = 0;
+    long long_Bytes_LTE_Header = 0;
+
+    bool fix_interface = true;
+
+    double Cost_LTE = 0;
+    double Cost_WiFi = 0;
 
     bool windows_fix = true;
+    uint8_t Strategy_Switching = 0;
 
     // ******************* GW REPLICATE Task ************************
     int timer_Control_GPS_Data = 0;

@@ -1,0 +1,281 @@
+//
+// Copyright (C) 2004 OpenSim Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+//
+
+
+#include "inet/applications/tcpapp/TcpServerBusApp.h"
+
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/lifecycle/NodeStatus.h"
+#include "inet/common/packet/Message.h"
+#include "inet/common/socket/SocketTag_m.h"
+#include "inet/networklayer/common/L3AddressResolver.h"
+
+#include "inet/common/packet/chunk/BytesChunk.h"
+
+namespace inet {
+
+Define_Module(TcpServerBusApp);
+Define_Module(TcpServerBusAppThread);
+
+TcpServerBusApp::TcpServerBusApp()
+{
+}
+
+TcpServerBusApp::~TcpServerBusApp()
+{
+}
+
+
+simsignal_t TcpServerBusApp::packetReceiveServerTCPSignal = registerSignal("numMsgTCPReceiveServer");
+
+void TcpServerBusApp::initialize(int stage)
+{
+    TcpServerHostApp::initialize(stage);
+
+    if (stage == INITSTAGE_LOCAL) {
+        bytesRcvd = 0;
+        WATCH(bytesRcvd);
+        EV_INFO << "App SERVER without Re-Try msg"<<endl;
+
+
+
+        global_msg_counter = 0;
+
+    }
+}
+
+void TcpServerBusApp::refreshDisplay() const
+{
+    EV_INFO << "TEST server refresh" << endl;
+    ApplicationBase::refreshDisplay();
+
+    char buf[160];
+    sprintf(buf, "threads: %d\nrcvd: %ld bytes", socketMap.size(), bytesRcvd);
+    getDisplayString().setTagArg("t", 0, buf);
+}
+
+void TcpServerBusApp::finish()
+{
+    EV_INFO << "TEST server finish" << endl;
+    TcpServerHostApp::finish();
+
+    recordScalar("bytesRcvd", bytesRcvd);
+}
+
+void TcpServerBusApp::removeBusThread(TcpServerThreadBase *thread)
+{
+    Enter_Method_Silent();
+
+    // 1. Cerramos el socket
+    if (thread->getSocket()) {
+        thread->getSocket()->abort();
+    }
+
+    // 2. MAGIA: Usamos la función interna de INET para eliminar el hilo de la GUI y la RAM
+    removeThread(thread);
+}
+
+void TcpServerBusAppThread::initialize(int stage)
+{
+    EV_INFO << "TEST thread initialize" << endl;
+    TcpServerThreadBase::initialize(stage);
+
+    if (stage == INITSTAGE_LOCAL) {
+        bytesRcvd = 0;
+        WATCH(bytesRcvd);
+
+        fresh_priority_1 = registerSignal("fresh_AoI_priority_1");
+        fresh_priority_2 = registerSignal("fresh_AoI_priority_2");
+        fresh_priority_3 = registerSignal("fresh_AoI_priority_3");
+        fresh_priority_4 = registerSignal("fresh_AoI_priority_4");
+        fresh_priority_wifi = registerSignal("fresh_AoI_priority_wifi");
+
+    }
+}
+
+void TcpServerBusAppThread::established()
+{
+    Enter_Method_Silent();
+
+    EV_INFO << "TEST thread establish" << endl;
+    bytesRcvd = 0;
+    lastDataTime = simTime(); // Tiempo actual de la simulación
+
+    // Crear y programar el primer disparo del timer
+    timeoutMsg = new cMessage("watchdog-timer");
+    scheduleAt(simTime() + 5.0, timeoutMsg);
+
+    EV_INFO << "Conexión establecida. Watchdog iniciado para T+5s." << endl;
+}
+
+void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
+{
+    lastDataTime = simTime();
+
+    // Extrac bytes received
+    auto bytesChunk = pk->peekAllAsBytes();
+    std::vector<uint8_t> bytes = bytesChunk->getBytes();
+    std::string content(bytes.begin(), bytes.end());
+
+    EV_INFO << "msg received and process: " << content << endl;
+
+    // =========================================================================
+    // NUEVO: Descomposición del String usando std::stringstream
+    // =========================================================================
+    std::stringstream ss(content);
+    std::string token;
+
+    // Variables donde guardaremos los datos extraídos
+    std::string fechaStr;
+    int tipoMensaje = 0;
+    double deadlineValue = 0.0;
+
+    try {
+        // 1. Extraer primer segmento: La fecha (antes de la primera /)
+        if (std::getline(ss, token, '/')) fechaStr = token;
+
+        // 2. Extraer segundo segmento: El tipo de mensaje (ej: "2.0000")
+        if (std::getline(ss, token, '/')) {
+            // std::stoi convierte a entero. Al pasarle "2.0000",
+            // se detiene en el punto decimal y guarda un 2 perfecto.
+            tipoMensaje = std::stoi(token);
+        }
+
+        // 3. Extraer tercer segmento: El deadline (ej: "8.24000")
+        if (std::getline(ss, token, '/')) {
+            deadlineValue = std::stod(token); // Convierte a double
+        }
+
+        // --- Mostrar los resultados en la consola de OMNeT++ ---
+        EV_INFO << "[PARSER] Tipo de Mensaje obtenido (int): " << tipoMensaje << "\n";
+        EV_INFO << "[PARSER] Deadline obtenido (double): " << deadlineValue << " segundos.\n";
+
+        //const double maxWaitTime[NUM_PRIORITIES] = {2.0, 60.0, 900.0, 9600.0, 9650.0};
+
+        double fresh_data1 = 0.0;
+        double fresh_data2 = 0.0;
+        double fresh_data3 = 0.0;
+        double fresh_data4 = 0.0;
+        double fresh_datawifi = 0.0;
+
+        if(tipoMensaje == 0){// priority 1
+
+            fresh_data1 = (deadlineValue + 2.0) - simTime().dbl();
+
+        }else if(tipoMensaje == 1){// priority 2
+
+            fresh_data2 = (deadlineValue + 60.0) - simTime().dbl();
+
+        }else if(tipoMensaje == 2){// priority 3
+
+            fresh_data3 = (deadlineValue + 900.0) - simTime().dbl();
+
+        }else if(tipoMensaje == 3){// priority 4
+
+            fresh_data4 = (deadlineValue + 9600.0) - simTime().dbl();
+
+        }else if(tipoMensaje == 4){// priority wifi
+
+            fresh_datawifi = (deadlineValue + 9650.0) - simTime().dbl();
+
+        }
+
+        emit(fresh_priority_1, fresh_data1);
+        emit(fresh_priority_2, fresh_data2);
+        emit(fresh_priority_3, fresh_data3);
+        emit(fresh_priority_4, fresh_data4);
+        emit(fresh_priority_wifi, fresh_datawifi);
+
+    } catch (const std::exception& e) {
+        EV_ERROR << "Error al procesar los componentes del string: " << e.what() << "\n";
+    }
+    // =========================================================================
+
+    // update statistics
+    bytesRcvd += pk->getByteLength();
+    sinkAppModule->bytesRcvd += pk->getByteLength();
+
+    emit(packetReceivedSignal, pk);
+    delete pk; // clear packet, its not more necessary
+
+    int currentCount = sinkAppModule->incrementMsgCounter();
+
+    sinkAppModule->emit(TcpServerBusApp::packetReceiveServerTCPSignal, currentCount);
+
+}
+
+void TcpServerBusAppThread::refreshDisplay() const
+{
+    EV_INFO << "TEST thread refresh" << endl;
+    std::ostringstream os;
+    os << (sock ? TcpSocket::stateName(sock->getState()) : "NULL_SOCKET") << "\nrcvd: " << bytesRcvd << " bytes";
+    getDisplayString().setTagArg("t", 0, os.str().c_str());
+}
+
+void TcpServerBusAppThread::timerExpired(cMessage *msg)
+{
+    if (msg == timeoutMsg) {
+        simtime_t tiempoInactivo = simTime() - lastDataTime;
+
+        if (tiempoInactivo >= 4.9) {
+            EV_INFO << "WATCHDOG: Cerrando socket y destruyendo hilo..." << endl;
+
+            timeoutMsg = nullptr;
+            delete msg;
+
+            // --- EL CAMBIO ESTÁ AQUÍ ---
+            // Le pedimos al padre que nos elimine pasándole 'this' (nuestro propio hilo)
+            sinkAppModule->removeBusThread(this);
+
+            // ¡SÚPER IMPORTANTE!
+            // El hilo acaba de ser borrado de la memoria en la línea anterior.
+            // Debemos usar 'return;' para salir inmediatamente y evitar que C++
+            // intente leer variables de un hilo que ya no existe (Segmentation Fault).
+            return;
+            // ---------------------------
+        }
+        else {
+            scheduleAt(lastDataTime + 5.0, msg);
+        }
+    } else {
+        delete msg;
+    }
+}
+
+void TcpServerBusAppThread::handleMessage(cMessage *msg)
+{
+    // 1. Crucial: Informar al simulador que el contexto cambia al Thread
+    Enter_Method_Silent();
+
+    if (msg->isSelfMessage()) {
+        // 2. Tomar posesión del mensaje para poder borrarlo o reprogramarlo
+        take(msg);
+
+        // 3. Ejecutar tu lógica de 5 segundos
+        timerExpired(msg);
+    }
+    else {
+        // Mensajes de control de TCP que la clase base sabe manejar
+        TcpServerThreadBase::handleMessage(msg);
+    }
+}
+
+TcpServerBusAppThread::~TcpServerBusAppThread()
+{
+    // Si el timer sigue pendiente en el calendario de eventos, lo cancelamos y borramos
+
+    // clean msg only if msg exist
+    if (timeoutMsg) {
+        cancelAndDelete(timeoutMsg);
+    }
+}
+
+
+
+
+} // namespace inet
+

@@ -168,8 +168,14 @@ void AppBusTCP_R_StateM::initialize(int stage)
         outputBufferSignal_lte = registerSignal("outputBufferSize_lte");
         sdcardBufferSignal = registerSignal("sdcardBufferSize");
 
+        Packet_lose_deadline = registerSignal("Packet_lose_deadline_signal");
+        Byte_lose_deadline = registerSignal("Byte_lose_deadline_signal");
+
         outputBytes_wifi = registerSignal("outputBytesInterface_wifi");
         outputBytes_lte = registerSignal("outputBytesInterface_lte");
+
+        Cost_Data_wifi = registerSignal("Cost_Data_wifi_signal");
+        Cost_Data_lte = registerSignal("Cost_Data_lte_signal");
 
         GW_Battery_signal = registerSignal("GW_Battery_level");
 
@@ -507,7 +513,13 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         speed_pass = 0.0;
                         measure_stage = false;
 
-                        windows_fix = false; // i use adaptative windows
+                        windows_fix = true; // i sent 5min of data
+                        Strategy_Switching = 3;
+                        //Strategy_Switching = 0 --> no strategy
+                        //Strategy_Switching = 1 --> WIFI
+                        //Strategy_Switching = 2 --> LTE
+                        //Strategy_Switching = 3 --> Dead line (wifi and LTE)
+
 
                         // ------------------ available event accident -------------------------------------
                         state_of_accident = 0; // not accident state
@@ -907,11 +919,11 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         }else{// sleep mode
 
 
-                            if(windows_fix == true){
-                                Esp_Consumption_temp = (10*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40))/3600000.0;// 80-120mA// not sleep
-                            }else{
+                            //if(windows_fix == true){
+                            //    Esp_Consumption_temp = (10*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40))/3600000.0;// 80-120mA// not sleep
+                            //}else{
                                 Esp_Consumption_temp = (10*(0.8))/3600000.0;// sleep
-                            }
+                            //}
                             //timer_esp_module++; // here it is in sleep mode not count timer
                         }
                         emit(Consumption_WIFI,Esp_Consumption_temp);
@@ -952,10 +964,16 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 if(timer_LTE > 1645){// sleep by hardware
 
                                     //LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
-                                    if(ConnectionToAP){
+                                    if(Strategy_Switching==1){
                                         LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
-                                    }else{
+                                    }else if(Strategy_Switching==2){
                                         LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
+                                    }else if(Strategy_Switching==3){
+                                        if(ConnectionToAP){
+                                            LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+                                        }else{
+                                            LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
+                                        }
                                     }
                                     //LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
                                     timer_LTE = 1646; // avoid overflow
@@ -979,13 +997,30 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                             Battery_Available = 0.0; // insure level of battery
 
-                            Battery_Available = GW_Battery_Capacity_mAh
-                                                  - GW_MICRO_INA_Consumption
-                                                  - Esp_Consumption
-                                                  - LTE_Consuption
-                                                  - BLE_Consumption
-                                                  - XBEE_Consumption
-                                                  - GNSS_Consumption;
+                            if(Strategy_Switching == 1){
+                                Battery_Available = GW_Battery_Capacity_mAh
+                                                      - GW_MICRO_INA_Consumption
+                                                      - Esp_Consumption
+                                                      - BLE_Consumption
+                                                      - XBEE_Consumption
+                                                      - GNSS_Consumption;
+                            }if(Strategy_Switching == 2){
+                                Battery_Available = GW_Battery_Capacity_mAh
+                                                      - GW_MICRO_INA_Consumption
+                                                      - LTE_Consuption
+                                                      - BLE_Consumption
+                                                      - XBEE_Consumption
+                                                      - GNSS_Consumption;
+                            } if(Strategy_Switching == 3){
+
+                                Battery_Available = GW_Battery_Capacity_mAh
+                                                      - GW_MICRO_INA_Consumption
+                                                      - Esp_Consumption
+                                                      - LTE_Consuption
+                                                      - BLE_Consumption
+                                                      - XBEE_Consumption
+                                                      - GNSS_Consumption;
+                            }
 
                             emit(GW_Battery_signal, Battery_Available);
 
@@ -1016,22 +1051,51 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              ******* interface control must be continuous ****************
                              ******* select / Switch Interface ***************************
                              ******* *****************************************************/
-                            if(ConnectionToAP != ConnectionToAP_Pass){
-                                interfaceAvailable();
-                                socket_ready = false;
-                                socket_state_close = true;
-    //                            if (socket.getState() != inet::TcpSocket::CLOSED){
-    //                                socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
-    //                                EV_ERROR << "Wifi Available if socket was open, NOW IS CLOSE" << endl;
-    //                            }
+                            EV_ERROR << "interface ojo: " << ConnectionToAP << endl;
+                            if(Strategy_Switching==1){
+                                if(fix_interface){
+                                    interfaceAvailable();
+                                    fix_interface = false;
+                                    socket_ready = false;
+                                    socket_state_close = true;
+                                    count_reTX = waiting_changing_x_10ms -1;    // obligamos a crear el socket con la nueva tecnologia
+                                    time_threshold_send_data = 900000; // dont execute the send data function
+                                    timer_Control_Send_Data = 0;
+                                }
 
-                                count_reTX = waiting_changing_x_10ms -1;    // obligamos a crear el socket con la nueva tecnologia
+                            }else if(Strategy_Switching==2){
+                                if(fix_interface){
+                                    interfaceAvailable();
+                                    fix_interface = false;
+                                    socket_ready = false;
+                                    socket_state_close = true;
+                                    count_reTX = waiting_changing_x_10ms -1;    // obligamos a crear el socket con la nueva tecnologia
+                                    time_threshold_send_data = 900000; // dont execute the send data function
+                                    timer_Control_Send_Data = 0;
+                                }
 
-                                time_threshold_send_data = 900000; // dont execute the send data function
-                                timer_Control_Send_Data = 0;
+                            }else if(Strategy_Switching==3){
+                                if(ConnectionToAP != ConnectionToAP_Pass){
+                                    EV_ERROR << "cambiando de interface" << endl;
+                                    interfaceAvailable();
+                                    EV_ERROR << "cambio realizado" << endl;
+                                    socket_ready = false;
+                                    socket_state_close = true;
+        //                            if (socket.getState() != inet::TcpSocket::CLOSED){
+        //                                socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
+        //                                EV_ERROR << "Wifi Available if socket was open, NOW IS CLOSE" << endl;
+        //                            }
 
-                                ConnectionToAP_Pass = ConnectionToAP;
+                                    count_reTX = waiting_changing_x_10ms -1;    // obligamos a crear el socket con la nueva tecnologia
+
+                                    time_threshold_send_data = 900000; // dont execute the send data function
+                                    timer_Control_Send_Data = 0;
+
+                                    ConnectionToAP_Pass = ConnectionToAP;
+                                }
                             }
+
+                            EV_ERROR << "interface ojo1: " << ConnectionToAP << endl;
 
 
                             /*************************************************************
@@ -1057,10 +1121,23 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                         EV_INFO << "Cooldown Timer/Backoff. trying open new socket" << endl;
 
-                                        if(!stablishTCP(ConnectionToAP)){
-                                            EV_WARN << "ERROR CREATING NEW SOCKET, retrying..." << endl;
-                                            count_reTX = 0;
+                                        if(Strategy_Switching==1){//wifi
+                                            if(!stablishTCP(1)){
+                                                EV_WARN << "ERROR CREATING NEW SOCKET, retrying..." << endl;
+                                                count_reTX = 0;
+                                            }
+                                        }else if(Strategy_Switching==2){// LTE
+                                            if(!stablishTCP(0)){
+                                                EV_WARN << "ERROR CREATING NEW SOCKET, retrying..." << endl;
+                                                count_reTX = 0;
+                                            }
+                                        }else if(Strategy_Switching==3){
+                                            if(!stablishTCP(ConnectionToAP)){
+                                                EV_WARN << "ERROR CREATING NEW SOCKET, retrying..." << endl;
+                                                count_reTX = 0;
+                                            }
                                         }
+
                                     }
 
 
@@ -1121,7 +1198,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                 deadline_on_SERVER = simTime().dbl();
 
                                 // ---------- Build format of DATA ------------
-                                std::vector<double> gps = {deadline_on_SERVER,lat, lon};
+                                std::vector<double> gps = {(double)Priority_3, deadline_on_SERVER,lat, lon};
                                 std::string data = buildDataString(gps);
                                 // --------------------------------------------
                                 counter_msg++;
@@ -1179,7 +1256,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 // -------- OTHER TYPE SENSORS ----------------
                                  std::vector<double> sensor = {
-                                         deadline_on_SERVER, co2, co, nox, pmx
+                                         (double)Priority_3, deadline_on_SERVER, co2, co, nox, pmx
                                  };
 
                                  std::string data = buildDataString(sensor);
@@ -1247,7 +1324,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 // -------- OTHER TYPE SENSORS ----------------
                                  std::vector<double> sensor = {
-                                         deadline_on_SERVER, speed, accel, Decaccel, fuel, time_trip
+                                         (double)Priority_wifi, deadline_on_SERVER, speed, accel, Decaccel, fuel, time_trip
                                  };
 
                                  std::string data = buildDataString(sensor);
@@ -1360,7 +1437,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             deadline_on_SERVER = simTime().dbl();
 
                                              std::vector<double> event_traffic = {
-                                                     deadline_on_SERVER, (double)(periodic_nitification/2), lat, lon
+                                                     (double)Priority_2, deadline_on_SERVER, (double)(periodic_nitification/2), lat, lon
                                              };
 
                                              std::string data = buildDataString(event_traffic);
@@ -1416,9 +1493,11 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             // -----------------------------------------------------------------------------------------------
                             // -----------------------------------------------------------------------------------------------
 
-                            bool send_data = false;
+                            //bool send_data = false;
 
-                            if(msg_emergency_pending) send_data = true;
+                            //if(msg_emergency_pending) send_data = true;
+
+                            bool msg_emergency_active = false;
 
                             if(accident_detected_app){
 
@@ -1429,15 +1508,64 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 if((timer_Control_Accident == 0)||(timer_Control_Accident == 300)){ // start or 3seconds after
                                     state_of_accident = 1;
-                                    send_data = true;
-                                    msg_emergency_pending = true;
+                                    //send_data = true;
+                                    //msg_emergency_pending = true;
+                                    msg_emergency_active = true;
 
                                 }
 
                                 if (timer_Control_Accident % 1000 == 0){// send each 10s
                                     state_of_accident = 2;
-                                    send_data = true;
-                                    msg_emergency_pending = true;
+                                    //send_data = true;
+                                    //msg_emergency_pending = true;
+                                    msg_emergency_active = true;
+                                }
+
+                                if(msg_emergency_active){
+
+                                    std::string vehicle = mobility->getExternalId();
+                                    Coord pos = mobility->getCurrentPosition();
+                                    Coord geo = convertXYtoLatLon(pos);
+
+                                    double lat = geo.y;
+                                    double lon = geo.x;
+                                    deadline_on_SERVER = simTime().dbl();
+
+                                     std::vector<double> accident_traffic = {
+                                             (double)Priority_1, deadline_on_SERVER, (double)state_of_accident, lat, lon
+                                     };
+
+                                     std::string data = buildDataString(accident_traffic);
+                                     // --------------------------------------------
+                                     counter_msg++;
+
+                                     bool state_buff = inputBuffer.add(data, Priority_1, deadline_on_SERVER);// deadline 5minutes.
+
+                                     static_inputBuff = inputBuffer.size();
+
+                                     // -------- save buffer immediately --------
+
+                                     delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+
+                                     // save buffer en SDCARD
+                                     auto batch = inputBuffer.flush();
+                                     sdcard.pushBatch(batch);
+
+                                     EV_INFO << "SAVING buffer fill" << endl;
+                                     counter_msg = 0;
+
+                                     //  update when inputBuffer was empty
+                                     double currentBytes = (double)sdcard.totalSize();
+                                     double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+                                     if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+                                     emit(sdcardBufferSignal, currentBytes);
+                                     emit(sdcardPercentSignal, usagePercent);
+                                     // Maintain the last state
+                                     static_currentBytes = currentBytes;
+                                     static_usagePercent = usagePercent;
+                                     // -----------------------------------------------
+
                                 }
 
                                 timer_Control_Accident++;
@@ -1445,8 +1573,8 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             }else if(timer_Control_Accident > 0){
 
                                 state_of_accident = 3;
-                                send_data =true;
-                                msg_emergency_pending = true;
+                                //send_data =true;
+                                //msg_emergency_pending = true;
                                 timer_Control_Accident = 0; // it not allow inside on this condition more
 
                             }
@@ -1465,20 +1593,11 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                             // -------------------------------------- check expiration DATA ------------------------------------------------------
                             // -------------------------------------- Depend of state of WIFI ----------------------------------------------------
                             // -------------------------------------------------------------------------------------------------------------------
-                            if(!msg_emergency_pending){
-
-                                if(ConnectionToAP){ // WIFI available
-
+                            if(Strategy_Switching == 1){
+                                if(ConnectionToAP){
                                     if(socket_ready){
 
-                                        //check_timers_expired = 0; // reset time to check expired data
-                                        //take_time_when_find_expired_data = false;
-
-                                        // sent all data on the cloud
-                                        //EV_ERROR << "socket WIFI OK1: "<< endl;
                                         if (timer_Control_Send_Data >= time_threshold_send_data){
-                                            //EV_ERROR << "SEND  WIFI OK: "<< endl;
-                                            //if(Retry_Sent == 0){
 
                                                 deadline_start = simTime(); // update this time each call function is sufficient to empty data from SDCARD
                                                 //deadline_until = 600;
@@ -1490,7 +1609,61 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                                time_threshold_send_data = 10; // 100ms to retry
 
-                                            //}
+                                           timer_Control_Send_Data = 0;
+
+                                       }
+
+                                       timer_Control_Send_Data++;
+
+                                    }
+
+                                    check_timers_expired = 105; // USED TO CHECK IN THE NEXT CYCLE WHEN WIFY IS LOSE
+                                    take_time_when_find_expired_data = false; // reset this variable while it has WIFI, in this case i must sento all data
+                                }
+                            }else if(Strategy_Switching == 2){
+
+                                check_timers_expired = 0; // reset timer for next time
+
+                                if(socket_ready){
+                                    EV_ERROR << "strategy 2: "<< endl;
+                                    if (timer_Control_Send_Data >= time_threshold_send_data){
+
+                                        deadline_start = simTime()-1;
+                                        deadline_until = 6000; // take all data to send
+
+                                           /****** Sent Message to Cloud *********************/
+                                           sendDataToCloud("lte"); // prepare and send message
+                                           flag_tx_lte = true;
+                                           /**************************************************/
+
+                                           time_threshold_send_data = 15; // 150ms to retry
+
+                                           if(!take_time_when_find_expired_data){
+                                               // not increase the count number msg sent
+                                               // FINISH THE COMMUNICATION
+                                           }
+                                        timer_Control_Send_Data = 0;
+                                    }
+                                    timer_Control_Send_Data++;
+                                }
+
+                            }else if(Strategy_Switching == 3){
+
+                                if(ConnectionToAP){ // WIFI available
+
+                                    if(socket_ready){
+
+                                        if (timer_Control_Send_Data >= time_threshold_send_data){
+
+                                                deadline_start = simTime(); // update this time each call function is sufficient to empty data from SDCARD
+                                                //deadline_until = 600;
+
+                                                /****** Sent Message to Cloud *********************/
+                                                sendDataToCloud("wifi"); // prepare and send message
+                                                flag_tx_wifi = true;
+                                               /**************************************************/
+
+                                               time_threshold_send_data = 10; // 100ms to retry
 
                                            timer_Control_Send_Data = 0;
 
@@ -1498,171 +1671,65 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                        timer_Control_Send_Data++;
 
-                                    }/*else{
-                                        EV_ERROR << "waiting socket wifi: "<< endl;
-                                    }*/
+                                    }
 
                                     check_timers_expired = 105; // USED TO CHECK IN THE NEXT CYCLE WHEN WIFY IS LOSE
                                     take_time_when_find_expired_data = false; // reset this variable while it has WIFI, in this case i must sento all data
 
-                                }else{
+                                }else {
 
-                                    if((!take_time_when_find_expired_data)&&(check_timers_expired >= 100)){// check each second
+                                        if((!take_time_when_find_expired_data)&&(check_timers_expired >= 100)){// check each second
 
-                                        bool expiration_time_exceeded  = sdcard.hasExpiredData(simTime()+2); // 2s before data expired
+                                            bool expiration_time_exceeded  = sdcard.hasExpiredData(simTime()+2); // 2s before data expired
 
-                                        if((expiration_time_exceeded)&&(!take_time_when_find_expired_data)){
-                                            // DATA PENDING TO SEND BEFORE BECOMING UNUSABLE
-                                            //EV_ERROR << "DATA EXPIRED PREPARE LTE TO SEND: "<< endl;
-                                            deadline_start = simTime();
-                                            // ----------------- fix windows data send -----------------------------
-                                            //deadline_until = 600; defaul is 5min using a windows fix
-                                            // ------------------ conciente batching data to send -----------------------------
-                                            if(windows_fix == false)
-                                                deadline_until = (int)(TTD); // MORE 10 SECONDS TO ERROR
+                                            if((expiration_time_exceeded)&&(!take_time_when_find_expired_data)){
+                                                deadline_start = simTime();
+                                                // ----------------- fix windows data send -----------------------------
+                                                //deadline_until = 600; defaul is 5min using a windows fix
+                                                // ------------------ conciente batching data to send -----------------------------
+                                                if(windows_fix == false)
+                                                    deadline_until = (int)(TTD); // MORE 10 SECONDS TO ERROR
 
-                                            EV_ERROR << "DATA EXPIRED PREPARE LTE TO SEND data from range: "<< deadline_start+2 << " " << deadline_start+deadline_until << " TTD: " << TTD << endl;
-                                            take_time_when_find_expired_data = true;
-                                        }
+                                                EV_ERROR << "DATA EXPIRED PREPARE LTE TO SEND data from range: "<< deadline_start+2 << " " << deadline_start+deadline_until << " TTD: " << TTD << endl;
+                                                take_time_when_find_expired_data = true;
+                                            }
 
-                                        check_timers_expired = 0;
+                                            check_timers_expired = 0;
 
-                                    }else if(take_time_when_find_expired_data){
-                                        check_timers_expired = 0; // reset timer for next time
+                                        }else if(take_time_when_find_expired_data){
+                                            check_timers_expired = 0; // reset timer for next time
 
-                                        if(socket_ready){
-                                            //EV_ERROR << "socket LTE OK: "<< endl;
-                                            if (timer_Control_Send_Data >= time_threshold_send_data){
-                                                //EV_ERROR << "SEND LTE OK: "<< endl;
-                                                //if(Retry_Sent == 0){
-                                                   /****** Sent Message to Cloud *********************/
-                                                   sendDataToCloud("lte"); // prepare and send message
-                                                   flag_tx_lte = true;
-                                                   /**************************************************/
+                                            if(socket_ready){
+                                                //EV_ERROR << "socket LTE OK: "<< endl;
+                                                if (timer_Control_Send_Data >= time_threshold_send_data){
+                                                       /****** Sent Message to Cloud *********************/
+                                                       sendDataToCloud("lte"); // prepare and send message
+                                                       flag_tx_lte = true;
+                                                       /**************************************************/
 
-                                                   time_threshold_send_data = 15; // 150ms to retry
+                                                       time_threshold_send_data = 15; // 150ms to retry
 
-                                                   if(!take_time_when_find_expired_data){
-                                                       // not increase the count number msg sent
-                                                       // FINISH THE COMMUNICATION
-                                                   }
+                                                       if(!take_time_when_find_expired_data){
+                                                           // not increase the count number msg sent
+                                                           // FINISH THE COMMUNICATION
+                                                       }
 
-                                                //}
+                                                    //}
 
-                                                timer_Control_Send_Data = 0;
+                                                    timer_Control_Send_Data = 0;
+
+                                                }
+
+                                                timer_Control_Send_Data++;
 
                                             }
 
-                                            timer_Control_Send_Data++;
+
 
                                         }
-
-
-
-                                    }
-
-
 
                                 }
                             }
-
-                            // -----------------------------------------------------------------------------------------------
-                            // here continue to sent emergency message, in this way block the transmission the others messages
-                            // -----------------------------------------------------------------------------------------------
-                            // -----------------------------------------------------------------------------------------------
-                            if(send_data){
-                                std::string vehicle = mobility->getExternalId();
-                                Coord pos = mobility->getCurrentPosition();
-                                Coord geo = convertXYtoLatLon(pos);
-
-                                double lat = geo.y;
-                                double lon = geo.x;
-                                deadline_on_SERVER = simTime().dbl();
-
-
-                                std::vector<double> gps = {deadline_on_SERVER, (double)state_of_accident,lat, lon};
-                                std::string data = buildDataString(gps);
-
-                                if(msg_emergency_pending){
-
-                                    if(ConnectionToAP){ // WIFI available
-
-                                        if (socket.getState() != inet::TcpSocket::CONNECTED) {
-                                            EV_ERROR << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
-                                            // ------------------- restart socket -----------------------
-                                            socket_ready = false;
-                                            socket_state_close = true;
-                                            count_reTX = 0;
-                                            // ----------------------------------------------------------
-                                        }else{
-
-                                            if(socket_ready){
-
-                                                auto packet = new inet::Packet("accident_car_test_TCP");
-
-                                                auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
-
-                                                timestampPayload(payload);
-
-                                                packet->insertAtBack(payload);
-                                                EV_ERROR << "test emergency sent to WIFI: "<< endl;
-                                                socket.send(packet);
-                                                flag_tx_wifi=true;
-
-                                                long_Bytes_wifi += static_cast<long>(data.size());
-
-                                                msg_emergency_pending = false;
-
-                                                emit(outputBufferSignal_wifi, 1);
-
-                                                count_msg_TCP_send++;
-
-                                            }
-                                        }
-
-
-                                    }else{ // send to LTE interface
-
-                                        if (socket.getState() != inet::TcpSocket::CONNECTED) {
-                                            EV_ERROR << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
-                                            // ------------------- restart socket -----------------------
-                                            socket_ready = false;
-                                            socket_state_close = true;
-                                            count_reTX = 0;
-                                            // ----------------------------------------------------------
-                                        }else{
-
-                                            if(socket_ready){
-
-                                                auto packet = new inet::Packet("accident_car_test_TCP");
-
-                                                auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
-
-                                                timestampPayload(payload);
-
-                                                packet->insertAtBack(payload);
-                                                EV_ERROR << "test emergency send using LTE: "<< endl;
-                                                socket.send(packet);
-                                                flag_tx_lte = false;
-
-                                                long_Bytes_LTE += static_cast<long>(data.size());
-
-                                                msg_emergency_pending = false;
-
-                                                emit(outputBufferSignal_lte, 1);
-
-                                                count_msg_TCP_send++;
-
-                                            }
-                                        }
-
-                                    }
-                                }
-
-
-                            }
-
-                            //*******************************************************************************************************************
 
 
 
@@ -1715,6 +1782,31 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              emit(outputBytes_wifi, long_Bytes_wifi);
                              emit(outputBytes_lte, long_Bytes_LTE);
 
+                             emit(Packet_lose_deadline, number_packet_lose);
+                             emit(Byte_lose_deadline, number_bytes_lose);
+
+                             //-------------- Coomunication Cost ---------------------------
+
+                             // Things Mobile è un operatore IoT/M2M reale molto utilizzato in Italia per la telemetria e i sistemi di trasporto intelligenti (ITS)
+                             // 0,10 € / MB (a consumo)
+                             // https://www.thingsmobile.com/it/business
+
+                             // conversione nel  networking
+                             // 1KB = 1024 B
+                             // 1MB = 1024 * 1024B = 1.048.576 B
+                             // Coste by Byte = (0.10 / 1.048.576 B) = 0,0000000954
+                             //-------------------------------------------------------------
+                             // ******* consideretion header MQTT + TCP + IP ***************
+                             // ------------------------------------------------------------
+                             // Total de Overhead MQTT: Aproximadamente 21 Bytes por paquete.
+                             // Cabecera TCP: 20 Bytes
+                             // Cabecera IPv4: 20 Bytes
+
+                             Cost_LTE = long_Bytes_LTE_Header * 0.0000000954;
+                             Cost_WiFi = 0; // IT IS FREE
+
+                             emit(Cost_Data_wifi, Cost_WiFi);
+                             emit(Cost_Data_lte, Cost_LTE);
 
                              //EV_ERROR << "msg guardados en sdcadr: "<< " " << counter_msg << endl;
 
@@ -1860,6 +1952,7 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
         socket_ready = false;
         socket_state_close = true;
         count_reTX = 0;
+        fix_interface = true;
         // ----------------------------------------------------------
         return;
     }else{
@@ -1877,18 +1970,41 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
             long data_priority_on_sd = sdcard.data_priority_on_sdcard();
 
             if(data_priority_on_sd >= 20){
-                auto batch = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
-                if(!batch.empty())
-                    outputBuffer.load(batch);
+                if(Strategy_Switching == 1){
+                    auto batch = sdcard.popBatch(20, deadline_start, deadline_until, 1);// wifi
+                    if(!batch.empty())
+                        outputBuffer.load(batch);
+                }else if(Strategy_Switching == 2){
+                    auto batch = sdcard.popBatch(20, deadline_start, deadline_until, 1);// LTE pero mandamos 1 como su estubiera conectado a WIFI para mandar todos los datos
+                    if(!batch.empty())
+                        outputBuffer.load(batch);
+                }else if(Strategy_Switching == 3){
+                    auto batch = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
+                    if(!batch.empty())
+                        outputBuffer.load(batch);
+                }
+
+
             }else {
                 // save buffer en SDCARD
                 auto batch = inputBuffer.flush();
                 sdcard.pushBatch(batch);
 
-                auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
+                if(Strategy_Switching == 1){
+                    auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, 1);
+                    if(!batch1.empty())
+                        outputBuffer.load(batch1);
+                }else if(Strategy_Switching == 2){
+                    auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, 1);
+                    if(!batch1.empty())
+                        outputBuffer.load(batch1);
+                }else if(Strategy_Switching == 3){
+                    auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
+                    if(!batch1.empty())
+                        outputBuffer.load(batch1);
+                }
 
-                if(!batch1.empty())
-                    outputBuffer.load(batch1);
+
             }
 
             // aqui va el timer SDCARD
@@ -1920,47 +2036,164 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
 
         }else {
             EV_ERROR << "socket WIFI OK4: "<< endl;
-
             // ------ create the packet -----------------
-            auto packet = new inet::Packet("accident_car_test_TCP");
+            bool packet_lose = true;
 
-            std::string data = outputBuffer.getOne();
-            //EV_WARN << "SEND next DATA NUMBER: " << Retry_Sent << endl;
-            //lastMessageSent = data;
-            //Retry_Sent++;
+            while(packet_lose){
 
-            auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
 
-            timestampPayload(payload);
 
-            packet->insertAtBack(payload);
-            EV_ERROR << "test1: "<< endl;
-            socket.send(packet);
-            //socket.requestStatus();
+                if (outputBuffer.isEmpty()) {
+                    EV_ERROR << "socket WIFI OK4.4: "<< endl;
 
-            EV_ERROR << "PACKET SENT to SERVER: "<< endl;
+                    long data_priority_on_sd = sdcard.data_priority_on_sdcard();
 
-            count_msg_TCP_send++;
+                    if(data_priority_on_sd >= 20){
+                        if(Strategy_Switching == 1){
+                            auto batch = sdcard.popBatch(20, deadline_start, deadline_until, 1);// wifi
+                            if(!batch.empty())
+                                outputBuffer.load(batch);
+                        }else if(Strategy_Switching == 2){
+                            auto batch = sdcard.popBatch(20, deadline_start, deadline_until, 1);// LTE
+                            if(!batch.empty())
+                                outputBuffer.load(batch);
+                        }else if(Strategy_Switching == 3){
+                            auto batch = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
+                            if(!batch.empty())
+                                outputBuffer.load(batch);
+                        }
+                    }else {
+                        // save buffer en SDCARD
+                        auto batch = inputBuffer.flush();
+                        sdcard.pushBatch(batch);
 
-            if (interface_output == "wifi") {
-                // use wifi
-                long_Bytes_wifi += static_cast<long>(data.size());
+                        if(Strategy_Switching == 1){
+                            auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, 1);
+                            if(!batch1.empty())
+                                outputBuffer.load(batch1);
+                        }else if(Strategy_Switching == 2){
+                            auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, 1);
+                            if(!batch1.empty())
+                                outputBuffer.load(batch1);
+                        }else if(Strategy_Switching == 3){
+                            auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);
+                            if(!batch1.empty())
+                                outputBuffer.load(batch1);
+                        }
+                    }
 
-                static_outputBuff_wifi = outputBuffer.size();
-                emit(outputBufferSignal_wifi, static_outputBuff_wifi);
-                static_outputBuff_lte = 0; // LTE regresa a 0 continua wifi
-                emit(outputBufferSignal_lte, static_outputBuff_lte);
+                    // aqui va el timer SDCARD
+                    int data_recovery = outputBuffer.size();
+
+                    if(data_recovery > 0){
+                        //delay_sdcard = (data_recovery * 30)/20; //(300/10)ms
+                        EV_ERROR << "NUM DATA RECOVERY: num, delay, tiempo " << data_recovery << " " << delay_sdcard << " " << time_threshold_send_data << endl;
+
+                    }else{
+                        take_time_when_find_expired_data = false; // allow get out and continue to check data expired
+                        packet_lose = false;
+
+                    }
+
+                }else{// mientras tenga datos en el buffer
+
+                    if (socket.getState() != inet::TcpSocket::CONNECTED) {
+                        EV_ERROR << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
+                        // ------------------- restart socket -----------------------
+                        socket_ready = false;
+                        socket_state_close = true;
+                        count_reTX = 0;
+                        fix_interface = true;
+                        // ----------------------------------------------------------
+                        return;
+                    }
+
+                    auto packet = new inet::Packet("accident_car_test_TCP");
+                    std::string data = outputBuffer.getOne();
+
+                    EV_ERROR << "socket WIFI OK4.4.4: " << data << endl;
+
+                    std::string fechaStr;
+                    int tipoMensaje = 0;
+                    double deadlineValue = 0.0;
+
+                    std::stringstream ss(data);
+                    std::string token;
+                    if (std::getline(ss, token, '/')) fechaStr = token;
+
+                    if (std::getline(ss, token, '/')) {
+                        tipoMensaje = std::stoi(token);
+                    }
+
+                    if (std::getline(ss, token, '/')) {
+                        deadlineValue = std::stod(token);
+                    }
+
+                    //const double maxWaitTime[NUM_PRIORITIES] = {2.0, 60.0, 900.0, 9600.0, 9650.0};
+
+                    double fresh_data = 0.0;
+
+                    if(tipoMensaje == 0){// priority 1
+                        fresh_data = (deadlineValue + 2.0) - simTime().dbl();
+                    }else if(tipoMensaje == 1){// priority 2
+                        fresh_data = (deadlineValue + 60.0) - simTime().dbl();
+                    }else if(tipoMensaje == 2){// priority 3
+                        fresh_data = (deadlineValue + 900.0) - simTime().dbl();
+                    }else if(tipoMensaje == 3){
+                        fresh_data = (deadlineValue + 9600.0) - simTime().dbl();
+                    }else if(tipoMensaje == 4){
+                        fresh_data = (deadlineValue + 9650.0) - simTime().dbl();
+                    }
+
+                    if(fresh_data > 0.0){// envio el dato y salgo del while
+                        auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
+
+                        timestampPayload(payload);
+
+                        packet->insertAtBack(payload);
+                        socket.send(packet);
+
+                        EV_ERROR << "PACKET SENT to SERVER: "<< data << " " << fresh_data << endl;
+
+                        count_msg_TCP_send++;
+
+                        if (interface_output == "wifi") {
+                            // use wifi
+                            long_Bytes_wifi += static_cast<long>(data.size());
+                            long_Bytes_wifi_Header = long_Bytes_wifi + 60;
+
+                            static_outputBuff_wifi = outputBuffer.size();
+                            emit(outputBufferSignal_wifi, static_outputBuff_wifi);
+                            static_outputBuff_lte = 0; // LTE regresa a 0 continua wifi
+                            emit(outputBufferSignal_lte, static_outputBuff_lte);
+                        }
+                        else if (interface_output == "lte") {
+                            // use lte
+                            long_Bytes_LTE += static_cast<long>(data.size());
+                            long_Bytes_LTE_Header = long_Bytes_LTE + 60;
+
+                            static_outputBuff_lte = outputBuffer.size();
+                            emit(outputBufferSignal_lte, static_outputBuff_lte);
+                            static_outputBuff_wifi = 0;// wifi regresa a 0 LTE continua
+                            emit(outputBufferSignal_wifi, static_outputBuff_wifi);// LTE continue, wifi return to 0
+                        }
+
+                        packet_lose = false; // termino el while
+
+                    }else{// descartar el dato contar y leer el siguiente
+                        // contar los paquetes descartados
+                        EV_ERROR << "socket WIFI OK4.4.4.4: " << data << fresh_data << endl;
+                        number_packet_lose++;
+                        emit(Packet_lose_deadline, number_packet_lose);
+                        number_bytes_lose += data.size();
+                        emit(Byte_lose_deadline, number_bytes_lose);
+                    }
+
+
+
+                }
+
             }
-            else if (interface_output == "lte") {
-                // use lte
-                long_Bytes_LTE += static_cast<long>(data.size());
-
-                static_outputBuff_lte = outputBuffer.size();
-                emit(outputBufferSignal_lte, static_outputBuff_lte);
-                static_outputBuff_wifi = 0;// wifi regresa a 0 LTE continua
-                emit(outputBufferSignal_wifi, static_outputBuff_wifi);// LTE continue, wifi return to 0
-            }
-
 
 
         }
@@ -1975,12 +2208,12 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
 
 void AppBusTCP_R_StateM::interfaceAvailable(){
 
-    if(ConnectionToAP){
+    if(Strategy_Switching == 1){
         //------------------ start counter time --------------------
         //connectionWiFiStart = simTime();
         //----------------------------------------------------------
 
-        coun_msg_sent++;
+        //coun_msg_sent++;
         wifi->setState(NetworkInterface::State::UP);
         celular->setState(NetworkInterface::State::DOWN);
 
@@ -2009,16 +2242,7 @@ void AppBusTCP_R_StateM::interfaceAvailable(){
 
         EV_INFO << "Default route added via WIFI (gw=192.168.0.1)" << endl;
 
-    }else {
-
-        //simtime_t duration = simTime() - connectionWiFiStart;
-
-        // Save only the connection is greater that;
-//        if (duration > 1) { // time minimum to establish connection with WIFI ***** pain attention, really we must to check if there are connection
-//            emit(timeWiFiWorking, duration.dbl()); // we Emit with double variable type
-//            //EV_INFO << "Desconectado. Duración de la conexión: " << duration << " segundos." << endl;
-//        }
-
+    }else if(Strategy_Switching == 2){
         celular->setState(NetworkInterface::State::UP);
         wifi->setState(NetworkInterface::State::DOWN);
         EV_INFO << "WiFi disable → Using interfaz celular" << endl;
@@ -2046,6 +2270,80 @@ void AppBusTCP_R_StateM::interfaceAvailable(){
 
         EV_INFO << "Default route added via CELLULAR (gw=10.0.0.1)" << endl;
 
+    }else if(Strategy_Switching == 3){
+
+        if(ConnectionToAP){
+            //------------------ start counter time --------------------
+            //connectionWiFiStart = simTime();
+            //----------------------------------------------------------
+
+            //coun_msg_sent++;
+            wifi->setState(NetworkInterface::State::UP);
+            celular->setState(NetworkInterface::State::DOWN);
+
+
+            EV_INFO << "CELLULAR disable → Using interfaz WIFI" << endl;
+
+            auto rt = check_and_cast<Ipv4RoutingTable*>(getModuleByPath("^.ipv4.routingTable"));
+
+            // delete default route previous
+            for (int i = rt->getNumRoutes() - 1; i >= 0; --i) {
+                auto route = rt->getRoute(i);
+                if (route->getDestination().isUnspecified()) {
+                    rt->deleteRoute(route);
+                }
+            }
+
+            // we update the routing table with WIFI domain like GW
+            auto wlan0 = interfaceTable->findInterfaceByName("wlan0");
+            auto def = new Ipv4Route();
+            def->setDestination(Ipv4Address("0.0.0.0"));
+            def->setNetmask(Ipv4Address("0.0.0.0"));
+            def->setGateway(Ipv4Address("192.168.0.1"));
+            def->setInterface(wlan0);
+            def->setSourceType(Ipv4Route::MANUAL);
+            rt->addRoute(def);
+
+            EV_INFO << "Default route added via WIFI (gw=192.168.0.1)" << endl;
+
+        }else {
+
+            //simtime_t duration = simTime() - connectionWiFiStart;
+
+            // Save only the connection is greater that;
+    //        if (duration > 1) { // time minimum to establish connection with WIFI ***** pain attention, really we must to check if there are connection
+    //            emit(timeWiFiWorking, duration.dbl()); // we Emit with double variable type
+    //            //EV_INFO << "Desconectado. Duración de la conexión: " << duration << " segundos." << endl;
+    //        }
+
+            celular->setState(NetworkInterface::State::UP);
+            wifi->setState(NetworkInterface::State::DOWN);
+            EV_INFO << "WiFi disable → Using interfaz celular" << endl;
+
+            auto rt = check_and_cast<Ipv4RoutingTable*>(getModuleByPath("^.ipv4.routingTable"));
+            auto interfaceTable = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
+
+            // limpiar default routes previas
+            for (int i = rt->getNumRoutes() - 1; i >= 0; --i) {
+                auto route = rt->getRoute(i);
+                if (route->getDestination().isUnspecified()) {
+                    rt->deleteRoute(route);
+                }
+            }
+
+            // we update the routing table with cellular domain like GW
+            auto celular = interfaceTable->findInterfaceByName("cellular");
+            auto def = new Ipv4Route();
+            def->setDestination(Ipv4Address("0.0.0.0"));
+            def->setNetmask(Ipv4Address("0.0.0.0"));
+            def->setGateway(Ipv4Address("10.0.0.1"));
+            def->setInterface(celular);
+            def->setSourceType(Ipv4Route::MANUAL);
+            rt->addRoute(def);
+
+            EV_INFO << "Default route added via CELLULAR (gw=10.0.0.1)" << endl;
+
+        }
     }
 
 }
@@ -2279,6 +2577,7 @@ void AppBusTCP_R_StateM::socketPeerClosed(inet::TcpSocket *socket) {
     socket_ready = false;
     socket_state_close = true; // start cooldown
     count_reTX = 0;
+    fix_interface = true;
 }
 
 void AppBusTCP_R_StateM::socketClosed(inet::TcpSocket *socket) {
@@ -2286,6 +2585,7 @@ void AppBusTCP_R_StateM::socketClosed(inet::TcpSocket *socket) {
     socket_ready = false;
     socket_state_close = true; // start cooldown
     count_reTX = 0;
+    fix_interface = true;
 }
 
 void AppBusTCP_R_StateM::socketFailure(inet::TcpSocket *socket, int code) {
@@ -2327,6 +2627,7 @@ void AppBusTCP_R_StateM::socketFailure(inet::TcpSocket *socket, int code) {
     socket_ready = false;
     socket_state_close = true; // start cooldown
     count_reTX = 0;
+    fix_interface = true;
 }
 
 void AppBusTCP_R_StateM::socketStatusArrived(inet::TcpSocket *socket, inet::TcpStatusInfo *statusInfo) {

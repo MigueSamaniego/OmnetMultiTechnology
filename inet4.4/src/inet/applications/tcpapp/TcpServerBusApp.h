@@ -54,6 +54,12 @@ class INET_API TcpServerBusAppThread : public TcpServerThreadBase
     cMessage *timeoutMsg = nullptr;
     simtime_t lastDataTime;
 
+    simsignal_t fresh_priority_1;
+    simsignal_t fresh_priority_2;
+    simsignal_t fresh_priority_3;
+    simsignal_t fresh_priority_4;
+    simsignal_t fresh_priority_wifi;
+
     int count_msg_received_on_server = 0;
 
   public:
