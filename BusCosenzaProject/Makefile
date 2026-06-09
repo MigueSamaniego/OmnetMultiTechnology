@@ -45,6 +45,7 @@ OBJS = \
     $O/src/node_bus/apps/AppBusDataCollectionTCP_R.o \
     $O/src/node_bus/apps/AppBusDataCollectionUDP.o \
     $O/src/node_bus/apps/AppBusTCP_R_StateM.o \
+    $O/src/node_bus/apps/AppBusTCP_R_StateM_B.o \
     $O/src/node_bus/apps/AppBusTCP_StateM.o \
     $O/src/node_bus/apps/VeinsInetApplicationBase.o \
     $O/src/node_bus/apps/VeinsInetManager.o \

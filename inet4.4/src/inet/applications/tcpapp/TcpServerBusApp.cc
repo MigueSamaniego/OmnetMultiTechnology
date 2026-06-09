@@ -162,27 +162,49 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         double AoI4 = 0.0;
         double AoIwifi = 0.0;
 
+        double Deadline1 = 0.0;
+        double Deadline2 = 0.0;
+        double Deadline3 = 0.0;
+        double Deadline4 = 0.0;
+        double Deadlinewifi = 0.0;
+
         if(tipoMensaje == 0){// priority 1
 
+            // DeadLine
+            Deadline1 = (time_created + 2.0) - simTime().dbl();
+
+            // age of information
             AoI1 = simTime().dbl() - time_created;
             emit(fresh_priority_1, AoI1);
 
         }else if(tipoMensaje == 1){// priority 2
+
+            // DeadLine
+            Deadline2 = (time_created + 60.0) - simTime().dbl();
 
             AoI2 = simTime().dbl() - time_created;
             emit(fresh_priority_2, AoI2);
 
         }else if(tipoMensaje == 2){// priority 3
 
+            // DeadLine
+            Deadline3 = (time_created + 900.0) - simTime().dbl();
+
             AoI3 = simTime().dbl() - time_created;
             emit(fresh_priority_3, AoI3);
 
         }else if(tipoMensaje == 3){// priority 4
 
+            // DeadLine
+            Deadline4 = (time_created + 9600.0) - simTime().dbl();
+
             AoI4 = simTime().dbl() - time_created;
             emit(fresh_priority_4, AoI4);
 
         }else if(tipoMensaje == 4){// priority wifi
+
+            // DeadLine
+            Deadlinewifi = (time_created + 9650.0) - simTime().dbl();
 
             AoIwifi = simTime().dbl() - time_created;
             emit(fresh_priority_wifi, AoIwifi);
