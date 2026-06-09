@@ -28,6 +28,42 @@ module TcpServerBusApp extends TcpServerHostApp
         @signal[fresh_AoI_priority_4](type="double");
         @signal[fresh_AoI_priority_wifi](type="double");
         
+        @signal[deadline_1_signal](type="double");
+        @signal[deadline_2_signal](type="double");
+        @signal[deadline_3_signal](type="double");
+        @signal[deadline_4_signal](type="double");
+        @signal[deadline_wifi_signal](type="double");
+        
+        @signal[packet_lose_1_signal](type="long");
+        @signal[packet_lose_2_signal](type="long");
+        @signal[packet_lose_3_signal](type="long");
+        @signal[packet_lose_4_signal](type="long");
+        @signal[packet_lose_wifi_signal](type="long");
+        @signal[packet_lose_total_signal](type="double");
+        
+        @signal[bytes_lose_1_signal](type="long");
+        @signal[bytes_lose_2_signal](type="long");
+        @signal[bytes_lose_3_signal](type="long");
+        @signal[bytes_lose_4_signal](type="long");
+        @signal[bytes_lose_wifi_signal](type="long");
+        @signal[bytes_lose_total_signal](type="double");
+        
+        @signal[packet_Rx_1_signal](type="long");
+        @signal[packet_Rx_2_signal](type="long");
+        @signal[packet_Rx_3_signal](type="long");
+        @signal[packet_Rx_4_signal](type="long");
+        @signal[packet_Rx_wifi_signal](type="long");
+        @signal[packet_Rx_total_signal](type="double");
+        
+        @signal[bytes_Rx_1_signal](type="long");
+        @signal[bytes_Rx_2_signal](type="long");
+        @signal[bytes_Rx_3_signal](type="long");
+        @signal[bytes_Rx_4_signal](type="long");
+        @signal[bytes_Rx_wifi_signal](type="long");
+        @signal[bytes_Rx_total_signal](type="double");
+        
+        
+        
         
         @statistic[packetReceived](title="packets received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none; checkSignals=false);
         @statistic[endToEndDelay](title="end-to-end delay"; source="dataAge(packetReceived)"; unit=s; record=histogram,weightedHistogram,vector; interpolationmode=none; checkSignals=false);
@@ -39,6 +75,40 @@ module TcpServerBusApp extends TcpServerHostApp
 		@statistic[fresh_AoI_priority_3](title= "AoI3 [s]"; source="fresh_AoI_priority_3"; record=vector,last,mean);
 		@statistic[fresh_AoI_priority_4](title= "AoI4 [s]"; source="fresh_AoI_priority_4"; record=vector,last,mean);
 		@statistic[fresh_AoI_priority_wifi](title= "AoIW [s]"; source="fresh_AoI_priority_wifi"; record=vector,last,mean);
+		
+		@statistic[deadline_1_signal](title= "Deadline_1 [s]"; source="deadline_1_signal"; record=vector,last,mean);
+		@statistic[deadline_2_signal](title= "Deadline_2 [s]"; source="deadline_2_signal"; record=vector,last,mean);
+		@statistic[deadline_3_signal](title= "Deadline_3 [s]"; source="deadline_3_signal"; record=vector,last,mean);
+		@statistic[deadline_4_signal](title= "Deadline_4 [s]"; source="deadline_4_signal"; record=vector,last,mean);
+		@statistic[deadline_wifi_signal](title= "Deadline_wifi [s]"; source="deadline_wifi_signal"; record=vector,last,mean);
+		
+		@statistic[packet_lose_1_signal](title= "Packet lost 1"; source="packet_lose_1_signal"; record=vector,last,mean);
+		@statistic[packet_lose_2_signal](title= "Packet lost 2"; source="packet_lose_2_signal"; record=vector,last,mean);
+		@statistic[packet_lose_3_signal](title= "Packet lost 3"; source="packet_lose_3_signal"; record=vector,last,mean);
+		@statistic[packet_lose_4_signal](title= "Packet lost 4"; source="packet_lose_4_signal"; record=vector,last,mean);
+		@statistic[packet_lose_wifi_signal](title= "Packet lost wifi"; source="packet_lose_wifi_signal"; record=vector,last,mean);
+		@statistic[packet_lose_total_signal](title= "Packet lost total"; source="packet_lose_total_signal"; record=vector,last,mean);
+		
+		@statistic[bytes_lose_1_signal](title= "Bytes lost 1 [B]"; source="bytes_lose_1_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_2_signal](title= "Bytes lost 2 [B]"; source="bytes_lose_2_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_3_signal](title= "Bytes lost 3 [B]"; source="bytes_lose_3_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_4_signal](title= "Bytes lost 4 [B]"; source="bytes_lose_4_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_wifi_signal](title= "Bytes lost wifi [B]"; source="bytes_lose_wifi_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_total_signal](title= "Bytes lost total [B]"; source="bytes_lose_total_signal"; record=vector,last,mean);
+		
+		@statistic[packet_Rx_1_signal](title= "Packet Rx 1"; source="packet_Rx_1_signal"; record=vector,last,mean);
+		@statistic[packet_Rx_2_signal](title= "Packet Rx 2"; source="packet_Rx_2_signal"; record=vector,last,mean);
+		@statistic[packet_Rx_3_signal](title= "Packet Rx 3"; source="packet_Rx_3_signal"; record=vector,last,mean);
+		@statistic[packet_Rx_4_signal](title= "Packet Rx 4"; source="packet_Rx_4_signal"; record=vector,last,mean);
+		@statistic[packet_Rx_wifi_signal](title= "Packet Rx wifi"; source="packet_Rx_wifi_signal"; record=vector,last,mean);
+		@statistic[packet_Rx_total_signal](title= "Packet Rx total"; source="packet_Rx_total_signal"; record=vector,last,mean);
+		
+		@statistic[bytes_Rx_1_signal](title= "Payload Rx 1"; source="bytes_Rx_1_signal"; record=vector,last,mean);
+		@statistic[bytes_Rx_2_signal](title= "Payload Rx 2"; source="bytes_Rx_2_signal"; record=vector,last,mean);
+		@statistic[bytes_Rx_3_signal](title= "Payload Rx 3"; source="bytes_Rx_3_signal"; record=vector,last,mean);
+		@statistic[bytes_Rx_4_signal](title= "Payload Rx 4"; source="bytes_Rx_4_signal"; record=vector,last,mean);
+		@statistic[bytes_Rx_wifi_signal](title= "Payload Rx wifi"; source="bytes_Rx_wifi_signal"; record=vector,last,mean);
+		@statistic[bytes_Rx_total_signal](title= "Payload Rx total"; source="bytes_Rx_total_signal"; record=vector,last,mean);
 		
 }
 

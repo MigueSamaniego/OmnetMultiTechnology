@@ -514,7 +514,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                         measure_stage = false;
 
                         windows_fix = true; // i sent 5min of data
-                        Strategy_Switching = 4;
+                        Strategy_Switching = 1;
                         //Strategy_Switching = 0 --> no strategy
                         //Strategy_Switching = 1 --> WIFI
                         //Strategy_Switching = 2 --> LTE

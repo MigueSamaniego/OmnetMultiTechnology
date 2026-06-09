@@ -94,6 +94,42 @@ void TcpServerBusAppThread::initialize(int stage)
         fresh_priority_4 = registerSignal("fresh_AoI_priority_4");
         fresh_priority_wifi = registerSignal("fresh_AoI_priority_wifi");
 
+        deadline_1 = registerSignal("deadline_1_signal");
+        deadline_2 = registerSignal("deadline_2_signal");
+        deadline_3 = registerSignal("deadline_3_signal");
+        deadline_4 = registerSignal("deadline_4_signal");
+        deadline_wifi = registerSignal("deadline_wifi_signal");
+
+        packet_lose_1 = registerSignal("packet_lose_1_signal");
+        packet_lose_2 = registerSignal("packet_lose_2_signal");
+        packet_lose_3 = registerSignal("packet_lose_3_signal");
+        packet_lose_4 = registerSignal("packet_lose_4_signal");
+        packet_lose_wifi = registerSignal("packet_lose_wifi_signal");
+        packet_lose_total = registerSignal("packet_lose_total_signal");
+
+        bytes_lose_1 = registerSignal("bytes_lose_1_signal");
+        bytes_lose_2 = registerSignal("bytes_lose_2_signal");
+        bytes_lose_3 = registerSignal("bytes_lose_3_signal");
+        bytes_lose_4 = registerSignal("bytes_lose_4_signal");
+        bytes_lose_wifi = registerSignal("bytes_lose_wifi_signal");
+        bytes_lose_total = registerSignal("bytes_lose_total_signal");
+
+        packet_Rx_1 = registerSignal("packet_Rx_1_signal");
+        packet_Rx_2 = registerSignal("packet_Rx_2_signal");
+        packet_Rx_3 = registerSignal("packet_Rx_3_signal");
+        packet_Rx_4 = registerSignal("packet_Rx_4_signal");
+        packet_Rx_wifi = registerSignal("packet_Rx_wifi_signal");
+        packet_Rx_total = registerSignal("packet_Rx_total_signal");
+
+        bytes_Rx_1 = registerSignal("bytes_Rx_1_signal");
+        bytes_Rx_2 = registerSignal("bytes_Rx_2_signal");
+        bytes_Rx_3 = registerSignal("bytes_Rx_3_signal");
+        bytes_Rx_4 = registerSignal("bytes_Rx_4_signal");
+        bytes_Rx_wifi = registerSignal("bytes_Rx_wifi_signal");
+        bytes_Rx_total = registerSignal("bytes_Rx_total_signal");
+
+
+
     }
 }
 
@@ -171,8 +207,22 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         if(tipoMensaje == 0){// priority 1
 
             // DeadLine
-            Deadline1 = (time_created + 2.0) - simTime().dbl();
-
+            Deadline1 = (time_created + 2.0);
+            EV_ERROR << "DEADLINE 1: " << Deadline1 << endl;
+            if(Deadline1 > simTime().dbl()){
+                number_packet_Rx_1++;
+                number_bytes_Rx_1 += content.size();
+                number_packet_Rx_total++;
+                number_bytes_Rx_total += content.size();
+            }else{
+                number_packet_lost_1++;
+                number_bytes_lost_1 += content.size();
+                number_packet_lost_total++;
+                number_bytes_lost_total += content.size();
+            }
+            emit(packet_Rx_1,number_packet_Rx_1);
+            emit(packet_lose_1,number_packet_lost_1);
+            emit(deadline_1, Deadline1);
             // age of information
             AoI1 = simTime().dbl() - time_created;
             emit(fresh_priority_1, AoI1);
@@ -180,7 +230,22 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         }else if(tipoMensaje == 1){// priority 2
 
             // DeadLine
-            Deadline2 = (time_created + 60.0) - simTime().dbl();
+            Deadline2 = (time_created + 60.0);
+            EV_ERROR << "DEADLINE 2: " << Deadline2 << endl;
+            if(Deadline2 > simTime().dbl()){
+                number_packet_Rx_2++;
+                number_bytes_Rx_2 += content.size();
+                number_packet_Rx_total++;
+                number_bytes_Rx_total += content.size();
+            }else{
+                number_packet_lost_2++;
+                number_bytes_lost_2 += content.size();
+                number_packet_lost_total++;
+                number_bytes_lost_total += content.size();
+            }
+            emit(packet_Rx_2,number_packet_Rx_2);
+            emit(packet_lose_2,number_packet_lost_2);
+            emit(deadline_2, Deadline2);
 
             AoI2 = simTime().dbl() - time_created;
             emit(fresh_priority_2, AoI2);
@@ -188,7 +253,22 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         }else if(tipoMensaje == 2){// priority 3
 
             // DeadLine
-            Deadline3 = (time_created + 900.0) - simTime().dbl();
+            Deadline3 = (time_created + 900.0);
+            EV_ERROR << "DEADLINE 3: " << Deadline3 << endl;
+            if(Deadline3 > simTime().dbl()){
+                number_packet_Rx_3++;
+                number_bytes_Rx_3 += content.size();
+                number_packet_Rx_total++;
+                number_bytes_Rx_total += content.size();
+            }else{
+                number_packet_lost_3++;
+                number_bytes_lost_3 += content.size();
+                number_packet_lost_total++;
+                number_bytes_lost_total += content.size();
+            }
+            emit(packet_Rx_3,number_packet_Rx_3);
+            emit(packet_lose_3,number_packet_lost_3);
+            emit(deadline_3, Deadline3);
 
             AoI3 = simTime().dbl() - time_created;
             emit(fresh_priority_3, AoI3);
@@ -196,7 +276,22 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         }else if(tipoMensaje == 3){// priority 4
 
             // DeadLine
-            Deadline4 = (time_created + 9600.0) - simTime().dbl();
+            Deadline4 = (time_created + 9600.0);
+            EV_ERROR << "DEADLINE 4: " << Deadline4 << endl;
+            if(Deadline4 > simTime().dbl()){
+                number_packet_Rx_4++;
+                number_bytes_Rx_4 += content.size();
+                number_packet_Rx_total++;
+                number_bytes_Rx_total += content.size();
+            }else{
+                number_packet_lost_4++;
+                number_bytes_lost_4 += content.size();
+                number_packet_lost_total++;
+                number_bytes_lost_total += content.size();
+            }
+            emit(packet_Rx_4,number_packet_Rx_4);
+            emit(packet_lose_4,number_packet_lost_4);
+            emit(deadline_4, Deadline4);
 
             AoI4 = simTime().dbl() - time_created;
             emit(fresh_priority_4, AoI4);
@@ -204,12 +299,32 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         }else if(tipoMensaje == 4){// priority wifi
 
             // DeadLine
-            Deadlinewifi = (time_created + 9650.0) - simTime().dbl();
+            Deadlinewifi = (time_created + 9650.0);
+            EV_ERROR << "DEADLINE wifi: " << Deadlinewifi << endl;
+            if(Deadlinewifi > simTime().dbl()){
+                number_packet_Rx_wifi++;
+                number_bytes_Rx_wifi += content.size();
+                number_packet_Rx_total++;
+                number_bytes_Rx_total += content.size();
+            }else{
+                number_packet_lost_wifi++;
+                number_bytes_lost_wifi += content.size();
+                number_packet_lost_total++;
+                number_bytes_lost_total += content.size();
+            }
+            emit(packet_Rx_wifi,number_packet_Rx_wifi);
+            emit(packet_lose_wifi,number_packet_lost_wifi);
+            emit(deadline_wifi, Deadlinewifi);
 
             AoIwifi = simTime().dbl() - time_created;
             emit(fresh_priority_wifi, AoIwifi);
 
         }
+
+        emit(packet_Rx_total,number_packet_Rx_total);
+        emit(bytes_Rx_total,number_bytes_Rx_total);
+        emit(packet_lose_total,number_packet_lost_total);
+        emit(bytes_lose_total,number_bytes_lost_total);
 
 
 

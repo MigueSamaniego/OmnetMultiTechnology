@@ -5,30 +5,31 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="Strategy_Switching"/>
+		<item key="selection" value="priority_4"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="priority_4"/>
+			<item value="priority_wifi"/>
+			<item value="priority_3"/>
+			<item value="priority_2"/>
+			<item value="priority_1"/>
 			<item value="Strategy_Switching"/>
+			<item value="deadline_1"/>
+			<item value="bytes_lose_1"/>
+			<item value="packet"/>
+			<item value="fresh_priority_1"/>
 			<item value="socket error 3"/>
 			<item value="stablishTCP"/>
 			<item value="estableciendo TCP PARA INTERFACE"/>
 			<item value="WiFi disable → Using interfaz celular"/>
 			<item value="timeout waiting for response from the Server"/>
-			<item value="bus stop timer"/>
-			<item value="strategy 2"/>
-			<item value="socket_ready"/>
-			<item value="socket.send("/>
-			<item value="wifi interface ON"/>
-			<item value="PACKET SENT to SERVER"/>
-			<item value="socket\.send\("/>
-			<item value="send"/>
-			<item value="interfaceAvailable"/>
 		</list>
 		<list key="replacehistory">
+			<item value="bytes"/>
 			<item value="time_created"/>
 			<item value="AoI"/>
 			<item value="TTD"/>
@@ -43,7 +44,6 @@
 			<item value="packetReceiveServerTCPSignal"/>
 			<item value="TcpServerBusApp_R"/>
 			<item value="#ifndef __INET_TCPSERVERBUSAPP_H&#x0A;#define __INET_TCPSERVERBUSAPP_H"/>
-			<item value="AppBusDataCollectionTCP_R"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
