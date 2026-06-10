@@ -26,7 +26,88 @@ class INET_API TcpServerBusApp : public TcpServerHostApp
 
   public:
       static simsignal_t packetReceiveServerTCPSignal;
+
+      static simsignal_t fresh_priority_1;
+      static simsignal_t fresh_priority_2;
+      static simsignal_t fresh_priority_3;
+      static simsignal_t fresh_priority_4;
+      static simsignal_t fresh_priority_wifi;
+
+      static simsignal_t deadline_1;
+      static simsignal_t deadline_2;
+      static simsignal_t deadline_3;
+      static simsignal_t deadline_4;
+      static simsignal_t deadline_wifi;
+
+      static simsignal_t packet_lose_1;
+      static simsignal_t packet_lose_2;
+      static simsignal_t packet_lose_3;
+      static simsignal_t packet_lose_4;
+      static simsignal_t packet_lose_wifi;
+      static simsignal_t packet_lose_total;
+
+      static simsignal_t bytes_lose_1;
+      static simsignal_t bytes_lose_2;
+      static simsignal_t bytes_lose_3;
+      static simsignal_t bytes_lose_4;
+      static simsignal_t bytes_lose_wifi;
+      static simsignal_t bytes_lose_total;
+
+      static simsignal_t packet_Rx_1;
+      static simsignal_t packet_Rx_2;
+      static simsignal_t packet_Rx_3;
+      static simsignal_t packet_Rx_4;
+      static simsignal_t packet_Rx_wifi;
+      static simsignal_t packet_Rx_total;
+
+      static simsignal_t bytes_Rx_1;
+      static simsignal_t bytes_Rx_2;
+      static simsignal_t bytes_Rx_3;
+      static simsignal_t bytes_Rx_4;
+      static simsignal_t bytes_Rx_wifi;
+      static simsignal_t bytes_Rx_total;
+
+      long number_packet_lost_1 = 0;
+      long number_packet_lost_2 = 0;
+      long number_packet_lost_3 = 0;
+      long number_packet_lost_4 = 0;
+      long number_packet_lost_wifi = 0;
+
+
+      long number_bytes_lost_1 = 0;
+      long number_bytes_lost_2 = 0;
+      long number_bytes_lost_3 = 0;
+      long number_bytes_lost_4 = 0;
+      long number_bytes_lost_wifi = 0;
+
+
+      long number_packet_Rx_1 = 0;
+      long number_packet_Rx_2 = 0;
+      long number_packet_Rx_3 = 0;
+      long number_packet_Rx_4 = 0;
+      long number_packet_Rx_wifi = 0;
+
+
+      long number_bytes_Rx_1 = 0;
+      long number_bytes_Rx_2 = 0;
+      long number_bytes_Rx_3 = 0;
+      long number_bytes_Rx_4 = 0;
+      long number_bytes_Rx_wifi = 0;
+
+
       int global_msg_counter = 0;
+
+      double number_packet_lost_total = 0.0;
+      double number_bytes_lost_total = 0.0;
+      double number_packet_Rx_total = 0.0;
+      double number_bytes_Rx_total = 0.0;
+
+  public:
+      double incrementPacket_Rx_test() { return number_packet_Rx_total; }
+      double incrementPacket_Rx() { return ++number_packet_Rx_total; }
+      double incrementPacket_lost() { return ++number_packet_lost_total; }
+      double incrementBytes_Rx(long val) { return number_bytes_Rx_total+= val; }
+      double incrementBytes_lost(long val) { return number_bytes_lost_total+= val; }
 
   protected:
     virtual void initialize(int stage) override;
@@ -37,6 +118,10 @@ class INET_API TcpServerBusApp : public TcpServerHostApp
     void removeBusThread(TcpServerThreadBase *thread);
 
     int incrementMsgCounter() { return ++global_msg_counter; }
+
+
+
+
 
   public:
     TcpServerBusApp();
@@ -54,75 +139,12 @@ class INET_API TcpServerBusAppThread : public TcpServerThreadBase
     cMessage *timeoutMsg = nullptr;
     simtime_t lastDataTime;
 
-    simsignal_t fresh_priority_1;
-    simsignal_t fresh_priority_2;
-    simsignal_t fresh_priority_3;
-    simsignal_t fresh_priority_4;
-    simsignal_t fresh_priority_wifi;
 
-    simsignal_t deadline_1;
-    simsignal_t deadline_2;
-    simsignal_t deadline_3;
-    simsignal_t deadline_4;
-    simsignal_t deadline_wifi;
-
-    simsignal_t packet_lose_1;
-    simsignal_t packet_lose_2;
-    simsignal_t packet_lose_3;
-    simsignal_t packet_lose_4;
-    simsignal_t packet_lose_wifi;
-    simsignal_t packet_lose_total;
-
-    simsignal_t bytes_lose_1;
-    simsignal_t bytes_lose_2;
-    simsignal_t bytes_lose_3;
-    simsignal_t bytes_lose_4;
-    simsignal_t bytes_lose_wifi;
-    simsignal_t bytes_lose_total;
-
-    simsignal_t packet_Rx_1;
-    simsignal_t packet_Rx_2;
-    simsignal_t packet_Rx_3;
-    simsignal_t packet_Rx_4;
-    simsignal_t packet_Rx_wifi;
-    simsignal_t packet_Rx_total;
-
-    simsignal_t bytes_Rx_1;
-    simsignal_t bytes_Rx_2;
-    simsignal_t bytes_Rx_3;
-    simsignal_t bytes_Rx_4;
-    simsignal_t bytes_Rx_wifi;
-    simsignal_t bytes_Rx_total;
 
     int count_msg_received_on_server = 0;
 
-    long number_packet_lost_1 = 0;
-    long number_packet_lost_2 = 0;
-    long number_packet_lost_3 = 0;
-    long number_packet_lost_4 = 0;
-    long number_packet_lost_wifi = 0;
-    double number_packet_lost_total = 0.0;
 
-    long number_bytes_lost_1 = 0;
-    long number_bytes_lost_2 = 0;
-    long number_bytes_lost_3 = 0;
-    long number_bytes_lost_4 = 0;
-    long number_bytes_lost_wifi = 0;
-    double number_bytes_lost_total = 0.0;
 
-    long number_packet_Rx_1 = 0;
-    long number_packet_Rx_2 = 0;
-    long number_packet_Rx_3 = 0;
-    long number_packet_Rx_4 = 0;
-    long number_packet_Rx_wifi = 0;
-    double number_packet_Rx_total = 0.0;
-
-    long number_bytes_Rx_1 = 0;
-    long number_bytes_Rx_2 = 0;
-    long number_bytes_Rx_3 = 0;
-    long number_bytes_Rx_4 = 0;
-    long number_bytes_Rx_wifi = 0;
-    double number_bytes_Rx_total = 0.0;
 
   public:
     // Destructor to clean socket if it was closed

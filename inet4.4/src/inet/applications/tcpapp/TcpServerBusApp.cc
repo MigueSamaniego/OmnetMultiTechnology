@@ -32,6 +32,46 @@ TcpServerBusApp::~TcpServerBusApp()
 
 simsignal_t TcpServerBusApp::packetReceiveServerTCPSignal = registerSignal("numMsgTCPReceiveServer");
 
+simsignal_t TcpServerBusApp::fresh_priority_1 = registerSignal("fresh_AoI_priority_1");
+simsignal_t TcpServerBusApp::fresh_priority_2 = registerSignal("fresh_AoI_priority_2");
+simsignal_t TcpServerBusApp::fresh_priority_3 = registerSignal("fresh_AoI_priority_3");
+simsignal_t TcpServerBusApp::fresh_priority_4 = registerSignal("fresh_AoI_priority_4");
+simsignal_t TcpServerBusApp::fresh_priority_wifi = registerSignal("fresh_AoI_priority_wifi");
+
+simsignal_t TcpServerBusApp::deadline_1 = registerSignal("deadline_1_signal");
+simsignal_t TcpServerBusApp::deadline_2 = registerSignal("deadline_2_signal");
+simsignal_t TcpServerBusApp::deadline_3 = registerSignal("deadline_3_signal");
+simsignal_t TcpServerBusApp::deadline_4 = registerSignal("deadline_4_signal");
+simsignal_t TcpServerBusApp::deadline_wifi = registerSignal("deadline_wifi_signal");
+
+simsignal_t TcpServerBusApp::packet_lose_1 = registerSignal("packet_lose_1_signal");
+simsignal_t TcpServerBusApp::packet_lose_2 = registerSignal("packet_lose_2_signal");
+simsignal_t TcpServerBusApp::packet_lose_3 = registerSignal("packet_lose_3_signal");
+simsignal_t TcpServerBusApp::packet_lose_4 = registerSignal("packet_lose_4_signal");
+simsignal_t TcpServerBusApp::packet_lose_wifi = registerSignal("packet_lose_wifi_signal");
+simsignal_t TcpServerBusApp::packet_lose_total = registerSignal("packet_lose_total_signal");
+
+simsignal_t TcpServerBusApp::bytes_lose_1 = registerSignal("bytes_lose_1_signal");
+simsignal_t TcpServerBusApp::bytes_lose_2 = registerSignal("bytes_lose_2_signal");
+simsignal_t TcpServerBusApp::bytes_lose_3 = registerSignal("bytes_lose_3_signal");
+simsignal_t TcpServerBusApp::bytes_lose_4 = registerSignal("bytes_lose_4_signal");
+simsignal_t TcpServerBusApp::bytes_lose_wifi = registerSignal("bytes_lose_wifi_signal");
+simsignal_t TcpServerBusApp::bytes_lose_total = registerSignal("bytes_lose_total_signal");
+
+simsignal_t TcpServerBusApp::packet_Rx_1 = registerSignal("packet_Rx_1_signal");
+simsignal_t TcpServerBusApp::packet_Rx_2 = registerSignal("packet_Rx_2_signal");
+simsignal_t TcpServerBusApp::packet_Rx_3 = registerSignal("packet_Rx_3_signal");
+simsignal_t TcpServerBusApp::packet_Rx_4 = registerSignal("packet_Rx_4_signal");
+simsignal_t TcpServerBusApp::packet_Rx_wifi = registerSignal("packet_Rx_wifi_signal");
+simsignal_t TcpServerBusApp::packet_Rx_total = registerSignal("packet_Rx_total_signal");
+
+simsignal_t TcpServerBusApp::bytes_Rx_1 = registerSignal("bytes_Rx_1_signal");
+simsignal_t TcpServerBusApp::bytes_Rx_2 = registerSignal("bytes_Rx_2_signal");
+simsignal_t TcpServerBusApp::bytes_Rx_3 = registerSignal("bytes_Rx_3_signal");
+simsignal_t TcpServerBusApp::bytes_Rx_4 = registerSignal("bytes_Rx_4_signal");
+simsignal_t TcpServerBusApp::bytes_Rx_wifi = registerSignal("bytes_Rx_wifi_signal");
+simsignal_t TcpServerBusApp::bytes_Rx_total = registerSignal("bytes_Rx_total_signal");
+
 void TcpServerBusApp::initialize(int stage)
 {
     TcpServerHostApp::initialize(stage);
@@ -41,7 +81,8 @@ void TcpServerBusApp::initialize(int stage)
         WATCH(bytesRcvd);
         EV_INFO << "App SERVER without Re-Try msg"<<endl;
 
-
+        EV_INFO << "INIT TcpServerBusApp THIS=" << this
+                << " stage=" << stage << endl;
 
         global_msg_counter = 0;
 
@@ -88,45 +129,9 @@ void TcpServerBusAppThread::initialize(int stage)
         bytesRcvd = 0;
         WATCH(bytesRcvd);
 
-        fresh_priority_1 = registerSignal("fresh_AoI_priority_1");
-        fresh_priority_2 = registerSignal("fresh_AoI_priority_2");
-        fresh_priority_3 = registerSignal("fresh_AoI_priority_3");
-        fresh_priority_4 = registerSignal("fresh_AoI_priority_4");
-        fresh_priority_wifi = registerSignal("fresh_AoI_priority_wifi");
 
-        deadline_1 = registerSignal("deadline_1_signal");
-        deadline_2 = registerSignal("deadline_2_signal");
-        deadline_3 = registerSignal("deadline_3_signal");
-        deadline_4 = registerSignal("deadline_4_signal");
-        deadline_wifi = registerSignal("deadline_wifi_signal");
 
-        packet_lose_1 = registerSignal("packet_lose_1_signal");
-        packet_lose_2 = registerSignal("packet_lose_2_signal");
-        packet_lose_3 = registerSignal("packet_lose_3_signal");
-        packet_lose_4 = registerSignal("packet_lose_4_signal");
-        packet_lose_wifi = registerSignal("packet_lose_wifi_signal");
-        packet_lose_total = registerSignal("packet_lose_total_signal");
-
-        bytes_lose_1 = registerSignal("bytes_lose_1_signal");
-        bytes_lose_2 = registerSignal("bytes_lose_2_signal");
-        bytes_lose_3 = registerSignal("bytes_lose_3_signal");
-        bytes_lose_4 = registerSignal("bytes_lose_4_signal");
-        bytes_lose_wifi = registerSignal("bytes_lose_wifi_signal");
-        bytes_lose_total = registerSignal("bytes_lose_total_signal");
-
-        packet_Rx_1 = registerSignal("packet_Rx_1_signal");
-        packet_Rx_2 = registerSignal("packet_Rx_2_signal");
-        packet_Rx_3 = registerSignal("packet_Rx_3_signal");
-        packet_Rx_4 = registerSignal("packet_Rx_4_signal");
-        packet_Rx_wifi = registerSignal("packet_Rx_wifi_signal");
-        packet_Rx_total = registerSignal("packet_Rx_total_signal");
-
-        bytes_Rx_1 = registerSignal("bytes_Rx_1_signal");
-        bytes_Rx_2 = registerSignal("bytes_Rx_2_signal");
-        bytes_Rx_3 = registerSignal("bytes_Rx_3_signal");
-        bytes_Rx_4 = registerSignal("bytes_Rx_4_signal");
-        bytes_Rx_wifi = registerSignal("bytes_Rx_wifi_signal");
-        bytes_Rx_total = registerSignal("bytes_Rx_total_signal");
+        EV_INFO << "THREAD using APP THIS=" << sinkAppModule << endl;
 
 
 
@@ -190,6 +195,8 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         EV_INFO << "[PARSER] Tipo de Mensaje obtenido (int): " << tipoMensaje << "\n";
         EV_INFO << "[PARSER] Deadline obtenido (double): " << time_created << " segundos.\n";
 
+        EV_INFO << "Last value RX: "<< sinkAppModule->incrementPacket_Rx_test() <<endl;
+
         //const double maxWaitTime[NUM_PRIORITIES] = {2.0, 60.0, 900.0, 9600.0, 9650.0};
 
         double AoI1 = 0.0;
@@ -204,127 +211,175 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         double Deadline4 = 0.0;
         double Deadlinewifi = 0.0;
 
+        double  increment_packets_Rx = 0.0;
+        double  increment_packets_lost = 0.0;
+        double  increment_bytes_Rx = 0.0;
+        double  increment_bytes_lost = 0.0;
+
+        double time_current = 0.0;
+
         if(tipoMensaje == 0){// priority 1
 
             // DeadLine
             Deadline1 = (time_created + 2.0);
+            time_current = simTime().dbl();
             EV_ERROR << "DEADLINE 1: " << Deadline1 << endl;
-            if(Deadline1 > simTime().dbl()){
-                number_packet_Rx_1++;
-                number_bytes_Rx_1 += content.size();
-                number_packet_Rx_total++;
-                number_bytes_Rx_total += content.size();
+            if(Deadline1 > time_current){
+                sinkAppModule->number_packet_Rx_1++;
+                sinkAppModule->emit(TcpServerBusApp::packet_Rx_1,sinkAppModule->number_packet_Rx_1);
+                sinkAppModule->number_bytes_Rx_1 += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_Rx_1,sinkAppModule->number_bytes_Rx_1);
+                increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(content.size());
+                //EV_INFO << "PACKET Rx: " << content << " Numb: "<< increment_packets_Rx << endl;
             }else{
-                number_packet_lost_1++;
-                number_bytes_lost_1 += content.size();
-                number_packet_lost_total++;
-                number_bytes_lost_total += content.size();
+                sinkAppModule->number_packet_lost_1++;
+                sinkAppModule->emit(TcpServerBusApp::packet_lose_1,sinkAppModule->number_packet_lost_1);
+                sinkAppModule->number_bytes_lost_1 += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_lose_1,sinkAppModule->number_bytes_lost_1);
+                increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                increment_bytes_lost = sinkAppModule->incrementBytes_lost(content.size());
+                //EV_INFO << "PACKET avoid: " << content << " Numb: "<< increment_packets_lost << " val total rx: "<< sinkAppModule->incrementPacket_Rx_test() <<endl;
             }
-            emit(packet_Rx_1,number_packet_Rx_1);
-            emit(packet_lose_1,number_packet_lost_1);
-            emit(deadline_1, Deadline1);
+
+
+            sinkAppModule->emit(TcpServerBusApp::deadline_1, Deadline1-time_current);
             // age of information
             AoI1 = simTime().dbl() - time_created;
-            emit(fresh_priority_1, AoI1);
+            sinkAppModule->emit(TcpServerBusApp::fresh_priority_1, AoI1);
 
         }else if(tipoMensaje == 1){// priority 2
 
             // DeadLine
             Deadline2 = (time_created + 60.0);
+            time_current = simTime().dbl();
             EV_ERROR << "DEADLINE 2: " << Deadline2 << endl;
-            if(Deadline2 > simTime().dbl()){
-                number_packet_Rx_2++;
-                number_bytes_Rx_2 += content.size();
-                number_packet_Rx_total++;
-                number_bytes_Rx_total += content.size();
+            if(Deadline2 > time_current){
+                sinkAppModule->number_packet_Rx_2++;
+                sinkAppModule->emit(TcpServerBusApp::packet_Rx_2,sinkAppModule->number_packet_Rx_2);
+                sinkAppModule->number_bytes_Rx_2 += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_Rx_2,sinkAppModule->number_bytes_Rx_2);
+                increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(content.size());
+                //EV_INFO << "PACKET Rx: " << content << " Numb: "<< increment_packets_Rx << endl;
             }else{
-                number_packet_lost_2++;
-                number_bytes_lost_2 += content.size();
-                number_packet_lost_total++;
-                number_bytes_lost_total += content.size();
+                sinkAppModule->number_packet_lost_2++;
+                sinkAppModule->emit(TcpServerBusApp::packet_lose_2,sinkAppModule->number_packet_lost_2);
+                sinkAppModule->number_bytes_lost_2 += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_lose_2,sinkAppModule->number_bytes_lost_2);
+                increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                increment_bytes_lost = sinkAppModule->incrementBytes_lost(content.size());
+                //EV_INFO << "PACKET avoid: " << content << " Numb: "<< increment_packets_lost << " val total rx: "<< sinkAppModule->incrementPacket_Rx_test() <<endl;
             }
-            emit(packet_Rx_2,number_packet_Rx_2);
-            emit(packet_lose_2,number_packet_lost_2);
-            emit(deadline_2, Deadline2);
+
+
+            sinkAppModule->emit(TcpServerBusApp::deadline_2, Deadline2-time_current);
 
             AoI2 = simTime().dbl() - time_created;
-            emit(fresh_priority_2, AoI2);
+            sinkAppModule->emit(TcpServerBusApp::fresh_priority_2, AoI2);
 
         }else if(tipoMensaje == 2){// priority 3
 
             // DeadLine
             Deadline3 = (time_created + 900.0);
+            time_current = simTime().dbl();
             EV_ERROR << "DEADLINE 3: " << Deadline3 << endl;
-            if(Deadline3 > simTime().dbl()){
-                number_packet_Rx_3++;
-                number_bytes_Rx_3 += content.size();
-                number_packet_Rx_total++;
-                number_bytes_Rx_total += content.size();
+            if(Deadline3 > time_current){
+                sinkAppModule->number_packet_Rx_3++;
+                sinkAppModule->emit(TcpServerBusApp::packet_Rx_3,sinkAppModule->number_packet_Rx_3);
+                sinkAppModule->number_bytes_Rx_3 += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_Rx_3,sinkAppModule->number_bytes_Rx_3);
+                increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(content.size());
+                //EV_INFO << "PACKET Rx: " << content << " Numb: "<< increment_packets_Rx << endl;
             }else{
-                number_packet_lost_3++;
-                number_bytes_lost_3 += content.size();
-                number_packet_lost_total++;
-                number_bytes_lost_total += content.size();
+                sinkAppModule->number_packet_lost_3++;
+                sinkAppModule->emit(TcpServerBusApp::packet_lose_3,sinkAppModule->number_packet_lost_3);
+                sinkAppModule->number_bytes_lost_3 += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_lose_3,sinkAppModule->number_bytes_lost_3);
+                increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                increment_bytes_lost = sinkAppModule->incrementBytes_lost(content.size());
+                //EV_INFO << "PACKET avoid: " << content << " Numb: "<< increment_packets_lost << " val total rx: "<< sinkAppModule->incrementPacket_Rx_test() <<endl;
             }
-            emit(packet_Rx_3,number_packet_Rx_3);
-            emit(packet_lose_3,number_packet_lost_3);
-            emit(deadline_3, Deadline3);
+
+
+            sinkAppModule->emit(TcpServerBusApp::deadline_3, Deadline3-time_current);
 
             AoI3 = simTime().dbl() - time_created;
-            emit(fresh_priority_3, AoI3);
+            sinkAppModule->emit(TcpServerBusApp::fresh_priority_3, AoI3);
 
         }else if(tipoMensaje == 3){// priority 4
 
             // DeadLine
             Deadline4 = (time_created + 9600.0);
+            time_current = simTime().dbl();
             EV_ERROR << "DEADLINE 4: " << Deadline4 << endl;
-            if(Deadline4 > simTime().dbl()){
-                number_packet_Rx_4++;
-                number_bytes_Rx_4 += content.size();
-                number_packet_Rx_total++;
-                number_bytes_Rx_total += content.size();
+            if(Deadline4 > time_current){
+                sinkAppModule->number_packet_Rx_4++;
+                sinkAppModule->emit(TcpServerBusApp::packet_Rx_4,sinkAppModule->number_packet_Rx_4);
+                sinkAppModule->number_bytes_Rx_4 += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_Rx_4,sinkAppModule->number_bytes_Rx_4);
+                increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(content.size());
+                //EV_INFO << "PACKET Rx: " << content << " Numb: "<< increment_packets_Rx << endl;
             }else{
-                number_packet_lost_4++;
-                number_bytes_lost_4 += content.size();
-                number_packet_lost_total++;
-                number_bytes_lost_total += content.size();
+                sinkAppModule->number_packet_lost_4++;
+                sinkAppModule->emit(TcpServerBusApp::packet_lose_4,sinkAppModule->number_packet_lost_4);
+                sinkAppModule->number_bytes_lost_4 += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_lose_4,sinkAppModule->number_bytes_lost_4);
+                increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                increment_bytes_lost = sinkAppModule->incrementBytes_lost(content.size());
+                //EV_INFO << "PACKET avoid: " << content << " Numb: "<< increment_packets_lost << " val total rx: "<< sinkAppModule->incrementPacket_Rx_test() <<endl;
             }
-            emit(packet_Rx_4,number_packet_Rx_4);
-            emit(packet_lose_4,number_packet_lost_4);
-            emit(deadline_4, Deadline4);
+
+
+            sinkAppModule->emit(TcpServerBusApp::deadline_4, Deadline4-time_current);
 
             AoI4 = simTime().dbl() - time_created;
-            emit(fresh_priority_4, AoI4);
+            sinkAppModule->emit(TcpServerBusApp::fresh_priority_4, AoI4);
 
         }else if(tipoMensaje == 4){// priority wifi
 
             // DeadLine
             Deadlinewifi = (time_created + 9650.0);
+            time_current = simTime().dbl();
             EV_ERROR << "DEADLINE wifi: " << Deadlinewifi << endl;
-            if(Deadlinewifi > simTime().dbl()){
-                number_packet_Rx_wifi++;
-                number_bytes_Rx_wifi += content.size();
-                number_packet_Rx_total++;
-                number_bytes_Rx_total += content.size();
+            if(Deadlinewifi > time_current){
+                sinkAppModule->number_packet_Rx_wifi++;
+                sinkAppModule->emit(TcpServerBusApp::packet_Rx_wifi,sinkAppModule->number_packet_Rx_wifi);
+                sinkAppModule->number_bytes_Rx_wifi += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_Rx_wifi,sinkAppModule->number_bytes_Rx_wifi);
+                increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(content.size());
+                //EV_INFO << "PACKET Rx: " << content << " Numb: "<< increment_packets_Rx << endl;
             }else{
-                number_packet_lost_wifi++;
-                number_bytes_lost_wifi += content.size();
-                number_packet_lost_total++;
-                number_bytes_lost_total += content.size();
+                sinkAppModule->number_packet_lost_wifi++;
+                sinkAppModule->emit(TcpServerBusApp::packet_lose_wifi,sinkAppModule->number_packet_lost_wifi);
+                sinkAppModule->number_bytes_lost_wifi += (content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data
+                sinkAppModule->emit(TcpServerBusApp::bytes_lose_wifi,sinkAppModule->number_bytes_lost_wifi);
+                increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                increment_bytes_lost = sinkAppModule->incrementBytes_lost(content.size());
+                //EV_INFO << "PACKET avoid: " << content << " Numb: "<< increment_packets_lost << " val total rx: "<< sinkAppModule->incrementPacket_Rx_test() <<endl;
             }
-            emit(packet_Rx_wifi,number_packet_Rx_wifi);
-            emit(packet_lose_wifi,number_packet_lost_wifi);
-            emit(deadline_wifi, Deadlinewifi);
+
+
+            sinkAppModule->emit(TcpServerBusApp::deadline_wifi, Deadlinewifi-time_current);
 
             AoIwifi = simTime().dbl() - time_created;
-            emit(fresh_priority_wifi, AoIwifi);
+            sinkAppModule->emit(TcpServerBusApp::fresh_priority_wifi, AoIwifi);
 
+        }else{
+            EV_WARN << "message different to hop: " << tipoMensaje << endl;
         }
 
-        emit(packet_Rx_total,number_packet_Rx_total);
-        emit(bytes_Rx_total,number_bytes_Rx_total);
-        emit(packet_lose_total,number_packet_lost_total);
-        emit(bytes_lose_total,number_bytes_lost_total);
+        if(increment_packets_Rx > 0.0)
+            sinkAppModule->emit(TcpServerBusApp::packet_Rx_total,increment_packets_Rx);
+        if(increment_bytes_Rx > 0.0)
+            sinkAppModule->emit(TcpServerBusApp::bytes_Rx_total,increment_bytes_Rx);
+        if(increment_packets_lost > 0.0)
+            sinkAppModule->emit(TcpServerBusApp::packet_lose_total,increment_packets_lost);
+        if(increment_bytes_lost > 0.0)
+            sinkAppModule->emit(TcpServerBusApp::bytes_lose_total,increment_bytes_lost);
 
 
 

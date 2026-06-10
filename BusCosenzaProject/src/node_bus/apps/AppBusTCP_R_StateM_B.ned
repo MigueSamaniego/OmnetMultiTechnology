@@ -97,9 +97,9 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
         @statistic[inputBufferSize](title="Input Buffer Size"; source="inputBufferSize"; record=vector,last);
         @statistic[outputBufferSize_wifi](title="Output Buffer Size Wifi"; source="outputBufferSize_wifi"; record=vector,last);
         @statistic[outputBufferSize_lte](title="Output Buffer Size LTE"; source="outputBufferSize_lte"; record=vector,last);
-        @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last);
+        @statistic[sdcardBufferSize](title="SDCard Buffer Size"; source="sdcardBufferSize"; record=vector,last,stats);
 		//@statistic[sdcardUsage](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last; interpolationmode=linear);
-		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last);
+		@statistic[sdcardPercentSize](title="SDCard used (%)"; source="sdcardPercentSize"; record=vector,last,stats);
 		
 		@statistic[outputBytesInterface_wifi](title="Total Bytes Wifi"; source="outputBytesInterface_wifi"; record=vector,last);
 		@statistic[outputBytesInterface_lte](title="Total Bytes LTE"; source="outputBytesInterface_lte"; record=vector,last);
@@ -121,15 +121,15 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
 		@statistic[Cost_Data_lte_signal](title="Cost LTE [€]"; source="Cost_Data_lte_signal"; record=vector,last);
 		
 		// number of messajes on sdcard size
-		@statistic[buffer_priority_1](title="Buffer Priority Emergency"; source="buffer_priority_1"; record=vector,last);
-		@statistic[buffer_priority_2](title="Buffer Priority 2"; source="buffer_priority_2"; record=vector,last);
-		@statistic[buffer_priority_3](title="Buffer Priority 3"; source="buffer_priority_3"; record=vector,last);
-		@statistic[buffer_priority_4](title="Buffer Priority 4"; source="buffer_priority_4"; record=vector,last);
-		@statistic[buffer_priority_wifi](title="Buffer Priority WiFi"; source="buffer_priority_wifi"; record=vector,last);
+		@statistic[buffer_priority_1](title="Buffer Priority Emergency"; source="buffer_priority_1"; record=vector,last,stats);
+		@statistic[buffer_priority_2](title="Buffer Priority 2"; source="buffer_priority_2"; record=vector,last,stats);
+		@statistic[buffer_priority_3](title="Buffer Priority 3"; source="buffer_priority_3"; record=vector,last,stats);
+		@statistic[buffer_priority_4](title="Buffer Priority 4"; source="buffer_priority_4"; record=vector,last,stats);
+		@statistic[buffer_priority_wifi](title="Buffer Priority WiFi"; source="buffer_priority_wifi"; record=vector,last,stats);
         
         
-        @statistic[timeWiFiStateON](title= "WiFi Time Tx [s]"; source="timeWiFiStateON"; record=vector,last,mean);
-        @statistic[timeLTEStateON](title= "LTE Time Tx [s]"; source="timeLTEStateON"; record=vector,last,mean);
+        @statistic[timeWiFiStateON](title= "WiFi Time Tx [s]"; source="timeWiFiStateON"; record=vector,last,stats);
+        @statistic[timeLTEStateON](title= "LTE Time Tx [s]"; source="timeLTEStateON"; record=vector,last,stats);
         
         
         @statistic[numMsgTCPSend](title="TCP packet sent"; source="numMsgTCPSend"; record=vector,count,last);

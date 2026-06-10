@@ -5,30 +5,37 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="priority_4"/>
+		<item key="selection" value="record=vector,last"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="priority_4"/>
-			<item value="priority_wifi"/>
-			<item value="priority_3"/>
-			<item value="priority_2"/>
-			<item value="priority_1"/>
+			<item value="record=vector,last"/>
 			<item value="Strategy_Switching"/>
-			<item value="deadline_1"/>
-			<item value="bytes_lose_1"/>
-			<item value="packet"/>
+			<item value="detected_traffic_state"/>
+			<item value="content.size();"/>
+			<item value="lost"/>
+			<item value="packet_Rx_total_signal"/>
+			<item value="packet_Rx_total"/>
+			<item value="number_bytes_Rx_total"/>
+			<item value="sinkAppModule-&gt;number_bytes_Rx_total"/>
+			<item value="number_packet_Rx_1"/>
+			<item value="emit("/>
 			<item value="fresh_priority_1"/>
-			<item value="socket error 3"/>
-			<item value="stablishTCP"/>
-			<item value="estableciendo TCP PARA INTERFACE"/>
-			<item value="WiFi disable → Using interfaz celular"/>
-			<item value="timeout waiting for response from the Server"/>
+			<item value="fresh_priority"/>
+			<item value="simsignal_t"/>
+			<item value="packetReceiveServerTCPSignal"/>
 		</list>
 		<list key="replacehistory">
+			<item value="record=vector,last,min,max,stddev"/>
+			<item value="(content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data"/>
+			<item value="expired"/>
+			<item value="expired "/>
+			<item value="sinkAppModule-&gt;emit(TcpServerBusApp::"/>
+			<item value="simsignal_t TcpServerBusApp::fresh_priority"/>
+			<item value="static simsignal_t"/>
 			<item value="bytes"/>
 			<item value="time_created"/>
 			<item value="AoI"/>
@@ -37,13 +44,6 @@
 			<item value="vehicle"/>
 			<item value="GW_Battery_mAh"/>
 			<item value="GW_Battery"/>
-			<item value="Priority_3"/>
-			<item value="AppBusTCP_StateM"/>
-			<item value="AppBusTCP_R_StateM"/>
-			<item value="time_threshold_send_data"/>
-			<item value="packetReceiveServerTCPSignal"/>
-			<item value="TcpServerBusApp_R"/>
-			<item value="#ifndef __INET_TCPSERVERBUSAPP_H&#x0A;#define __INET_TCPSERVERBUSAPP_H"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

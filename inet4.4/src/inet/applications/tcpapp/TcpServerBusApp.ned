@@ -82,19 +82,19 @@ module TcpServerBusApp extends TcpServerHostApp
 		@statistic[deadline_4_signal](title= "Deadline_4 [s]"; source="deadline_4_signal"; record=vector,last,mean);
 		@statistic[deadline_wifi_signal](title= "Deadline_wifi [s]"; source="deadline_wifi_signal"; record=vector,last,mean);
 		
-		@statistic[packet_lose_1_signal](title= "Packet lost 1"; source="packet_lose_1_signal"; record=vector,last,mean);
-		@statistic[packet_lose_2_signal](title= "Packet lost 2"; source="packet_lose_2_signal"; record=vector,last,mean);
-		@statistic[packet_lose_3_signal](title= "Packet lost 3"; source="packet_lose_3_signal"; record=vector,last,mean);
-		@statistic[packet_lose_4_signal](title= "Packet lost 4"; source="packet_lose_4_signal"; record=vector,last,mean);
-		@statistic[packet_lose_wifi_signal](title= "Packet lost wifi"; source="packet_lose_wifi_signal"; record=vector,last,mean);
-		@statistic[packet_lose_total_signal](title= "Packet lost total"; source="packet_lose_total_signal"; record=vector,last,mean);
+		@statistic[packet_lose_1_signal](title= "Packet expired 1"; source="packet_lose_1_signal"; record=vector,last,mean);
+		@statistic[packet_lose_2_signal](title= "Packet expired  2"; source="packet_lose_2_signal"; record=vector,last,mean);
+		@statistic[packet_lose_3_signal](title= "Packet expired  3"; source="packet_lose_3_signal"; record=vector,last,mean);
+		@statistic[packet_lose_4_signal](title= "Packet expired  4"; source="packet_lose_4_signal"; record=vector,last,mean);
+		@statistic[packet_lose_wifi_signal](title= "Packet expired wifi"; source="packet_lose_wifi_signal"; record=vector,last,mean);
+		@statistic[packet_lose_total_signal](title= "Packet expired total"; source="packet_lose_total_signal"; record=vector,last,mean);
 		
-		@statistic[bytes_lose_1_signal](title= "Bytes lost 1 [B]"; source="bytes_lose_1_signal"; record=vector,last,mean);
-		@statistic[bytes_lose_2_signal](title= "Bytes lost 2 [B]"; source="bytes_lose_2_signal"; record=vector,last,mean);
-		@statistic[bytes_lose_3_signal](title= "Bytes lost 3 [B]"; source="bytes_lose_3_signal"; record=vector,last,mean);
-		@statistic[bytes_lose_4_signal](title= "Bytes lost 4 [B]"; source="bytes_lose_4_signal"; record=vector,last,mean);
-		@statistic[bytes_lose_wifi_signal](title= "Bytes lost wifi [B]"; source="bytes_lose_wifi_signal"; record=vector,last,mean);
-		@statistic[bytes_lose_total_signal](title= "Bytes lost total [B]"; source="bytes_lose_total_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_1_signal](title= "Bytes expired 1 [B]"; source="bytes_lose_1_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_2_signal](title= "Bytes expired 2 [B]"; source="bytes_lose_2_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_3_signal](title= "Bytes expired 3 [B]"; source="bytes_lose_3_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_4_signal](title= "Bytes expired 4 [B]"; source="bytes_lose_4_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_wifi_signal](title= "Bytes expired wifi [B]"; source="bytes_lose_wifi_signal"; record=vector,last,mean);
+		@statistic[bytes_lose_total_signal](title= "Bytes expired total [B]"; source="bytes_lose_total_signal"; record=vector,last,mean);
 		
 		@statistic[packet_Rx_1_signal](title= "Packet Rx 1"; source="packet_Rx_1_signal"; record=vector,last,mean);
 		@statistic[packet_Rx_2_signal](title= "Packet Rx 2"; source="packet_Rx_2_signal"; record=vector,last,mean);
