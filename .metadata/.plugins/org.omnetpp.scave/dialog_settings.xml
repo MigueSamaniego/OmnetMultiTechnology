@@ -20,15 +20,15 @@
 		<item key="active-tab" value="Input"/>
 	</section>
 	<section name="org.omnetpp.scave.editors.ui.ConfigureChartDialog">
-		<item key="DIALOG_X_ORIGIN" value="108"/>
-		<item key="DIALOG_Y_ORIGIN" value="158"/>
+		<item key="DIALOG_X_ORIGIN" value="798"/>
+		<item key="DIALOG_Y_ORIGIN" value="196"/>
 		<item key="DIALOG_WIDTH" value="827"/>
 		<item key="DIALOG_HEIGHT" value="711"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
 	</section>
 	<section name="org.omnetpp.scave.editors.ui.EditChartPagesDialog">
 		<item key="mainSash.weights" value="200 800"/>
-		<item key="contentSash.weights" value="200 200"/>
+		<item key="contentSash.weights" value="500 500"/>
 		<item key="DIALOG_X_ORIGIN" value="237"/>
 		<item key="DIALOG_Y_ORIGIN" value="58"/>
 		<item key="DIALOG_WIDTH" value="613"/>

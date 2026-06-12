@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<analysis version="2">
+    <inputs>
+        <input pattern="/BusCosenzaProject/simulations/BusCosenza/cars/results/ETA2/BL_Win_Fix.vec"/>
+        <input pattern="/BusCosenzaProject/simulations/BusCosenza/cars/results/ETA2/BL_Win_Fix.sca"/>
+    </inputs>
+    <charts/>
+</analysis>

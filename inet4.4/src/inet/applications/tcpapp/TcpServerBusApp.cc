@@ -283,7 +283,7 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
             // DeadLine
             Deadline3 = (time_created + 900.0);
             time_current = simTime().dbl();
-            EV_ERROR << "DEADLINE 3: " << Deadline3 << endl;
+            EV_ERROR << "DEADLINE 3: " << Deadline3 << " size: " << content.size() << endl;
             if(Deadline3 > time_current){
                 sinkAppModule->number_packet_Rx_3++;
                 sinkAppModule->emit(TcpServerBusApp::packet_Rx_3,sinkAppModule->number_packet_Rx_3);
@@ -374,12 +374,16 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
 
         if(increment_packets_Rx > 0.0)
             sinkAppModule->emit(TcpServerBusApp::packet_Rx_total,increment_packets_Rx);
-        if(increment_bytes_Rx > 0.0)
+        if(increment_bytes_Rx > 0.0){
+            EV_ERROR << "bytes size: " << increment_bytes_Rx << endl;
             sinkAppModule->emit(TcpServerBusApp::bytes_Rx_total,increment_bytes_Rx);
+        }
         if(increment_packets_lost > 0.0)
             sinkAppModule->emit(TcpServerBusApp::packet_lose_total,increment_packets_lost);
-        if(increment_bytes_lost > 0.0)
+        if(increment_bytes_lost > 0.0){
+            EV_ERROR << "bytes size lost: " << increment_bytes_lost << endl;
             sinkAppModule->emit(TcpServerBusApp::bytes_lose_total,increment_bytes_lost);
+        }
 
 
 

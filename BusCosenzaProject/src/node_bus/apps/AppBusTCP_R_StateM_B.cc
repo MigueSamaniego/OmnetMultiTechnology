@@ -518,7 +518,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                         //Strategy_Switching = 0 --> no strategy
                         //Strategy_Switching = 1 --> WIFI
                         //Strategy_Switching = 2 --> LTE
-                        //Strategy_Switching = 3 --> Dead line (wifi and LTE)
+                        //Strategy_Switching = 3 --> Deadline (wifi and LTE)
                         //Strategy_Switching = 4 --> wifi and LTE (without deadline)
 
 
@@ -1145,7 +1145,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                             // ******************* Detect an anomaly on socket, start timeOut reestablish/new socket ********************
                             if(socket_state_close){
-
+                                EV_INFO << "val reTX: " << count_reTX << "socket state: " << socket_ready << "socket get: " << socket.getState() << endl;
                                 count_reTX++;
                                 if(count_reTX % 100 == 0) {
                                     EV_INFO << "Cooldown... " << (count_reTX/100) << " Seconds." << endl;
@@ -1172,6 +1172,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                                 count_reTX = 0;
                                             }
                                         }else if(Strategy_Switching==3){
+                                            EV_INFO << "runing switching: " << count_reTX << endl;
                                             if(!stablishTCP(ConnectionToAP)){
                                                 EV_WARN << "ERROR CREATING NEW SOCKET, retrying..." << endl;
                                                 count_reTX = 0;
@@ -1188,8 +1189,12 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
 
                                     if(count_reTX >= (waiting_changing_x_10ms + 500)){
-                                        EV_WARN << "timeout waiting for response from the Server. Aborting and restarting cycle." << endl;
-                                        count_reTX = 0;
+                                        EV_WARN << "timeout waiting for response from the Server. Aborting and restarting cycle: --> socket state: " << socket.getState() << endl;
+                                        count_reTX = waiting_changing_x_10ms -1;
+                                        if (socket.getState() != inet::TcpSocket::CLOSED){
+                                            socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
+                                            EV_ERROR << "NOW IS CLOSE sure of socket" << endl;
+                                        }
                                     }
 
                                 }/*else if ((count_reTX < (waiting_changing_x_10ms + 1))&&(socket.getState() == inet::TcpSocket::CONNECTED) ){
@@ -1639,7 +1644,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                             // -------------------------------------- check expiration DATA ------------------------------------------------------
                             // -------------------------------------- Depend of state of WIFI ----------------------------------------------------
                             // -------------------------------------------------------------------------------------------------------------------
-                            EV_WARN << "TEST WIFI: " << ConnectionToAP << " socket val: "<< socket_ready <<endl;
+                            //EV_WARN << "TEST WIFI: " << ConnectionToAP << " socket val: "<< socket_ready <<endl;
                             if(Strategy_Switching == 1){
                                 if(ConnectionToAP){
                                     if(socket_ready){
@@ -2259,7 +2264,7 @@ void AppBusTCP_R_StateM_B::interfaceAvailable(){
         EV_INFO << "Default route added via CELLULAR (gw=10.0.0.1)" << endl;
 
     }else if((Strategy_Switching == 3)||(Strategy_Switching == 4)){
-
+        EV_INFO << "estate of wifi by strategy 3: " << ConnectionToAP << "socket state: " << socket_ready << endl;
         if(ConnectionToAP){
             //------------------ start counter time --------------------
             //connectionWiFiStart = simTime();

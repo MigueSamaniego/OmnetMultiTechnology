@@ -514,7 +514,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         measure_stage = false;
 
                         windows_fix = true; // i sent 5min of data
-                        Strategy_Switching = 3;
+                        Strategy_Switching = 1;
                         //Strategy_Switching = 0 --> no strategy
                         //Strategy_Switching = 1 --> WIFI
                         //Strategy_Switching = 2 --> LTE
@@ -1069,14 +1069,19 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                              ******* *****************************************************/
                             EV_ERROR << "interface ojo: " << ConnectionToAP << endl;
                             if(Strategy_Switching==1){
-                                if(fix_interface){
+                                if(ConnectionToAP != ConnectionToAP_Pass){
+                                    EV_ERROR << "cambiando de interface" << endl;
                                     interfaceAvailable();
-                                    fix_interface = false;
+                                    EV_ERROR << "cambio realizado" << endl;
                                     socket_ready = false;
                                     socket_state_close = true;
+
                                     count_reTX = waiting_changing_x_10ms -1;    // obligamos a crear el socket con la nueva tecnologia
+
                                     time_threshold_send_data = 900000; // dont execute the send data function
                                     timer_Control_Send_Data = 0;
+
+                                    ConnectionToAP_Pass = ConnectionToAP;
                                 }
 
                             }else if(Strategy_Switching==2){
@@ -1184,10 +1189,14 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                     if(count_reTX >= (waiting_changing_x_10ms + 500)){
                                         EV_WARN << "timeout waiting for response from the Server. Aborting and restarting cycle." << endl;
-                                        count_reTX = 0;
+                                        count_reTX = waiting_changing_x_10ms -1;
+                                        if (socket.getState() != inet::TcpSocket::CLOSED){
+                                            socket.close(); // the socket is close only when we use Cellular interface, because dont lose the connection. for WIFI the connection is break, we can't send session finish
+                                            EV_ERROR << "NOW IS CLOSE sure of socket" << endl;
+                                        }
                                     }
 
-                                }else if ((count_reTX < (waiting_changing_x_10ms + 1))&&(socket.getState() == inet::TcpSocket::CONNECTED) ){
+                                }/*else if ((count_reTX < (waiting_changing_x_10ms + 1))&&(socket.getState() == inet::TcpSocket::CONNECTED) ){
 
                                     socket_state_close = false;
                                     count_reTX = 0;
@@ -1199,7 +1208,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                     time_threshold_send_data = 5; // this is the time after stablish the link, so GW wait 50ms before to send
                                     timer_Control_Send_Data = 0;
-                                }
+                                }*/
 
                                 //********************************** check if the new socket was created successful **************************************
                                 if ((count_reTX >= (waiting_changing_x_10ms + 2)) && (socket.getState() == inet::TcpSocket::CONNECTED)) {
