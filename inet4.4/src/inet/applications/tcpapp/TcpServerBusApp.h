@@ -103,9 +103,13 @@ class INET_API TcpServerBusApp : public TcpServerHostApp
       double number_bytes_Rx_total = 0.0;
 
   public:
-      double incrementPacket_Rx_test() { return number_packet_Rx_total; }
-      double incrementPacket_Rx() { return ++number_packet_Rx_total; }
-      double incrementPacket_lost() { return ++number_packet_lost_total; }
+      double CurrentPacket_Rx_test() { return number_packet_Rx_total; }
+      double CurrentPacket_lost_test() { return number_packet_lost_total; }
+      double CurrentBytes_Rx_test() { return number_bytes_Rx_total; }
+      double CurrentBytes_lost_test() { return number_bytes_lost_total; }
+
+      double incrementPacket_Rx() { return number_packet_Rx_total++; }
+      double incrementPacket_lost() { return number_packet_lost_total++; }
       double incrementBytes_Rx(long val) { return number_bytes_Rx_total+= val; }
       double incrementBytes_lost(long val) { return number_bytes_lost_total+= val; }
 
@@ -147,6 +151,10 @@ class INET_API TcpServerBusAppThread : public TcpServerThreadBase
 
 
   public:
+
+    std::string storageBuffer = ""; // Buffer persistente por hilo
+
+
     // Destructor to clean socket if it was closed
     virtual ~TcpServerBusAppThread();
 

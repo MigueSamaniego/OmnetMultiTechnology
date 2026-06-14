@@ -1,6 +1,8 @@
 DataTable.HISTOGRAMS.Module.width=221
 DataTable.HISTOGRAMS.Name.width=268
-DataTable.PARAMETERS.Module.width=195
+DataTable.PARAMETERS.Module.width=256
+DataTable.PARAMETERS.Name.width=171
+DataTable.PARAMETERS.Value.width=137
 DataTable.SCALARS.Experiment.width=158
 DataTable.SCALARS.Folder.width=78
 DataTable.SCALARS.Module.width=270

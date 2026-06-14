@@ -1,0 +1,974 @@
+# Example simulation for integrating veins (http://veins.car2x.org/) with Simu5G
+# 
+# Requirements:
+#       You need to enable the feature "Simu5G Cars" for this simulation
+#       (Project->Properties->OMNeT++->Project Features)
+#
+#       You need to import the "veins" project and its subproject
+#       "veins_inet" in your workspace.
+[General]
+cmdenv-express-mode = true
+cmdenv-autoflush = true
+image-path = ../../images
+network = simulations.BusCosenza.cars.HighwayTCP
+
+#output-vector-file = "${resultdir}/${configname}-${iterationvarsf}-${repetition}.vec"
+#output-scalar-file = "${resultdir}/${configname}-${iterationvarsf}-${repetition}.sca"
+
+
+##########################################################
+#            Simulation parameters                       #
+##########################################################
+
+debug-on-errors = true
+record-eventlog = false
+print-undisposed = false
+
+sim-time-limit = 3500s#3750s
+
+#**.sctp.**.scalar-recording = false
+#**.sctp.**.vector-recording = false
+**.scalar-recording = true
+**.vector-recording = true
+**.app.*.vector-recording = true
+#**.bus[*].app.*.vector-recording = true
+#**.appBusDataCollectionUDP.*.vector-recording = true
+**.routingRecorder.enabled = false
+
+**.app[*].inputBufferSize.result-recording-modes = +vector
+**.app[*].outputBufferSize.result-recording-modes = +vector
+**.app[*].sdcardBufferSize.result-recording-modes = +vector
+
+
+
+*.playgroundSizeX = 10989m
+*.playgroundSizeY = 19063m
+*.playgroundSizeZ = 50m
+
+##########################################################
+# Annotation parameters                                  #
+##########################################################
+*.annotations.draw = true
+
+
+##########################################################
+# Obstacle parameters                                    #
+##########################################################
+*.obstacles.obstacles = xmldoc("./config.xml", "//AnalogueModel[@type='SimpleObstacleShadowing']/obstacles")
+
+
+##########################################################
+#            VeinsManager parameters                     #
+##########################################################
+*.veinsManager.host = "localhost"
+
+#*.veinsManager.moduleType = "src.node_bus.cars.BusGW"
+
+# 1. Ambos usan BusGW, porque sabemos que ese módulo sí existe y funciona
+*.veinsManager.moduleType = "CONSORZIO_AUTOLINEE_DUE=src.node_bus.cars.BusGW car_private=src.node_bus.cars.BusGW car_private2=src.node_bus.cars.BusGW"
+
+# 2. Los separamos por nombre para tratarlos de forma distinta
+*.veinsManager.moduleName = "CONSORZIO_AUTOLINEE_DUE=bus car_private=trafficCar car_private2=trafficCar"
+
+# 3. La cadena vacía para evitar errores del parser
+*.veinsManager.moduleDisplayString = ""
+
+#*.veinsManager.moduleName = "bus"
+*.veinsManager.launchConfig = xmldoc("cosenza.launchd.xml")
+*.veinsManager.updateInterval = 0.1s
+ 
+##########################################################
+#                      Mobility                          #
+##########################################################
+*.bus[*].mobility.typename = "src.node_bus.apps.VeinsInetMobility"
+
+############### IPv4 configurator LET #################
+*.configurator.config = xmldoc("./demo.xml")
+*.configurator.dumpAddresses = true
+*.configurator.dumpRoutes = true
+*.configurator.verbose = true
+
+#############################################################
+#					interface wifi BUS						#
+#############################################################
+*.bus[*].ipv4.configurator.typename = "HostAutoConfiguratorM"
+*.bus[*].ipv4.configurator.interfaces = "cellular lo0 wlan0"
+*.bus[*].ipv4.configurator.addressBase = "10.0.0.1"
+*.bus[*].ipv4.configurator.netmask = "255.255.0.0"
+*.bus[*].ipv4.configurator.addressBaseWlan = "192.168.0.1"
+*.bus[*].ipv4.configurator.netmaskWlan  = "255.255.0.0"
+
+#############################################################
+#					interface wifi APP						#
+#############################################################
+#*.ap[*].ipv4.configurator.typename = "HostAutoConfiguratorAP_M"
+#*.ap[*].ipv4.configurator.interfaces = "wlan0 eth0"
+#*.ap[*].ipv4.configurator.addressBase = "192.168.0.1"
+#*.ap[*].ipv4.configurator.netmask = "255.255.0.0"
+#*.ap[*].ipv4.configurator.addressBasePPP = "15.0.0.1"
+#*.ap[*].ipv4.configurator.netmaskPPP = "255.255.255.0"
+
+##########################################################
+#              CONFIGURATION APP AND RADIO               #
+##########################################################
+
+#*.bus[*].app[0].typename = "src.node_bus.apps.AppBusDataCollectionTCP"
+#*.bus[*].app[0].typename = "src.node_bus.apps.AppBusDataCollectionTCP_R"
+#*.bus[*].app[0].typename = "src.node_bus.apps.AppBusTCP_StateM"
+
+# Vehilces app configuration 
+*.bus[*].numWlanInterfaces = 1
+*.bus[*].numApps = 1
+*.bus[*].app[0].typename = "src.node_bus.apps.AppBusTCP_R_StateM_B"
+#*.bus[*].app[0].typename = "src.node_bus.apps.AppBusTCP_R_StateM"
+*.bus[*].app[0].interface = "wlan0"
+*.bus[*].hasTcp = true 	# -->--->--->--> dont forget that TCP it must available on bus --------------
+
+# Vehicles without interface wlan
+*.trafficCar[*].numWlanInterfaces = 0
+*.trafficCar[*].hasTcp = false
+*.trafficCar[*].cellularNic.typename = ""
+*.trafficCar[*].numApps = 1
+*.trafficCar[*].app[0].typename = "inet.applications.pingapp.PingApp"
+*.trafficCar[*].masterId = 0
+*.trafficCar[*].mobility.typename = "src.node_bus.apps.VeinsInetMobility"
+
+
+
+# Vehilces WIFI interface 
+*.bus[*].wlan[*].opMode = "n(mixed-2.4Ghz)"
+*.bus[*].wlan[*].radio.typename = "Ieee80211DimensionalRadio"
+*.bus[*].wlan[*].radio.bandName = "2.4 GHz"
+*.bus[*].wlan[*].radio.channelNumber = 3
+*.bus[*].wlan[*].radio.transmitter.power = 0.20mW
+*.bus[*].wlan[*].radio.receiver.sensitivity = -89dBm   # límite de recepción
+*.bus[*].wlan[*].radio.receiver.snirThreshold = 4dB    # mínimo SNIR
+*.bus[*].wlan[*].radio.bandwidth = 2 MHz
+*.bus[*].wlan[*].radio.antenna.mobility.typename = "AttachedMobility"
+*.bus[*].wlan[*].radio.antenna.mobility.mobilityModule = "^.^.^.^.mobility"
+*.bus[*].wlan[*].radio.antenna.mobility.offsetX = -2.5m
+*.bus[*].wlan[*].radio.antenna.mobility.offsetZ = 1.5m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinX = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxX = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinY = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxY = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinZ = 0m
+*.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxZ = 0m
+*.bus[*].wlan[*].mgmt.typename = "Ieee80211MgmtSta"
+*.bus[*].wlan[*].mac.typename = "Ieee80211MacM"
+*.bus[*].wlan[*].agent.typename = "Ieee80211AgentSta"
+*.bus[*].wlan[*].agent.defaultSsid = "Spintel"
+*.bus[*].wlan[*].agent.activeScan = true
+*.bus[*].wlan[*].agent.channelsToScan = "3"
+
+# Vehilces cellular interface 
+*.bus[*].cellularNic.channelModel[*].tolerateMaxDistViolation = true
+
+
+###########################################################
+#			accident Bus time configuration
+###########################################################
+
+*.bus[0].app[0].accident_start = 100s
+*.bus[0].app[0].accidentDuration = 300s
+*.bus[0].app[0].event_accident = false
+
+*.bus[0].app[0].GW_Battery_Capacity_mAh = 500mAh
+*.bus[0].app[0].GW_Battery_Level_Start = 100 # value %
+
+# distance setpoint = -54.8598m
+#distance_Go = distance and time of trip: 9954.38m 1077.2s
+#distance_Return = 11860.3m 1092.1s
+
+
+
+
+## ===================================================================
+## CONFIGURACIÓN DE ENERGÍA CON SIMPLECCBATTERY (Basado en mAh y mA)
+## ===================================================================
+#
+## 1. Activar el tipo de batería exacto que tienes en tu carpeta
+#*.bus[*].energyStorage.typename = "SimpleCcBattery"
+#
+## 2. Configurar la capacidad física (Ejemplo: Batería estándar de 5000 mAh)
+#*.bus[*].energyStorage.nominalCapacity = 5000mAh
+#*.bus[*].energyStorage.initialCapacity = 5000mAh
+#
+## 3. EL TRUCO PARA EL GATEWAY: Consumo base constante de 100mA
+## El módulo SimpleCcBattery tiene internamente un parámetro para simular 
+## una corriente de autodescarga constante o una carga inicial pasiva fija.
+## Configurando esto en 100mA, la batería drenará esa corriente pase lo que pase.
+##*.bus[*].energyStorage.constantCurrentConsumption = 100mA
+#
+## 4. Vincular la interfaz de Radio WiFi (wlan) al almacén de energía
+## Buscamos el consumidor de corriente nativo que tu radio WiFi ya sabe usar en INET
+#*.bus[*].wlan[*].radio.energyConsumer.typename = "StateBasedCcEnergyConsumer"
+#*.bus[*].wlan[*].radio.energyConsumer.offCurrentConsumption = 100mA
+#*.bus[*].wlan[*].radio.energyConsumer.sleepCurrentConsumption = 10mA
+##*.bus[*].wlan[*].radio.energyConsumer.idlePowerConsumption = 20mA      # Esperando en reposo
+#*.bus[*].wlan[*].radio.energyConsumer.receiverReceivingCurrentConsumption = 60mA  # Recibiendo ráfagas
+#*.bus[*].wlan[*].radio.energyConsumer.transmitterTransmittingCurrentConsumption = 120mA # Transmitiendo reportes
+
+
+###########################################################
+#			AP WIFI 
+###########################################################
+*.ap[*].wlan[*].opMode = "n(mixed-2.4Ghz)"	# opMode @enum("a","b","g(erp)","g(mixed)","n(mixed-2.4Ghz)","p","ac") = default("g(mixed)");
+*.ap[*].wlan[*].radio.typename = "Ieee80211DimensionalRadio"
+*.ap[*].wlan[*].radio.bandName = "2.4 GHz"
+*.ap[*].wlan[*].radio.channelNumber = 3
+*.ap[*].wlan[*].radio.transmitter.power = 0.20mW
+*.ap[*].wlan[*].radio.receiver.sensitivity = -89dBm   # límite de recepción
+*.ap[*].wlan[*].radio.receiver.snirThreshold = 4dB    # mínimo SNIR
+*.ap[*].wlan[*].radio.bandwidth = 10 MHz
+*.ap[*].wlan[*].radio.antenna.mobility.typename = "AttachedMobility"
+*.ap[*].wlan[*].radio.antenna.mobility.mobilityModule = "^.^.^.^.mobility"
+*.ap[*].wlan[*].radio.antenna.mobility.offsetX = -2.5m
+*.ap[*].wlan[*].radio.antenna.mobility.offsetZ = 1.5m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinX = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxX = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinY = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxY = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinZ = 0m
+*.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxZ = 0m
+
+*.ap[*].wlan[*].mgmt.typename = "Ieee80211MgmtAp"
+*.ap[*].wlan[*].mac.typename = "Ieee80211Mac"
+*.ap[*].wlan[*].agent.typename = ""
+*.ap[*].wlan[*].mgmt.ssid = "Spintel"
+*.ap[*].wlan[*].mgmt.beaconInterval = 0.1s  # each 100 ms
+
+
+*.ap[*].mobility.typename = "StationaryMobility"
+*.ap[*].mobility.initFromDisplayString = false
+
+# ********* important for forwarding data Ethe <-> WIFI
+*.ap[*].numWlanInterfaces = 1
+
+# *****************************************************
+###############################################################
+# choose protocolo TCP type
+###############################################################
+
+#**.tcp.tcpAlgorithmClass = "TcpReno"	#"TcpVegas","TcpWestwood","TcpNewReno","TcpReno","TcpTahoe","TcpNoCongestionControl") = default("TcpReno");
+**.tcp.typename = "Tcp"
+**.tcp.mss = 1452
+**.tcp.advertisedWindow = 65535
+
+## Specific configuration for the BUS (Client - Like ESP8266)
+#**.bus[*].tcp.typename = "Tcp"
+#**.bus[*].tcp.tcpAlgorithmClass = "TcpNewReno"
+#**.bus[*].tcp.mss = 1460
+#**.bus[*].tcp.advertisedWindow = 2920
+#
+## Specific configuration for the SERVER (The Cloud)
+#**.server.tcp.typename = "Tcp"
+#**.server.tcp.tcpAlgorithmClass = "TcpNewReno"    # Servers usually use Cubic
+#**.server.tcp.mss = 1460
+#**.server.tcp.advertisedWindow = 65535
+
+###############################################################
+#				positions AP
+###############################################################
+
+*.numAPs = 2
+
+# Unical Bus Station
+*.ap[0].mobility.initialX = 3543.52m#3543.52
+*.ap[0].mobility.initialY = 5712.03m
+*.ap[0].mobility.initialZ = 2m
+
+# BUS STATION COSENZA
+#*.ap[1].mobility.initialX = 5850.89m
+#*.ap[1].mobility.initialY = 11486.75m
+#*.ap[1].mobility.initialZ = 2m
+
+# CHIESA
+*.ap[1].mobility.initialX = 3132.72m
+*.ap[1].mobility.initialY = 6220.97m
+*.ap[1].mobility.initialZ = 2m
+
+# MetroPolis
+#*.ap[3].mobility.initialX = 4600.01m
+#*.ap[3].mobility.initialY = 7941.41m
+#*.ap[3].mobility.initialZ = 2m
+
+
+##########################################################
+#              LTE specific parameters                   #
+##########################################################
+*.eNodeB1.mobility.initFromDisplayString = false
+*.eNodeB1.mobility.initialX = 3634m
+*.eNodeB1.mobility.initialY = 6300m
+*.eNodeB1.mobility.initialZ = 20m
+
+*.eNodeB2.mobility.initFromDisplayString = false
+*.eNodeB2.mobility.initialX = 6500m
+*.eNodeB2.mobility.initialY = 8662m
+*.eNodeB2.mobility.initialZ = 20m
+
+*.eNodeB3.mobility.initFromDisplayString = false
+*.eNodeB3.mobility.initialX = 4000m
+*.eNodeB3.mobility.initialY = 10562m
+*.eNodeB3.mobility.initialZ = 20m
+
+
+*.server.numApps = 1
+*.server.app[0].typename = "TcpServerBusApp"
+#*.server.app[0].typename = "TcpServerBusApp_R"
+*.server.app[0].localPort = 3000
+
+#-------------------------------------
+
+*.configurator.assignAddresses = true
+*.configurator.addStaticRoutes = true
+*.configurator.addDefaultRoutes = true
+*.configurator.optimizeRoutes = false
+# ------------------------------------------------------------
+############################################################
+# RADIO LINK
+############################################################
+**.wlan[*].radio.antenna.mobilityModule = "^.^.^.mobility"
+#*.channelControl.propagationModel = "RuralMacrocell"
+
+# Number of Resource Blocks
+**.numBands = 25 
+
+# Transmission Power
+**.ueTxPower = 26#26
+**.eapBTxPower = 46#46
+
+
+
+# Enable dynamic association of UEs (based on best SINR)
+*.bus[*].cellularNic.phy.dynamicCellAssociation = true
+**.bus[*].masterId = 1     # useless if dynamic association is disabled
+**.bus[*].macCellId = 1    # useless if dynamic association is disabled
+
+# eNodeB configuration
+**.eNodeB1.macCellId = 1
+**.eNodeB1.macNodeId = 1
+**.eNodeB2.macCellId = 2
+**.eNodeB2.macNodeId = 2 
+
+**.eNodeB3.macCellId = 3
+**.eNodeB3.macNodeId = 3 
+
+
+# Enable handover
+*.bus[*].cellularNic.phy.enableHandover = true
+*.eNodeB*.cellularNic.phy.enableHandover = true
+*.eNodeB*.cellularNic.phy.handoverLatency = 50ms #50ms
+*.eNodeB*.cellInfo.broadcastMessageInterval = 1s # eNB will sends broadcast triggers every second
+
+# X2 and SCTP configuration
+*.eNodeB*.numX2Apps = 2    # one x2App per peering eNodeB
+
+*.eNodeB*.x2App[*].server.localPort = 5000 + ancestorIndex(1) # Server ports (x2App[0]=5000, x2App[1]=5001, ...)
+
+# --- Conexiones de eNodeB1 (a 2 y 3) ---
+*.eNodeB1.x2App[0].client.connectAddress = "eNodeB2%x2ppp0"
+*.eNodeB1.x2App[1].client.connectAddress = "eNodeB3%x2ppp0"
+
+*.eNodeB2.x2App[0].client.connectAddress = "eNodeB1%x2ppp0"
+*.eNodeB2.x2App[1].client.connectAddress = "eNodeB3%x2ppp0"
+
+*.eNodeB3.x2App[0].client.connectAddress = "eNodeB1%x2ppp0"
+*.eNodeB3.x2App[1].client.connectAddress = "eNodeB2%x2ppp0"
+
+**.sctp.nagleEnabled = false         # if true, transmission of small packets will be delayed on the X2
+**.sctp.enableHeartbeats = true	# true is used to model failures and reconnections
+
+
+# =======================
+#  range
+# =======================
+
+# === visualization WiFi ===
+*.visualizer.mediumVisualizer.displayCommunicationRanges = true
+*.visualizer.mediumVisualizer.displayInterferenceRanges = false
+
+
+# ****************  estudiar modelos ****************************
+#*.channelControl.propagationModel = "LogNormalShadowingModel"
+*.channelControl.propagationModel = "RuralMacrocell"
+*.radioMedium.pathLoss.typename = "LogNormalShadowing"
+*.radioMedium.backgroundNoise.power = -110dBm
+
+
+##########################################################
+#        ACTIVACIÓN DE EMISIÓN DE SEÑALES DE RADIO       #
+##########################################################
+**.wlan[0].radio.receiver.receptionResult.result-recording-modes = +vector
+**.cellularNic.phy.servingCellRsrp.result-recording-modes = +vector
+
+
+
+#*.switch.numEthInterfaces = 50
+#**.switch.macTable.agingTime = 15s
+
+
+# *************** network delay ********************
+# delay = replaceUnit(length / 2e8, "s");
+# change the cable type on HighwayTCP.ned, use the "MyDelayLink" in the connections
+#***************************************************
+#**.channel.delay = 100ms
+
+#*.server.pppg[*].channel.delay = 50ms
+#*.ap[*].ethg[*].channel.delay = 20ms
+
+
+
+[Config Escenario_AP_6]
+
+extends = General
+
+cmdenv-express-mode = true
+cmdenv-autoflush = true
+
+
+##########################################################
+#            Simulation parameters                       #
+##########################################################
+debug-on-errors = true
+record-eventlog = false
+print-undisposed = false
+
+sim-time-limit = 3000s
+
+**.bus[*].app[*].**.vector-recording = true
+**.bus[*].**.vector-recording = true
+
+# Asegurar que los vectores de tu aplicación específica se guarden
+**.bus[*].app[0].inputBufferSize:vector.vector-recording = true
+**.bus[*].app[0].outputBufferSize:vector.vector-recording = true
+**.bus[*].app[0].sdcardBufferSize:vector.vector-recording = true
+
+*.switch.numEthInterfaces = 50
+
+
+###############################################################
+#				positions AP
+###############################################################
+
+# 1. Definimos el número total de APs (Índices 0, 1, 2 y 3)
+*.numAPs = 6
+# important for garantice the Ethernet Interface
+*.ap[*].numEthInterfaces = 1
+*.ap[*].numWlanInterfaces = 1
+
+# 4. Posiciones de los Access Points
+# Es OBLIGATORIO definir 0 y 1 si numAPs = 4
+
+# APs Originales (Mantenidos de la config General)
+# BUS STATION UNICAL
+*.ap[0].mobility.initialX = 3543.52m
+*.ap[0].mobility.initialY = 5712.03m
+*.ap[0].mobility.initialZ = 2m
+
+*.ap[1].mobility.initialX = 4600.01m
+*.ap[1].mobility.initialY = 7941.41m
+*.ap[1].mobility.initialZ = 2m
+
+*.ap[2].mobility.initialX = 5405.16m
+*.ap[2].mobility.initialY = 9641.98m
+*.ap[2].mobility.initialZ = 2m
+
+# BUS STATION COSENZA
+*.ap[3].mobility.initialX = 5850.89m
+*.ap[3].mobility.initialY = 11486.75m
+*.ap[3].mobility.initialZ = 2m
+
+*.ap[4].mobility.initialX = 5030.84m
+*.ap[4].mobility.initialY = 7846.02m
+*.ap[4].mobility.initialZ = 2m
+
+*.ap[5].mobility.initialX = 4813.20m
+*.ap[5].mobility.initialY = 5807.11m
+*.ap[5].mobility.initialZ = 2m
+
+# 5. Visualización (Opcional pero recomendado)
+# Esto te permite ver en el entorno gráfico el rango de cobertura de los 4 APs
+*.ap[*].wlan[*].radio.displayCommunicationRange = true
+
+[Config Escenario_AP_12]
+
+extends = General
+
+cmdenv-express-mode = true
+cmdenv-autoflush = true
+
+
+##########################################################
+#            Simulation parameters                       #
+##########################################################
+debug-on-errors = true
+record-eventlog = false
+print-undisposed = false
+
+sim-time-limit = 3000s
+
+**.bus[*].app[*].**.vector-recording = true
+**.bus[*].**.vector-recording = true
+
+# Asegurar que los vectores de tu aplicación específica se guarden
+**.bus[*].app[0].inputBufferSize:vector.vector-recording = true
+**.bus[*].app[0].outputBufferSize:vector.vector-recording = true
+**.bus[*].app[0].sdcardBufferSize:vector.vector-recording = true
+
+*.switch.numEthInterfaces = 50
+
+
+###############################################################
+#				positions AP
+###############################################################
+
+# 1. Definimos el número total de APs (Índices 0, 1, 2 y 3)
+*.numAPs = 12
+# important for garantice the Ethernet Interface
+*.ap[*].numEthInterfaces = 1
+*.ap[*].numWlanInterfaces = 1
+
+# 4. Posiciones de los Access Points
+# Es OBLIGATORIO definir 0 y 1 si numAPs = 4
+
+# APs Originales (Mantenidos de la config General)
+# BUS STATION UNICAL
+*.ap[0].mobility.initialX = 3543.52m
+*.ap[0].mobility.initialY = 5712.03m
+*.ap[0].mobility.initialZ = 2m
+
+*.ap[1].mobility.initialX = 4863.34m
+*.ap[1].mobility.initialY = 6831.13m
+*.ap[1].mobility.initialZ = 2m
+
+*.ap[2].mobility.initialX = 4600.01m
+*.ap[2].mobility.initialY = 7941.41m
+*.ap[2].mobility.initialZ = 2m
+
+*.ap[3].mobility.initialX = 4926.84m
+*.ap[3].mobility.initialY = 9089.97m
+*.ap[3].mobility.initialZ = 2m
+
+*.ap[4].mobility.initialX = 5405.16m
+*.ap[4].mobility.initialY = 9641.98m
+*.ap[4].mobility.initialZ = 2m
+
+# BUS STATION COSENZA
+*.ap[5].mobility.initialX = 5850.89m
+*.ap[5].mobility.initialY = 11486.75m
+*.ap[5].mobility.initialZ = 2m
+
+*.ap[6].mobility.initialX = 5487.11m
+*.ap[6].mobility.initialY = 9890.81m
+*.ap[6].mobility.initialZ = 2m
+
+*.ap[7].mobility.initialX = 5059.73m
+*.ap[7].mobility.initialY = 8820.94m
+*.ap[7].mobility.initialZ = 2m
+
+*.ap[8].mobility.initialX = 5030.84m
+*.ap[8].mobility.initialY = 7846.02m
+*.ap[8].mobility.initialZ = 2m
+
+*.ap[9].mobility.initialX = 5000.22m
+*.ap[9].mobility.initialY = 6464.15m
+*.ap[9].mobility.initialZ = 2m
+
+*.ap[10].mobility.initialX = 4813.20m
+*.ap[10].mobility.initialY = 5807.11m
+*.ap[10].mobility.initialZ = 2m
+
+*.ap[11].mobility.initialX = 3520.61m
+*.ap[11].mobility.initialY = 4858.36m
+*.ap[11].mobility.initialZ = 2m
+
+# 5. Visualización (Opcional pero recomendado)
+# Esto te permite ver en el entorno gráfico el rango de cobertura de los 4 APs
+*.ap[*].wlan[*].radio.displayCommunicationRange = true
+
+[Config Escenario_AP_24]
+
+extends = General
+
+cmdenv-express-mode = true
+cmdenv-autoflush = true
+
+
+##########################################################
+#            Simulation parameters                       #
+##########################################################
+debug-on-errors = true
+record-eventlog = false
+print-undisposed = false
+
+sim-time-limit = 3000s
+
+**.bus[*].app[*].**.vector-recording = true
+**.bus[*].**.vector-recording = true
+
+# Asegurar que los vectores de tu aplicación específica se guarden
+**.bus[*].app[0].inputBufferSize:vector.vector-recording = true
+**.bus[*].app[0].outputBufferSize:vector.vector-recording = true
+**.bus[*].app[0].sdcardBufferSize:vector.vector-recording = true
+
+*.switch.numEthInterfaces = 50
+
+
+###############################################################
+#				positions AP
+###############################################################
+
+# 1. Definimos el número total de APs (Índices 0, 1, 2 y 3)
+*.numAPs = 24
+# important for garantice the Ethernet Interface
+*.ap[*].numEthInterfaces = 1
+*.ap[*].numWlanInterfaces = 1
+
+# 4. Posiciones de los Access Points
+# Es OBLIGATORIO definir 0 y 1 si numAPs = 4
+
+# APs Originales (Mantenidos de la config General)
+# BUS STATION UNICAL
+*.ap[0].mobility.initialX = 3543.52m
+*.ap[0].mobility.initialY = 5712.03m
+*.ap[0].mobility.initialZ = 2m
+
+*.ap[1].mobility.initialX = 4458.63m
+*.ap[1].mobility.initialY = 5987.27m
+*.ap[1].mobility.initialZ = 2m
+
+*.ap[2].mobility.initialX = 4863.34m
+*.ap[2].mobility.initialY = 6831.13m
+*.ap[2].mobility.initialZ = 2m
+
+*.ap[3].mobility.initialX = 4871.56m
+*.ap[3].mobility.initialY = 7197.52m
+*.ap[3].mobility.initialZ = 2m
+
+*.ap[4].mobility.initialX = 4600.01m
+*.ap[4].mobility.initialY = 7941.41m
+*.ap[4].mobility.initialZ = 2m
+
+*.ap[5].mobility.initialX = 4800.08m
+*.ap[5].mobility.initialY = 8375.21m
+*.ap[5].mobility.initialZ = 2m
+
+*.ap[6].mobility.initialX = 4926.84m
+*.ap[6].mobility.initialY = 9089.97m
+*.ap[6].mobility.initialZ = 2m
+
+*.ap[7].mobility.initialX = 5300.25m
+*.ap[7].mobility.initialY = 9106.13m
+*.ap[7].mobility.initialZ = 2m
+
+*.ap[8].mobility.initialX = 5405.16m
+*.ap[8].mobility.initialY = 9641.98m
+*.ap[8].mobility.initialZ = 2m
+
+*.ap[9].mobility.initialX = 5544.00m
+*.ap[9].mobility.initialY = 10350.05m
+*.ap[9].mobility.initialZ = 2m
+
+# BUS STATION COSENZA
+*.ap[10].mobility.initialX = 5850.89m
+*.ap[10].mobility.initialY = 11486.75m
+*.ap[10].mobility.initialZ = 2m
+
+*.ap[11].mobility.initialX = 5770.25m
+*.ap[11].mobility.initialY = 10832.75m
+*.ap[11].mobility.initialZ = 2m
+
+*.ap[12].mobility.initialX = 5540.98m
+*.ap[12].mobility.initialY = 10277.81m
+*.ap[12].mobility.initialZ = 2m
+
+*.ap[13].mobility.initialX = 5487.11m
+*.ap[13].mobility.initialY = 9890.81m
+*.ap[13].mobility.initialZ = 2m
+
+*.ap[14].mobility.initialX = 5418.65m
+*.ap[14].mobility.initialY = 9470.33m
+*.ap[14].mobility.initialZ = 2m
+
+*.ap[15].mobility.initialX = 5059.73m
+*.ap[15].mobility.initialY = 8820.94m
+*.ap[15].mobility.initialZ = 2m
+
+*.ap[16].mobility.initialX = 5030.55m
+*.ap[16].mobility.initialY = 8217.52m
+*.ap[16].mobility.initialZ = 2m
+
+*.ap[17].mobility.initialX = 5030.84m
+*.ap[17].mobility.initialY = 7846.02m
+*.ap[17].mobility.initialZ = 2m
+
+*.ap[18].mobility.initialX = 5010.28m
+*.ap[18].mobility.initialY = 6960.30m
+*.ap[18].mobility.initialZ = 2m
+
+*.ap[19].mobility.initialX = 5000.22m
+*.ap[19].mobility.initialY = 6464.15m
+*.ap[19].mobility.initialZ = 2m
+
+*.ap[20].mobility.initialX = 4955.80m
+*.ap[20].mobility.initialY = 5772.84m
+*.ap[20].mobility.initialZ = 2m
+
+*.ap[21].mobility.initialX = 4813.20m
+*.ap[21].mobility.initialY = 5807.11m
+*.ap[21].mobility.initialZ = 2m
+
+*.ap[22].mobility.initialX = 3855.28m
+*.ap[22].mobility.initialY = 5824.59m
+*.ap[22].mobility.initialZ = 2m
+
+*.ap[23].mobility.initialX = 3520.61m
+*.ap[23].mobility.initialY = 4858.36m
+*.ap[23].mobility.initialZ = 2m
+
+# 5. Visualización (Opcional pero recomendado)
+# Esto te permite ver en el entorno gráfico el rango de cobertura de los 4 APs
+*.ap[*].wlan[*].radio.displayCommunicationRange = true
+
+
+
+[Config Escenario_AP_48]
+
+extends = General
+
+cmdenv-express-mode = true
+cmdenv-autoflush = true
+
+
+##########################################################
+#            Simulation parameters                       #
+##########################################################
+debug-on-errors = true
+record-eventlog = false
+print-undisposed = false
+
+sim-time-limit = 3000s
+
+**.bus[*].app[*].**.vector-recording = true
+**.bus[*].**.vector-recording = true
+
+# Asegurar que los vectores de tu aplicación específica se guarden
+**.bus[*].app[0].inputBufferSize:vector.vector-recording = true
+**.bus[*].app[0].outputBufferSize:vector.vector-recording = true
+**.bus[*].app[0].sdcardBufferSize:vector.vector-recording = true
+
+*.switch.numEthInterfaces = 50
+
+
+###############################################################
+#				positions AP
+###############################################################
+
+# 1. Definimos el número total de APs (Índices 0, 1, 2 y 3)
+*.numAPs = 48
+# important for garantice the Ethernet Interface
+*.ap[*].numEthInterfaces = 1
+*.ap[*].numWlanInterfaces = 1
+
+# 4. Posiciones de los Access Points
+# Es OBLIGATORIO definir 0 y 1 si numAPs = 4
+
+# APs Originales (Mantenidos de la config General)
+# BUS STATION UNICAL
+*.ap[0].mobility.initialX = 3543.52m
+*.ap[0].mobility.initialY = 5712.03m
+*.ap[0].mobility.initialZ = 2m
+
+*.ap[1].mobility.initialX = 3132.72m
+*.ap[1].mobility.initialY = 6220.97m
+*.ap[1].mobility.initialZ = 2m
+
+*.ap[2].mobility.initialX = 4458.63m
+*.ap[2].mobility.initialY = 5987.27m
+*.ap[2].mobility.initialZ = 2m
+
+*.ap[3].mobility.initialX = 4835.64m
+*.ap[3].mobility.initialY = 6030.53m
+*.ap[3].mobility.initialZ = 2m
+
+*.ap[4].mobility.initialX = 4863.34m
+*.ap[4].mobility.initialY = 6831.13m
+*.ap[4].mobility.initialZ = 2m
+
+*.ap[5].mobility.initialX = 4866.23m
+*.ap[5].mobility.initialY = 6988.16m
+*.ap[5].mobility.initialZ = 2m
+
+*.ap[6].mobility.initialX = 4871.56m
+*.ap[6].mobility.initialY = 7197.52m
+*.ap[6].mobility.initialZ = 2m
+
+*.ap[7].mobility.initialX = 4825.19m
+*.ap[7].mobility.initialY = 7640.72m
+*.ap[7].mobility.initialZ = 2m
+
+*.ap[8].mobility.initialX = 4600.01m
+*.ap[8].mobility.initialY = 7941.41m
+*.ap[8].mobility.initialZ = 2m
+
+*.ap[9].mobility.initialX = 4805.88m
+*.ap[9].mobility.initialY = 8121.04m
+*.ap[9].mobility.initialZ = 2m
+
+*.ap[10].mobility.initialX = 4800.08m
+*.ap[10].mobility.initialY = 8375.21m
+*.ap[10].mobility.initialZ = 2m
+
+*.ap[11].mobility.initialX = 4645.21m
+*.ap[11].mobility.initialY = 8887.31m
+*.ap[11].mobility.initialZ = 2m
+
+*.ap[12].mobility.initialX = 4926.84m
+*.ap[12].mobility.initialY = 9089.97m
+*.ap[12].mobility.initialZ = 2m
+
+*.ap[13].mobility.initialX = 5090.23m
+*.ap[13].mobility.initialY = 9006.41m
+*.ap[13].mobility.initialZ = 2m
+
+*.ap[14].mobility.initialX = 5300.25m
+*.ap[14].mobility.initialY = 9106.13m
+*.ap[14].mobility.initialZ = 2m
+
+*.ap[15].mobility.initialX = 5410.21m
+*.ap[15].mobility.initialY = 9366.06m
+*.ap[15].mobility.initialZ = 2m
+
+*.ap[16].mobility.initialX = 5405.16m
+*.ap[16].mobility.initialY = 9641.98m
+*.ap[16].mobility.initialZ = 2m
+
+*.ap[17].mobility.initialX = 5484.39m
+*.ap[17].mobility.initialY = 10047.48m
+*.ap[17].mobility.initialZ = 2m
+
+*.ap[18].mobility.initialX = 5544.00m
+*.ap[18].mobility.initialY = 10350.05m
+*.ap[18].mobility.initialZ = 2m
+
+*.ap[19].mobility.initialX = 5689.55m
+*.ap[19].mobility.initialY = 10663.43m
+*.ap[19].mobility.initialZ = 2m
+
+*.ap[20].mobility.initialX = 5767.91m
+*.ap[20].mobility.initialY = 10865.06m
+*.ap[20].mobility.initialZ = 2m
+
+# BUS STATION COSENZA
+*.ap[21].mobility.initialX = 5850.89m
+*.ap[21].mobility.initialY = 11486.75m
+*.ap[21].mobility.initialZ = 2m
+
+*.ap[22].mobility.initialX = 5770.25m
+*.ap[22].mobility.initialY = 10832.75m
+*.ap[22].mobility.initialZ = 2m
+
+*.ap[23].mobility.initialX = 5643.66m
+*.ap[23].mobility.initialY = 10519.74m
+*.ap[23].mobility.initialZ = 2m
+
+*.ap[24].mobility.initialX = 5540.98m
+*.ap[24].mobility.initialY = 10277.81m
+*.ap[24].mobility.initialZ = 2m
+
+*.ap[25].mobility.initialX = 5509.92m
+*.ap[25].mobility.initialY = 10091.76m
+*.ap[25].mobility.initialZ = 2m
+
+*.ap[26].mobility.initialX = 5487.11m
+*.ap[26].mobility.initialY = 9890.81m
+*.ap[26].mobility.initialZ = 2m
+
+*.ap[27].mobility.initialX = 5446.53m
+*.ap[27].mobility.initialY = 9717.14m
+*.ap[27].mobility.initialZ = 2m
+
+*.ap[28].mobility.initialX = 5418.65m
+*.ap[28].mobility.initialY = 9470.33m
+*.ap[28].mobility.initialZ = 2m
+
+*.ap[29].mobility.initialX = 5245.88m
+*.ap[29].mobility.initialY = 8963.25m
+*.ap[29].mobility.initialZ = 2m
+
+*.ap[30].mobility.initialX = 5059.73m
+*.ap[30].mobility.initialY = 8820.94m
+*.ap[30].mobility.initialZ = 2m
+
+*.ap[31].mobility.initialX = 5042.71m
+*.ap[31].mobility.initialY = 8695.44m
+*.ap[31].mobility.initialZ = 2m
+
+*.ap[32].mobility.initialX = 5030.55m
+*.ap[32].mobility.initialY = 8217.52m
+*.ap[32].mobility.initialZ = 2m
+
+*.ap[33].mobility.initialX = 5030.64m
+*.ap[33].mobility.initialY = 8022.87m
+*.ap[33].mobility.initialZ = 2m
+
+*.ap[34].mobility.initialX = 5030.84m
+*.ap[34].mobility.initialY = 7846.02m
+*.ap[34].mobility.initialZ = 2m
+
+*.ap[35].mobility.initialX = 5016.27m
+*.ap[35].mobility.initialY = 7146.95m
+*.ap[35].mobility.initialZ = 2m
+
+*.ap[36].mobility.initialX = 5010.28m
+*.ap[36].mobility.initialY = 6960.30m
+*.ap[36].mobility.initialZ = 2m
+
+*.ap[37].mobility.initialX = 5000.46m
+*.ap[37].mobility.initialY = 6597.61m
+*.ap[37].mobility.initialZ = 2m
+
+*.ap[38].mobility.initialX = 5000.22m
+*.ap[38].mobility.initialY = 6464.15m
+*.ap[38].mobility.initialZ = 2m
+
+*.ap[39].mobility.initialX = 4970.08m
+*.ap[39].mobility.initialY = 5962.41m
+*.ap[39].mobility.initialZ = 2m
+
+*.ap[40].mobility.initialX = 4955.80m
+*.ap[40].mobility.initialY = 5772.84m
+*.ap[40].mobility.initialZ = 2m
+
+*.ap[41].mobility.initialX = 4807.77m
+*.ap[41].mobility.initialY = 5519.81m
+*.ap[41].mobility.initialZ = 2m
+
+*.ap[42].mobility.initialX = 4813.20m
+*.ap[42].mobility.initialY = 5807.11m
+*.ap[42].mobility.initialZ = 2m
+
+*.ap[43].mobility.initialX = 4402.70m
+*.ap[43].mobility.initialY = 5989.54m
+*.ap[43].mobility.initialZ = 2m
+
+*.ap[44].mobility.initialX = 3855.28m
+*.ap[44].mobility.initialY = 5824.59m
+*.ap[44].mobility.initialZ = 2m
+
+*.ap[45].mobility.initialX = 3610.09m
+*.ap[45].mobility.initialY = 5679.50m
+*.ap[45].mobility.initialZ = 2m
+
+*.ap[46].mobility.initialX = 3520.61m
+*.ap[46].mobility.initialY = 4858.36m
+*.ap[46].mobility.initialZ = 2m
+
+*.ap[47].mobility.initialX = 3582.54m
+*.ap[47].mobility.initialY = 5300.96m
+*.ap[47].mobility.initialZ = 2m
+
+# 5. Visualización (Opcional pero recomendado)
+# Esto te permite ver en el entorno gráfico el rango de cobertura de los 4 APs
+*.ap[*].wlan[*].radio.displayCommunicationRange = true

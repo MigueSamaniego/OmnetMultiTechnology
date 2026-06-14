@@ -67,7 +67,7 @@ std::string AppBusTCP_R_StateM::buildDataString(const std::vector<double>& value
 
     std::tm* tm_info = std::localtime(&simTimestamp);
 
-    oss << std::put_time(tm_info, "%Y-%m-%d-%H-%M-%S");
+    oss << std::put_time(tm_info, "/#/%Y-%m-%d-%H-%M-%S");
 
     // add dynamic values
     for (size_t i = 0; i < values.size(); i++) {
@@ -514,7 +514,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         measure_stage = false;
 
                         windows_fix = true; // i sent 5min of data
-                        Strategy_Switching = 1;
+                        Strategy_Switching = 3;
                         //Strategy_Switching = 0 --> no strategy
                         //Strategy_Switching = 1 --> WIFI
                         //Strategy_Switching = 2 --> LTE

@@ -153,7 +153,228 @@ void TcpServerBusAppThread::established()
     EV_INFO << "Conexión establecida. Watchdog iniciado para T+5s." << endl;
 }
 
+
 void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
+{
+    lastDataTime = simTime();
+
+    // 1. Extraer los bytes crudos que acaban de llegar por el socket
+    auto bytesChunk = pk->peekAllAsBytes();
+    std::vector<uint8_t> bytes = bytesChunk->getBytes();
+    std::string content(bytes.begin(), bytes.end());
+
+    //EV_INFO << "Trozo de red recibido en socket: " << content << " (" << pk->getByteLength() << " bytes)" << endl;
+
+    // 2. CONCATENACIÓN: Almacenar los nuevos bytes en el buffer persistente del hilo
+    storageBuffer += content;
+
+    // 3. BUCLE DE RECONSTRUCCIÓN: Procesar mientras existan paquetes delimitados completos
+    int number_proccess_data = 0;
+    while (true) {
+        number_proccess_data++;
+        size_t startPos = storageBuffer.find("#/");
+        if (startPos == std::string::npos) {
+            break; // No hay inicio de mensaje disponible. Parar y esperar más datos.
+        }
+        //EV_WARN<< "caracter inicial encontrado: " << storageBuffer << endl;
+        // Control de basura: Si hay caracteres corruptos antes de un /#/, los eliminamos
+        if (startPos > 0) {
+            storageBuffer.erase(0, startPos);
+            startPos = 0;
+        }
+        //EV_WARN << "caracter inicial rescrito: " << storageBuffer << endl;
+        // Buscar el delimitador de fin de mensaje "/s" especificado
+        size_t endPos = storageBuffer.find("/$", startPos);
+        if (endPos == std::string::npos) {
+            //EV_INFO << "[BUFFER] Mensaje incompleto detectado. Esperando ráfaga restante..." << endl;
+            break; // El final no ha llegado completo. Parar el bucle y conservar el buffer.
+        }
+
+
+
+        // Calculamos el tamaño real del paquete completo con sus delimitadores
+        size_t totalPacketLength = (endPos + 2) - startPos; // +2 porque "/s" mide 2 bytes
+        std::string fullPacketStr = storageBuffer.substr(startPos, totalPacketLength);
+
+        // Extraemos únicamente el contenido útil (payload) ignorando los delimitadores
+        size_t payloadStart = startPos + 2; // Saltarse el "#/"
+        size_t payloadLength = endPos - payloadStart;
+        std::string packetPayload = storageBuffer.substr(payloadStart, payloadLength);
+
+        // --- ¡MENSAJE COMPLETO ENCONTRADO! ---
+        //EV_ERROR << "procesando mensaje numero: " << number_proccess_data << " mensaje: " << packetPayload << endl;
+
+        // =========================================================================
+        // PARSEO DE COMPONENTES DEL STRING (Tus variables originales)
+        // =========================================================================
+        std::stringstream ss(packetPayload);
+        std::string token;
+
+        std::string fechaStr = "";
+        int tipoMensaje = -1;
+        double time_created = 0.0;
+
+        try {
+            // 1. Extraer Fecha (Ej: 2026-06-14-15-38-49)
+            if (std::getline(ss, token, '/')) fechaStr = token;
+
+            // 2. Extraer Tipo de Mensaje (Ej: "2.00000")
+            if (std::getline(ss, token, '/')) {
+                tipoMensaje = std::stoi(token);
+            }
+
+            // 3. Extraer Tiempo de Creación / Deadline base
+            if (std::getline(ss, token, '/')) {
+                time_created = std::stod(token);
+            }
+
+            // Mensajes informativos de depuración por cada paquete procesado
+            //EV_INFO << "[RECONSTRUCTOR] Procesando mensaje individual de tipo: " << tipoMensaje << "\n";
+            //EV_INFO << "[RECONSTRUCTOR] Fecha: " << fechaStr << " | Creado en: " << time_created << " s.\n";
+
+            // Variables de control métrico locales a este mensaje
+            double AoI1 = 0.0, AoI2 = 0.0, AoI3 = 0.0, AoI4 = 0.0, AoIwifi = 0.0;
+            double Deadline1 = 0.0, Deadline2 = 0.0, Deadline3 = 0.0, Deadline4 = 0.0, Deadlinewifi = 0.0;
+            double increment_packets_Rx = 0.0, increment_packets_lost = 0.0;
+            double increment_bytes_Rx = 0.0, increment_bytes_lost = 0.0;
+            double time_current = simTime().dbl();
+
+            // Usamos el tamaño del string real reconstruido para calcular el peso con overhead
+            size_t currentMsgSize = fullPacketStr.size();
+
+            // Lógica de Prioridades exacta de tu diseño original
+            if (tipoMensaje == 0) { // Priority 1
+                Deadline1 = (time_created + 2.0);
+                if (Deadline1 > time_current) {
+                    sinkAppModule->number_packet_Rx_1++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_Rx_1, sinkAppModule->number_packet_Rx_1);
+                    sinkAppModule->number_bytes_Rx_1 += currentMsgSize; // Overhead MQTT/TCP/IP
+                    sinkAppModule->emit(TcpServerBusApp::bytes_Rx_1, sinkAppModule->number_bytes_Rx_1);
+                    increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                    increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(currentMsgSize);
+                } else {
+                    sinkAppModule->number_packet_lost_1++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_lose_1, sinkAppModule->number_packet_lost_1);
+                    sinkAppModule->number_bytes_lost_1 += currentMsgSize;
+                    sinkAppModule->emit(TcpServerBusApp::bytes_lose_1, sinkAppModule->number_bytes_lost_1);
+                    increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                    increment_bytes_lost = sinkAppModule->incrementBytes_lost(currentMsgSize);
+                }
+                sinkAppModule->emit(TcpServerBusApp::deadline_1, Deadline1 - time_current);
+                AoI1 = time_current - time_created;
+                sinkAppModule->emit(TcpServerBusApp::fresh_priority_1, AoI1);
+
+            } else if (tipoMensaje == 1) { // Priority 2
+                Deadline2 = (time_created + 60.0);
+                if (Deadline2 > time_current) {
+                    sinkAppModule->number_packet_Rx_2++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_Rx_2, sinkAppModule->number_packet_Rx_2);
+                    sinkAppModule->number_bytes_Rx_2 += currentMsgSize;
+                    increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                    increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(currentMsgSize);
+                } else {
+                    sinkAppModule->number_packet_lost_2++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_lose_2, sinkAppModule->number_packet_lost_2);
+                    sinkAppModule->number_bytes_lost_2 += currentMsgSize;
+                    increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                    increment_bytes_lost = sinkAppModule->incrementBytes_lost(currentMsgSize);
+                }
+                sinkAppModule->emit(TcpServerBusApp::deadline_2, Deadline2 - time_current);
+                AoI2 = time_current - time_created;
+                sinkAppModule->emit(TcpServerBusApp::fresh_priority_2, AoI2);
+
+            } else if (tipoMensaje == 2) { // Priority 3
+                Deadline3 = (time_created + 900.0);
+                if (Deadline3 > time_current) {
+                    sinkAppModule->number_packet_Rx_3++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_Rx_3, sinkAppModule->number_packet_Rx_3);
+                    sinkAppModule->number_bytes_Rx_3 += currentMsgSize;
+                    increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                    increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(currentMsgSize);
+                } else {
+                    sinkAppModule->number_packet_lost_3++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_lose_3, sinkAppModule->number_packet_lost_3);
+                    sinkAppModule->number_bytes_lost_3 += currentMsgSize;
+                    increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                    increment_bytes_lost = sinkAppModule->incrementBytes_lost(currentMsgSize);
+                }
+                sinkAppModule->emit(TcpServerBusApp::deadline_3, Deadline3 - time_current);
+                AoI3 = time_current - time_created;
+                sinkAppModule->emit(TcpServerBusApp::fresh_priority_3, AoI3);
+
+            } else if (tipoMensaje == 3) { // Priority 4
+                Deadline4 = (time_created + 9600.0);
+                if (Deadline4 > time_current) {
+                    sinkAppModule->number_packet_Rx_4++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_Rx_4, sinkAppModule->number_packet_Rx_4);
+                    sinkAppModule->number_bytes_Rx_4 += currentMsgSize;
+                    increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                    increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(currentMsgSize);
+                } else {
+                    sinkAppModule->number_packet_lost_4++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_lose_4, sinkAppModule->number_packet_lost_4);
+                    sinkAppModule->number_bytes_lost_4 += currentMsgSize;
+                    increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                    increment_bytes_lost = sinkAppModule->incrementBytes_lost(currentMsgSize);
+                }
+                sinkAppModule->emit(TcpServerBusApp::deadline_4, Deadline4 - time_current);
+                AoI4 = time_current - time_created;
+                sinkAppModule->emit(TcpServerBusApp::fresh_priority_4, AoI4);
+
+            } else if (tipoMensaje == 4) { // Priority Wifi
+                Deadlinewifi = (time_created + 9650.0);
+                if (Deadlinewifi > time_current) {
+                    sinkAppModule->number_packet_Rx_wifi++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_Rx_wifi, sinkAppModule->number_packet_Rx_wifi);
+                    sinkAppModule->number_bytes_Rx_wifi += currentMsgSize;
+                    increment_packets_Rx = sinkAppModule->incrementPacket_Rx();
+                    increment_bytes_Rx = sinkAppModule->incrementBytes_Rx(currentMsgSize);
+                } else {
+                    sinkAppModule->number_packet_lost_wifi++;
+                    sinkAppModule->emit(TcpServerBusApp::packet_lose_wifi, sinkAppModule->number_packet_lost_wifi);
+                    sinkAppModule->number_bytes_lost_wifi += currentMsgSize;
+                    increment_packets_lost = sinkAppModule->incrementPacket_lost();
+                    increment_bytes_lost = sinkAppModule->incrementBytes_lost(currentMsgSize);
+                }
+                sinkAppModule->emit(TcpServerBusApp::deadline_wifi, Deadlinewifi - time_current);
+                AoIwifi = time_current - time_created;
+                sinkAppModule->emit(TcpServerBusApp::fresh_priority_wifi, AoIwifi);
+
+            } else {
+                EV_WARN << "Tipo de mensaje desconocido: " << tipoMensaje << endl;
+            }
+
+            // Emisión de estadísticas globales acumuladas en este paso
+            if (increment_packets_Rx > 0.0) {
+                sinkAppModule->emit(TcpServerBusApp::packet_Rx_total, increment_packets_Rx);
+                sinkAppModule->emit(TcpServerBusApp::bytes_Rx_total, increment_bytes_Rx);
+            }
+            if (increment_packets_lost > 0.0) {
+                sinkAppModule->emit(TcpServerBusApp::packet_lose_total, increment_packets_lost);
+                sinkAppModule->emit(TcpServerBusApp::bytes_lose_total, increment_bytes_lost);
+            }
+
+            // Contador de mensajes procesados exitosamente por la app servidor
+            int currentCount = sinkAppModule->incrementMsgCounter();
+            sinkAppModule->emit(TcpServerBusApp::packetReceiveServerTCPSignal, currentCount);
+
+        } catch (const std::exception& e) {
+            EV_ERROR << "Fallo crítico al parsear mensaje extraído: " << e.what() << "\n";
+        }
+
+        // 4. LIMPIEZA: Eliminar el mensaje procesado del buffer persistente
+        storageBuffer.erase(startPos, totalPacketLength);
+    }
+
+    // 5. Estadísticas de bajo nivel del módulo de transporte de OMNeT++ (Mantener fuera del bucle)
+    bytesRcvd += pk->getByteLength();
+    sinkAppModule->bytesRcvd += pk->getByteLength();
+
+    emit(packetReceivedSignal, pk);
+    delete pk; // Liberar memoria física del paquete crudo de red de OMNeT++
+}
+
+/*void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
 {
     lastDataTime = simTime();
 
@@ -195,7 +416,10 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
         EV_INFO << "[PARSER] Tipo de Mensaje obtenido (int): " << tipoMensaje << "\n";
         EV_INFO << "[PARSER] Deadline obtenido (double): " << time_created << " segundos.\n";
 
-        EV_INFO << "Last value RX: "<< sinkAppModule->incrementPacket_Rx_test() <<endl;
+        EV_INFO << "Last packet RX: "<< sinkAppModule->CurrentPacket_Rx_test() <<endl;
+        EV_INFO << "Last packet lost: "<< sinkAppModule->CurrentPacket_lost_test() <<endl;
+        EV_INFO << "Last bytes RX: "<< sinkAppModule->CurrentBytes_Rx_test() <<endl;
+        EV_INFO << "Last bytes lost: "<< sinkAppModule->CurrentBytes_lost_test() <<endl;
 
         //const double maxWaitTime[NUM_PRIORITIES] = {2.0, 60.0, 900.0, 9600.0, 9650.0};
 
@@ -372,18 +596,18 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
             EV_WARN << "message different to hop: " << tipoMensaje << endl;
         }
 
-        if(increment_packets_Rx > 0.0)
+        if(increment_packets_Rx > 0.0){
             sinkAppModule->emit(TcpServerBusApp::packet_Rx_total,increment_packets_Rx);
-        if(increment_bytes_Rx > 0.0){
-            EV_ERROR << "bytes size: " << increment_bytes_Rx << endl;
             sinkAppModule->emit(TcpServerBusApp::bytes_Rx_total,increment_bytes_Rx);
+            EV_ERROR << "Packet total RX: " << increment_packets_Rx << " bytes total Rx: " << increment_bytes_Rx << endl;
         }
-        if(increment_packets_lost > 0.0)
+
+        if(increment_packets_lost > 0.0){
             sinkAppModule->emit(TcpServerBusApp::packet_lose_total,increment_packets_lost);
-        if(increment_bytes_lost > 0.0){
-            EV_ERROR << "bytes size lost: " << increment_bytes_lost << endl;
             sinkAppModule->emit(TcpServerBusApp::bytes_lose_total,increment_bytes_lost);
+            EV_ERROR << "Packet total lost: " << increment_packets_lost << " bytes total lost: " << increment_bytes_lost << endl;
         }
+
 
 
 
@@ -403,7 +627,7 @@ void TcpServerBusAppThread::dataArrived(Packet *pk, bool urgent)
 
     sinkAppModule->emit(TcpServerBusApp::packetReceiveServerTCPSignal, currentCount);
 
-}
+}*/
 
 void TcpServerBusAppThread::refreshDisplay() const
 {

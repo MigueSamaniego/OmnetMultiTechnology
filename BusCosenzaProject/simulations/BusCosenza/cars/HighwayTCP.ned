@@ -137,6 +137,12 @@ network HighwayTCP
         eNodeB3: eNodeB {  // <-- new EnodeB
             @display("p=280,313;is=vl");
         }
+        eNodeB4: eNodeB {  // <-- new EnodeB
+            @display("p=290,313;is=vl");
+        }
+        eNodeB5: eNodeB {  // <-- new EnodeB
+            @display("p=290,313;is=vl");
+        }
 
     	//# wireless AP
         ap[numAPs]: AccessPoint {
@@ -185,11 +191,23 @@ network HighwayTCP
         pgw.pppg++ <--> Eth10G <--> eNodeB1.ppp;
         pgw.pppg++ <--> Eth10G <--> eNodeB2.ppp;
         pgw.pppg++ <--> Eth10G <--> eNodeB3.ppp;
+        pgw.pppg++ <--> Eth10G <--> eNodeB4.ppp;
+        pgw.pppg++ <--> Eth10G <--> eNodeB5.ppp;
 
         //# X2 connections
         eNodeB1.x2++ <--> Eth10G <--> eNodeB2.x2++;
         eNodeB1.x2++ <--> Eth10G <--> eNodeB3.x2++;
+        eNodeB1.x2++ <--> Eth10G <--> eNodeB4.x2++;
+        eNodeB1.x2++ <--> Eth10G <--> eNodeB5.x2++;
+        
         eNodeB2.x2++ <--> Eth10G <--> eNodeB3.x2++;
+        eNodeB2.x2++ <--> Eth10G <--> eNodeB4.x2++;
+        eNodeB2.x2++ <--> Eth10G <--> eNodeB5.x2++;
+        
+        eNodeB3.x2++ <--> Eth10G <--> eNodeB4.x2++;
+        eNodeB3.x2++ <--> Eth10G <--> eNodeB5.x2++;
+        
+        eNodeB4.x2++ <--> Eth10G <--> eNodeB5.x2++;
         
         for i=0..numAPs-1 {
             ap[i].ethg++ <--> Eth10G <--> switch.ethg++;
