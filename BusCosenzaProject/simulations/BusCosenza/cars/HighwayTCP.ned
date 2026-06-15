@@ -37,16 +37,18 @@ import simu5g.nodes.eNodeB;
 //import simu5g.nodes.Ue;
 import src.node_bus.cars.BusGW;
 
+//import ned.DatarateChannel;
+
 
 
 
 import org.car2x.veins.subprojects.veins_inet.VeinsInetManager;
 
-channel MyDelayLink extends ned.DatarateChannel
-{
-    datarate = 10Gbps;      // Velocidad del Eth10G
-    delay = default(2ms);  // Ahora sí es un valor por defecto configurable
-}
+//channel MyDelayLink extends ned.DatarateChannel
+//{
+//    datarate = 10Gbps;      // Velocidad del Eth10G
+//    delay = default(2ms);  // Ahora sí es un valor por defecto configurable
+//}
 
 network HighwayTCP
 {
@@ -166,16 +168,24 @@ network HighwayTCP
 //        router.ethg++ <--> MyDelayLink <--> switch.ethg++;
 //        pgw.pppg++ <--> MyDelayLink <--> eNodeB1.ppp;
 //        pgw.pppg++ <--> MyDelayLink <--> eNodeB2.ppp;
-//        // new EnodeB
 //        pgw.pppg++ <--> MyDelayLink <--> eNodeB3.ppp;
+//        pgw.pppg++ <--> MyDelayLink <--> eNodeB4.ppp;
+//        pgw.pppg++ <--> MyDelayLink <--> eNodeB5.ppp;
 //
 //        //# X2 connections
 //        eNodeB1.x2++ <--> MyDelayLink <--> eNodeB2.x2++;
-//        // new connections between EnodeBs
 //        eNodeB1.x2++ <--> MyDelayLink <--> eNodeB3.x2++;
-//        eNodeB2.x2++ <--> MyDelayLink <--> eNodeB3.x2++;
-//
+//        eNodeB1.x2++ <--> MyDelayLink <--> eNodeB4.x2++;
+//        eNodeB1.x2++ <--> MyDelayLink <--> eNodeB5.x2++;
 //        
+//        eNodeB2.x2++ <--> MyDelayLink <--> eNodeB3.x2++;
+//        eNodeB2.x2++ <--> MyDelayLink <--> eNodeB4.x2++;
+//        eNodeB2.x2++ <--> MyDelayLink <--> eNodeB5.x2++;
+//        
+//        eNodeB3.x2++ <--> MyDelayLink <--> eNodeB4.x2++;
+//        eNodeB3.x2++ <--> MyDelayLink <--> eNodeB5.x2++;
+//        
+//        eNodeB4.x2++ <--> MyDelayLink <--> eNodeB5.x2++;
 //        
 //        for i=0..numAPs-1 {
 //            ap[i].ethg++ <--> MyDelayLink <--> switch.ethg++;

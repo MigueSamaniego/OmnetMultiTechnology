@@ -514,7 +514,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                         measure_stage = false;
 
                         windows_fix = true; // i sent 5min of data
-                        Strategy_Switching = 2;
+                        Strategy_Switching = 3;
                         //Strategy_Switching = 0 --> no strategy
                         //Strategy_Switching = 1 --> WIFI
                         //Strategy_Switching = 2 --> LTE
@@ -910,12 +910,14 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                             if(ConnectionToAP){ //  Association to mqtt
                                 if((socket_ready)&&(flag_tx_wifi)){// tx data
                                     Esp_Consumption_temp = ((7*((-3.5*RSSI_WIFI_SIGNAL_TEST)-130))+(2*((-3.35*RSSI_WIFI_SIGNAL_TEST)-21))+(1*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40)))/3600000.0;// 180-247mA paper register
-                                    flag_tx_wifi = false;
+
                                 }else if((socket_ready)&&(!flag_tx_wifi)){// connected to mqtt
                                     Esp_Consumption_temp = (10*((-3.5*RSSI_WIFI_SIGNAL_TEST)-130))/3600000.0;// 80-150mA
                                 }
+                                flag_tx_wifi = false;
                             }else{  // scanning 97mA
                                 Esp_Consumption_temp = (10*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40))/3600000.0;// 80-120mA
+                                flag_tx_wifi = false;
                             }
 
                         }else{// sleep mode
@@ -925,6 +927,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                             //    Esp_Consumption_temp = (10*((-2.0*RSSI_WIFI_SIGNAL_TEST)-40))/3600000.0;// 80-120mA// not sleep
                             //}else{
                                 Esp_Consumption_temp = (10*(0.8))/3600000.0;// sleep
+                                flag_tx_wifi = false;
                             //}
                             //timer_esp_module++; // here it is in sleep mode not count timer
                         }
@@ -950,6 +953,61 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                         }else if(timer_LTE >= 1545){// finish stage turn ON module
 
 
+//                            if(ConnectionToAP){
+//                                LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+//                                timer_LTE = 1545;// avoid overflow
+//                                flag_tx_lte = false;
+//                            }else{
+//                                if(take_time_when_find_expired_data){
+//
+//                                    timer_LTE_Average++;
+//
+//                                    if((socket_ready)&&(flag_tx_lte)){          //base,  Tx data with cellular (200 a 500mA) // and received (100–300mA)
+//                                        LTE_Consuption_temp = ((3*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))+(5*((-5.45*RSSI_LTE_SIGNAL_TEST)-154.54))+(2*((-3.63*RSSI_LTE_SIGNAL_TEST)-136.36)))/3600000.0;
+//                                    }else{   // connected to mqtt
+//                                        LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) change
+//                                    }
+//
+//                                    timer_LTE = 1545;
+//                                    flag_tx_lte = false;
+//
+//                                }else{
+//
+//                                    if(timer_LTE > 1645){// sleep by hardware
+//
+//                                        //LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+//                                        if(Strategy_Switching==1){
+//                                            LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+//                                        }else if(Strategy_Switching==2){
+//                                            LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
+//                                        }else if(Strategy_Switching==3){
+//
+//                                            LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+//
+//                                        }else if(Strategy_Switching==4){
+//
+//                                            LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
+//
+//                                        }
+//                                        //LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
+//                                        timer_LTE = 1646; // avoid overflow
+//                                        //timer_LTE_Average++; // ***************aqui no cuenta el tiempo de sleep****************
+//                                    }else{// time before sleep mode
+//
+//                                        LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80)
+//                                        timer_LTE_Average++;
+//
+//                                    }
+//
+//                                }
+//
+//
+//                            }
+
+
+
+
+
                             if(take_time_when_find_expired_data){
                                 timer_LTE_Average++;
                                 if((socket_ready)&&(flag_tx_lte)){          //base,  Tx data with cellular (200 a 500mA) // and received (100–300mA)
@@ -971,11 +1029,9 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                     }else if(Strategy_Switching==2){
                                         LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
                                     }else if(Strategy_Switching==3){
-                                        if(ConnectionToAP){
-                                            LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
-                                        }else{
-                                            LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
-                                        }
+
+                                        LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+
                                     }else if(Strategy_Switching==4){
                                         if(ConnectionToAP){
                                             LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
@@ -1265,7 +1321,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                 if (state_buff) {
 
-                                    delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                    //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                     EV_INFO << "NEW GPS time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
 
 
@@ -1328,7 +1384,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                  if (state_buff) {
 
-                                     delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                     //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                      EV_INFO << "NEW airpollution time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
 
                                      // save buffer en SDCARD
@@ -1392,7 +1448,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                  if (state_buff) {
 
-                                      delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                      //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                       EV_INFO << "NEW traffic time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
 
                                       // save buffer en SDCARD
@@ -1499,7 +1555,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                              if (state_buff) {
 
-                                                 delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                                 //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
 
                                                  // save buffer en SDCARD
                                                  auto batch = inputBuffer.flush();
@@ -1592,7 +1648,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                      // -------- save buffer immediately --------
 
-                                     delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                     //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
 
                                      // save buffer en SDCARD
                                      auto batch = inputBuffer.flush();
@@ -1685,7 +1741,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                            flag_tx_lte = true;
                                            /**************************************************/
 
-                                           time_threshold_send_data = 15; // 150ms to retry
+                                           time_threshold_send_data = 10; // 150ms to retry
 
                                         timer_Control_Send_Data = 0;
                                     }
@@ -1725,7 +1781,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                         if((!take_time_when_find_expired_data)&&(check_timers_expired >= 100)){// check each second
 
-                                            bool expiration_time_exceeded  = sdcard.hasExpiredData(simTime()+2); // 2s before data expired
+                                            bool expiration_time_exceeded  = sdcard.hasExpiredData(simTime()+10); // 2s before data expired
 
                                             if((expiration_time_exceeded)&&(!take_time_when_find_expired_data)){
                                                 deadline_start = simTime();
@@ -1752,7 +1808,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                                        flag_tx_lte = true;
                                                        /**************************************************/
 
-                                                       time_threshold_send_data = 15; // 150ms to retry
+                                                       time_threshold_send_data = 10; // 150ms to retry
 
                                                        if(!take_time_when_find_expired_data){
                                                            // not increase the count number msg sent
@@ -1816,7 +1872,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                             flag_tx_lte = true;
                                             /**************************************************/
 
-                                            time_threshold_send_data = 15; // 150ms to retry
+                                            time_threshold_send_data = 10; // 150ms to retry
 
                                             timer_Control_Send_Data = 0;
 
@@ -2118,7 +2174,7 @@ void AppBusTCP_R_StateM_B::sendDataToCloud(const std::string& interface_output)
             int data_recovery = outputBuffer.size();
 
             if(data_recovery > 0){
-                delay_sdcard = (data_recovery * 30)/20; //(300/10)ms
+                //delay_sdcard = (data_recovery * 30)/20; //(300/10)ms
                 EV_ERROR << "NUM DATA RECOVERY: num, delay, tiempo " << data_recovery << " " << delay_sdcard << " " << time_threshold_send_data << endl;
 
             }else{
