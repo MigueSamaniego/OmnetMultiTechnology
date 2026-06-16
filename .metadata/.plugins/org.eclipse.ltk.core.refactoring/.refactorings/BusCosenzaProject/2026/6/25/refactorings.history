@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;BusCosenzaProject/simulations/BusCosenza/cars/results/study_test&apos; to &apos;Reduce_traff_data&apos;" description="Rename resource &apos;study_test&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="simulations/BusCosenza/cars/results/study_test" name="Reduce_traff_data" stamp="1781605494691" updateReferences="true"/>
+</session>

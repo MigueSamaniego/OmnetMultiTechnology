@@ -34,7 +34,7 @@
     <booleanAttribute key="org.omnetpp.launch.SILENT" value="false"/>
     <stringAttribute key="org.omnetpp.launch.STOP_BATCH_ON_ERROR" value=""/>
     <intAttribute key="org.omnetpp.launch.SWITCH_CONFIG_BEFORE_BUILD" value="0"/>
-    <stringAttribute key="org.omnetpp.launch.USER_INTERFACE" value="Cmdenv"/>
-    <booleanAttribute key="org.omnetpp.launch.USE_BATCHING" value="true"/>
+    <stringAttribute key="org.omnetpp.launch.USER_INTERFACE" value="Qtenv"/>
+    <booleanAttribute key="org.omnetpp.launch.USE_BATCHING" value="false"/>
     <stringAttribute key="org.omnetpp.launch.WORKING_DIRECTORY" value="/BusCosenzaProject/simulations/BusCosenza/cars"/>
 </launchConfiguration>

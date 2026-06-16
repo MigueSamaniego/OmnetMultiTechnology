@@ -514,7 +514,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                         measure_stage = false;
 
                         windows_fix = true; // i sent 5min of data
-                        Strategy_Switching = 3;
+                        Strategy_Switching = 1;
                         //Strategy_Switching = 0 --> no strategy
                         //Strategy_Switching = 1 --> WIFI
                         //Strategy_Switching = 2 --> LTE
@@ -970,11 +970,9 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                     }else if(Strategy_Switching==2){
                                         LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
                                     }else if(Strategy_Switching==3){
-                                        if(ConnectionToAP){
-                                            LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
-                                        }else{
-                                            LTE_Consuption_temp = (10*((-1.09*RSSI_LTE_SIGNAL_TEST)-50.9))/3600000.0;//(20 a 80) // LTE no sleep
-                                        }
+
+                                        LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
+
                                     }else if(Strategy_Switching==4){
                                         if(ConnectionToAP){
                                             LTE_Consuption_temp += (10*(13.4))/3600000.0; // LTE  sleep
@@ -1263,7 +1261,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                 if (state_buff) {
 
-                                    delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                    //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                     EV_INFO << "NEW GPS time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
 
 
@@ -1326,7 +1324,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                  if (state_buff) {
 
-                                     delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                     //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                      EV_INFO << "NEW airpollution time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
 
                                      // save buffer en SDCARD
@@ -1395,7 +1393,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                  if (state_buff) {
 
-                                      delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                      //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                       EV_INFO << "NEW traffic time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
 
                                       // save buffer en SDCARD
@@ -1502,7 +1500,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                              if (state_buff) {
 
-                                                 delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                                 //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
 
                                                  // save buffer en SDCARD
                                                  auto batch = inputBuffer.flush();
@@ -1595,7 +1593,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                      // -------- save buffer immediately --------
 
-                                     delay_sdcard = ((inputBuffer.size()) * 30) / 20;
+                                     //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
 
                                      // save buffer en SDCARD
                                      auto batch = inputBuffer.flush();
@@ -1687,7 +1685,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                            flag_tx_lte = true;
                                            /**************************************************/
 
-                                           time_threshold_send_data = 15; // 150ms to retry
+                                           time_threshold_send_data = 10; // 150ms to retry
 
                                         timer_Control_Send_Data = 0;
                                     }
@@ -1727,7 +1725,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
 
                                         if((!take_time_when_find_expired_data)&&(check_timers_expired >= 100)){// check each second
 
-                                            bool expiration_time_exceeded  = sdcard.hasExpiredData(simTime()+2); // 2s before data expired
+                                            bool expiration_time_exceeded  = sdcard.hasExpiredData(simTime()+10); // 2s before data expired
 
                                             if((expiration_time_exceeded)&&(!take_time_when_find_expired_data)){
                                                 deadline_start = simTime();
@@ -1754,7 +1752,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                                        flag_tx_lte = true;
                                                        /**************************************************/
 
-                                                       time_threshold_send_data = 15; // 150ms to retry
+                                                       time_threshold_send_data = 10; // 150ms to retry
 
                                                        if(!take_time_when_find_expired_data){
                                                            // not increase the count number msg sent
@@ -1818,7 +1816,7 @@ void AppBusTCP_R_StateM::handleMessage(cMessage *msg)
                                             flag_tx_lte = true;
                                             /**************************************************/
 
-                                            time_threshold_send_data = 15; // 150ms to retry
+                                            time_threshold_send_data = 10; // 150ms to retry
 
                                             timer_Control_Send_Data = 0;
 
@@ -2120,7 +2118,7 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
             int data_recovery = outputBuffer.size();
 
             if(data_recovery > 0){
-                delay_sdcard = (data_recovery * 30)/20; //(300/10)ms
+                //delay_sdcard = (data_recovery * 30)/20; //(300/10)ms
                 EV_ERROR << "NUM DATA RECOVERY: num, delay, tiempo " << data_recovery << " " << delay_sdcard << " " << time_threshold_send_data << endl;
 
             }else{
@@ -2229,21 +2227,37 @@ void AppBusTCP_R_StateM::sendDataToCloud(const std::string& interface_output)
                     std::string data = outputBuffer.getOne();
 
                     EV_ERROR << "socket WIFI OK4.4.4: " << data << endl;
+                    //-----> /#/2026-06-16-12-06-16/2.00000/7.21000/39.35601/16.23/$
 
+                    std::string StarFrameStr;
                     std::string fechaStr;
                     int tipoMensaje = 0;
                     double deadlineValue = 0.0;
 
                     std::stringstream ss(data);
                     std::string token;
-                    if (std::getline(ss, token, '/')) fechaStr = token;
+
+
+//                    if (std::getline(ss, token, '/')){
+//                        StarFrameStr = token;
+//                        EV_WARN << "start is: " << StarFrameStr << endl;
+//                    }
+
+                    if (std::getline(ss, token, '/')){// inicio del frame
+                        std::getline(ss, token, '/');// # valor de inicio del frame
+                        std::getline(ss, token, '/');// fecha del mensaje
+                        fechaStr = token;
+                        EV_WARN << "fecha is: " << fechaStr << endl;
+                    }
 
                     if (std::getline(ss, token, '/')) {
                         tipoMensaje = std::stoi(token);
+                        EV_WARN << "Tipo de msg: " << tipoMensaje << endl;
                     }
 
                     if (std::getline(ss, token, '/')) {
                         deadlineValue = std::stod(token);
+                        EV_WARN << "Deadline Value: " << deadlineValue << endl;
                     }
 
                     //const double maxWaitTime[NUM_PRIORITIES] = {2.0, 60.0, 900.0, 9600.0, 9650.0};

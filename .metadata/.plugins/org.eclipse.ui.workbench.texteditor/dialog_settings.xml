@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="delay_sdcard"/>
+		<item key="selection" value="count_msg_TCP_send"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="count_msg_TCP_send"/>
+			<item value="packetSendTCPSignal"/>
+			<item value="numMsgTCPSend"/>
+			<item value="recovery data on bufferOut times"/>
+			<item value="Strategy_Switching"/>
+			<item value="sendDataToCloud"/>
+			<item value="deadline_until"/>
+			<item value="long_Bytes_LTE_Header"/>
+			<item value="LTE"/>
+			<item value="stoi"/>
 			<item value="delay_sdcard"/>
 			<item value="ned"/>
 			<item value="DatarateChannel"/>
 			<item value="Eth10G"/>
 			<item value="MyDelayLink"/>
-			<item value="LTE_Consuption_temp"/>
-			<item value="Strategy_Switching"/>
-			<item value="take_time_when_find_expired_data"/>
-			<item value="flag_tx_lte"/>
-			<item value="packetReceiveServerTCPSignal"/>
-			<item value="numMsgTCPReceiveServer"/>
-			<item value="count_msg_TCP_send"/>
-			<item value="number_proccess_data"/>
-			<item value="Esperando ráfaga restante"/>
-			<item value="fresh_priority_1"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MyDelayLink"/>
@@ -47,8 +47,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1301"/>
-		<item key="DIALOG_Y_ORIGIN" value="523"/>
+		<item key="DIALOG_X_ORIGIN" value="1225"/>
+		<item key="DIALOG_Y_ORIGIN" value="335"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
