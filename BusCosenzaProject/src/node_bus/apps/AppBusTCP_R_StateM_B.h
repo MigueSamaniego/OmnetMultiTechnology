@@ -129,6 +129,10 @@ private:
     simtime_t nextEmissionTime;
     simtime_t nextControlTask;
 
+    simsignal_t cost_wait_ap;
+    simsignal_t cost_offloading_lte;
+    simsignal_t cost_offloading_wifi;
+
     int min_time_check;
     simtime_t deadline_start;
     int deadline_until;
@@ -220,6 +224,10 @@ private:
     bool windows_fix = true;
     uint8_t Strategy_Switching = 0;
 
+    double range_start_strategy_5 = 0.0;
+    double range_stop_strategy_5 = 0.0;
+    uint8_t Function_State = 0;
+
     // ******************* GW REPLICATE Task ************************
     int timer_Control_GPS_Data = 0;
     int timer_Control_Data_Emission = 0;
@@ -228,6 +236,7 @@ private:
     int timer_Congestion_traffic = 0;
     long timer_Control_Accident = 0;
     int timer_Control_Start_Scanning_WIFI = 0;
+    int timer_fuction_multi_objetive = 0;
 
     int time_threshold_send_data = 0;
 
@@ -301,6 +310,8 @@ protected:
     virtual void receiveSignal(cComponent *source, simsignal_t signalID, double l, cObject *details) override;
     virtual bool stablishTCP(bool Use_Netwok);
     virtual void printSocketInfo();
+
+    virtual uint8_t FuctionMultiObjetive(double alpha, double beta, double gamma_w, double coefficient);
 
 
 public:

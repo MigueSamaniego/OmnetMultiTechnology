@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <omnetpp.h>
+#include <array>
 
 using namespace omnetpp;
 
@@ -26,6 +27,12 @@ struct QueuedData {
 
 struct QueueState {
     int p1, p2, p3, p4, p5;
+};
+
+struct RangeStats {
+    int D_t;     // Número de paquetes en el rango
+    size_t Bytes_total_on_range;    // Suma de caracteres de los paquetes en el rango
+    std::array<int, 5> inside_range_priority;
 };
 
 // --- Clase SDCardBuffer (Gestión de Almacenamiento y Caducidad) ---
@@ -79,6 +86,60 @@ public:
             }
         }
         return false;
+    }
+
+    // Verifica si hay datos que expirarán antes de llegar al próximo punto WiFi
+    double remaining_time(simtime_t currentTime) {
+
+        double remaining_times_values[NUM_PRIORITIES];
+
+        for (int p = 0; p < NUM_PRIORITIES; p++) {
+            if (count[p] > 0) {
+                remaining_times_values[p] =
+                    maxWaitTime[p] - (currentTime - buffer[p][tail[p]].arrivalTime).dbl();
+            } else {
+                //remaining_times_values[p] = std::numeric_limits<double>::infinity();
+                remaining_times_values[p] = 20000; // not values on memory
+            }
+        }
+
+        return *std::min_element(
+            remaining_times_values,
+            remaining_times_values + NUM_PRIORITIES
+        );
+    }
+
+    RangeStats getStatsByDeadline(simtime_t start, simtime_t end) const {
+        int countInRange = 0;
+        size_t sumChars = 0;
+        std::array<int, 5> count_to_priority = {0};
+
+        for (int p = 0; p < NUM_PRIORITIES; p++) {
+            int currentIndex = tail[p];
+            for (int i = 0; i < count[p]; i++) {
+                //EV_WARN << "count: " << p <<endl;
+                // Calcula el índice real en el buffer circular
+                int idx = (currentIndex + i) % MAX_PER_PRIO;
+                //EV_WARN << "index: " << idx <<endl;
+                // Calcula la deadline del paquete
+                simtime_t deadline = buffer[p][idx].arrivalTime + maxWaitTime[p];
+
+                //EV_WARN << "deadline calculado: " << deadline <<endl;
+
+                // Verifica si la deadline cae en el rango [start, end]
+                //if (deadline >= start && deadline <= end) {
+                if (deadline <= end) {
+                    countInRange++;
+                    sumChars += buffer[p][idx].content.length();
+                    count_to_priority[p]++;
+
+                }else{
+                    i = count[p];
+                    //EV_WARN << "el resto no esta dentro del rango: " << endl;
+                }
+            }
+        }
+        return {countInRange, sumChars, count_to_priority};
     }
 
     // Extrae datos basados puramente en la caducidad (EDF)

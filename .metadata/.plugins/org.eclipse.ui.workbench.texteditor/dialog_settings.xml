@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="count_msg_TCP_send"/>
+		<item key="selection" value="FuctionMultiObjetive"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="count_msg_TCP_send"/>
-			<item value="packetSendTCPSignal"/>
-			<item value="numMsgTCPSend"/>
-			<item value="recovery data on bufferOut times"/>
-			<item value="Strategy_Switching"/>
-			<item value="sendDataToCloud"/>
+			<item value="FuctionMultiObjetive"/>
+			<item value="RangeStats"/>
+			<item value="Function Resul"/>
+			<item value="Function Result"/>
+			<item value="getStatsByDeadline"/>
+			<item value="deadline_start"/>
+			<item value="range_start_strategy_5"/>
 			<item value="deadline_until"/>
-			<item value="long_Bytes_LTE_Header"/>
-			<item value="LTE"/>
-			<item value="stoi"/>
-			<item value="delay_sdcard"/>
-			<item value="ned"/>
-			<item value="DatarateChannel"/>
-			<item value="Eth10G"/>
-			<item value="MyDelayLink"/>
+			<item value="sendDataToCloud"/>
+			<item value="time_threshold_send_data"/>
+			<item value="Strategy_Switching"/>
+			<item value="strategy"/>
+			<item value="coefficient"/>
+			<item value="size_priority_wifi"/>
+			<item value="nextControlTask"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MyDelayLink"/>
@@ -47,8 +47,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1225"/>
-		<item key="DIALOG_Y_ORIGIN" value="335"/>
+		<item key="DIALOG_X_ORIGIN" value="1278"/>
+		<item key="DIALOG_Y_ORIGIN" value="459"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

@@ -69,6 +69,11 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
     	@signal[buffer_priority_4](type="int");
     	@signal[buffer_priority_wifi](type="int");
     	
+    	@signal[cost_wait_ap_signal](type="double");
+    	@signal[cost_offloading_lte_signal](type="double");
+    	@signal[cost_offloading_wifi_signal](type="double");
+    	
+    	
     	// time connection with interfaces
     	@signal[timeWiFiStateON](type="double");
     	@signal[timeLTEStateON](type="double");
@@ -126,6 +131,10 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
 		@statistic[buffer_priority_3](title="Buffer Priority 3"; source="buffer_priority_3"; record=vector,last,stats);
 		@statistic[buffer_priority_4](title="Buffer Priority 4"; source="buffer_priority_4"; record=vector,last,stats);
 		@statistic[buffer_priority_wifi](title="Buffer Priority WiFi"; source="buffer_priority_wifi"; record=vector,last,stats);
+		
+		@statistic[cost_wait_ap_signal](title="Cost to wait"; source="cost_wait_ap_signal"; record=vector,last,stats);
+		@statistic[cost_offloading_lte_signal](title="Cost to use LTE"; source="cost_offloading_lte_signal"; record=vector,last,stats);
+		@statistic[cost_offloading_wifi_signal](title="Cost to use WiFi"; source="cost_offloading_wifi_signal"; record=vector,last,stats);
         
         
         @statistic[timeWiFiStateON](title= "WiFi Time Tx [s]"; source="timeWiFiStateON"; record=vector,last,stats);
