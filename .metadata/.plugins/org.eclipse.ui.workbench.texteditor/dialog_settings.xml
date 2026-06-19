@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="FuctionMultiObjetive"/>
+		<item key="selection" value="sendDataToCloud"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="sendDataToCloud"/>
+			<item value="range_stop_strategy_5"/>
+			<item value="deadline_start"/>
 			<item value="FuctionMultiObjetive"/>
+			<item value="P_t_1"/>
+			<item value="cost_wait_ap"/>
+			<item value="P_t"/>
+			<item value="SELECT LTE"/>
+			<item value="Function Result"/>
+			<item value="max costo financiero"/>
 			<item value="RangeStats"/>
 			<item value="Function Resul"/>
-			<item value="Function Result"/>
 			<item value="getStatsByDeadline"/>
-			<item value="deadline_start"/>
 			<item value="range_start_strategy_5"/>
 			<item value="deadline_until"/>
-			<item value="sendDataToCloud"/>
-			<item value="time_threshold_send_data"/>
-			<item value="Strategy_Switching"/>
-			<item value="strategy"/>
-			<item value="coefficient"/>
-			<item value="size_priority_wifi"/>
-			<item value="nextControlTask"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MyDelayLink"/>

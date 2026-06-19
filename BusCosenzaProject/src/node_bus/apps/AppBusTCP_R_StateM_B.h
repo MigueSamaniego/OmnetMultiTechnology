@@ -226,7 +226,7 @@ private:
 
     double range_start_strategy_5 = 0.0;
     double range_stop_strategy_5 = 0.0;
-    uint8_t Function_State = 0;
+    int Function_State = 0;
 
     // ******************* GW REPLICATE Task ************************
     int timer_Control_GPS_Data = 0;
@@ -311,7 +311,7 @@ protected:
     virtual bool stablishTCP(bool Use_Netwok);
     virtual void printSocketInfo();
 
-    virtual uint8_t FuctionMultiObjetive(double alpha, double beta, double gamma_w, double coefficient);
+    virtual int FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory);
 
 
 public:

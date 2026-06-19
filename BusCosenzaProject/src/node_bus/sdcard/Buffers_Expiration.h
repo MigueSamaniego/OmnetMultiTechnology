@@ -110,6 +110,7 @@ public:
     }
 
     RangeStats getStatsByDeadline(simtime_t start, simtime_t end) const {
+        end += start;
         int countInRange = 0;
         size_t sumChars = 0;
         std::array<int, 5> count_to_priority = {0};
