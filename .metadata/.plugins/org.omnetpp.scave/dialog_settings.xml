@@ -20,8 +20,8 @@
 		<item key="active-tab" value="Lines"/>
 	</section>
 	<section name="org.omnetpp.scave.editors.ui.ConfigureChartDialog">
-		<item key="DIALOG_X_ORIGIN" value="113"/>
-		<item key="DIALOG_Y_ORIGIN" value="113"/>
+		<item key="DIALOG_X_ORIGIN" value="13"/>
+		<item key="DIALOG_Y_ORIGIN" value="131"/>
 		<item key="DIALOG_WIDTH" value="827"/>
 		<item key="DIALOG_HEIGHT" value="711"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

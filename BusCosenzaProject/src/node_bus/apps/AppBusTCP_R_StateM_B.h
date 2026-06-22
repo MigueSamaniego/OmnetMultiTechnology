@@ -311,7 +311,7 @@ protected:
     virtual bool stablishTCP(bool Use_Netwok);
     virtual void printSocketInfo();
 
-    virtual int FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory);
+    virtual int FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows);
 
 
 public:
