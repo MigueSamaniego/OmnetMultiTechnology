@@ -85,6 +85,9 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
     	// RTT
     	@signal[timeRTT](type="double");
     	
+    	// packet lost for saturation
+    	@signal[Packet_lost_for_saturation_signal](type="long");
+    	
     	// TCP ACK
     	//@signal[packetDataAcked](type="long");
     	
@@ -112,7 +115,7 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
 		@statistic[Packet_lose_deadline_signal](title="Number Packet Lose"; source="Packet_lose_deadline_signal"; record=vector,last);
 		@statistic[Byte_lose_deadline_signal](title="Bytes Lose [B]"; source="Byte_lose_deadline_signal"; record=vector,last);
 		
-		@statistic[GW_Battery_level](title="Battery Level mA/h"; source="GW_Battery_level"; record=vector,last);
+		@statistic[GW_Battery_level](title="Battery Level mA/h"; source="GW_Battery_level"; record=last);
 		
 		@statistic[Consumption_WIFI_Battery](title="Current mA/h"; source="Consumption_WIFI_Battery"; record=vector,last);
 		@statistic[Consumption_LTE_Battery](title="Current mA/h"; source="Consumption_LTE_Battery"; record=vector,last);
@@ -122,8 +125,8 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
 		@statistic[RSSI_WIFI_level](title="RSSI WIFI [dBm]"; source="RSSI_WIFI_level"; record=vector,last);
 		@statistic[RSSI_LTE_level](title="RSSI LTE [dBm]"; source="RSSI_LTE_level"; record=vector,last);
 		
-		@statistic[Cost_Data_wifi_signal](title="Cost WIFI [€]"; source="Cost_Data_wifi_signal"; record=vector,last);
-		@statistic[Cost_Data_lte_signal](title="Cost LTE [€]"; source="Cost_Data_lte_signal"; record=vector,last);
+		@statistic[Cost_Data_wifi_signal](title="Cost WIFI [€]"; source="Cost_Data_wifi_signal"; record=last);
+		@statistic[Cost_Data_lte_signal](title="Cost LTE [€]"; source="Cost_Data_lte_signal"; record=last);
 		
 		// number of messajes on sdcard size
 		@statistic[buffer_priority_1](title="Buffer Priority Emergency"; source="buffer_priority_1"; record=vector,last,stats);
@@ -137,14 +140,16 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
 		@statistic[cost_offloading_wifi_signal](title="Cost to use WiFi"; source="cost_offloading_wifi_signal"; record=vector,last,stats);
         
         
-        @statistic[timeWiFiStateON](title= "WiFi Time Tx [s]"; source="timeWiFiStateON"; record=vector,last,stats);
-        @statistic[timeLTEStateON](title= "LTE Time Tx [s]"; source="timeLTEStateON"; record=vector,last,stats);
+        @statistic[timeWiFiStateON](title= "WiFi Time Tx [s]"; source="timeWiFiStateON"; record=last,stats);
+        @statistic[timeLTEStateON](title= "LTE Time Tx [s]"; source="timeLTEStateON"; record=last,stats);
         
         
-        @statistic[numMsgTCPSend](title="TCP packet sent"; source="numMsgTCPSend"; record=vector,count,last);
-        @statistic[numMsgTCPReceive](title="TCP packet received"; source="numMsgTCPReceive"; record=vector,count,last);
+        @statistic[numMsgTCPSend](title="TCP packet sent"; source="numMsgTCPSend"; record=last);
+        @statistic[numMsgTCPReceive](title="TCP packet received"; source="numMsgTCPReceive"; record=last);
         
         @statistic[timeRTT](title="RTT (ms)"; source="timeRTT"; record=vector,count,last);
+        
+        @statistic[Packet_lost_for_saturation_signal](title="Packet Lose Saturation Memory"; source="Packet_lost_for_saturation_signal"; record=last);
         
         // (Opcional) Si quieres que OMNeT++ guarde las gráficas .vec automáticamente:
         //@statistic[servingCellRsrp](title="Celular RSRP"; source="servingCellRsrp"; record=vector);

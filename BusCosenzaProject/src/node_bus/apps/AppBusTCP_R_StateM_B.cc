@@ -168,8 +168,11 @@ void AppBusTCP_R_StateM_B::initialize(int stage)
         outputBufferSignal_lte = registerSignal("outputBufferSize_lte");
         sdcardBufferSignal = registerSignal("sdcardBufferSize");
 
+        // FREE TO USE
         Packet_lose_deadline = registerSignal("Packet_lose_deadline_signal");
+        //emit(Packet_lose_deadline, number_packet_lose);
         Byte_lose_deadline = registerSignal("Byte_lose_deadline_signal");
+        //emit(Byte_lose_deadline, number_bytes_lose);
 
         outputBytes_wifi = registerSignal("outputBytesInterface_wifi");
         outputBytes_lte = registerSignal("outputBytesInterface_lte");
@@ -202,9 +205,11 @@ void AppBusTCP_R_StateM_B::initialize(int stage)
         size_priority_4 = registerSignal("buffer_priority_4");
         size_priority_wifi = registerSignal("buffer_priority_wifi");
 
-        cost_wait_ap = registerSignal("cost_wait_ap_signal");
-        cost_offloading_lte = registerSignal("cost_offloading_lte_signal");
-        cost_offloading_wifi = registerSignal("cost_offloading_wifi_signal");
+        model_cost_wait_ap = registerSignal("cost_wait_ap_signal");
+        model_cost_offloading_lte = registerSignal("cost_offloading_lte_signal");
+        model_cost_offloading_wifi = registerSignal("cost_offloading_wifi_signal");
+
+        Packet_lost_for_saturation = registerSignal("Packet_lost_for_saturation_signal");
 
         // START SDCAR FILL TO 50%
         //int memory_start_with = 0;
@@ -1300,9 +1305,28 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                 static_inputBuff = inputBuffer.size();
 
-                                //emit(inputBufferSignal, static_inputBuff);
-
                                 if (state_buff) {
+                                    //----------------------------- SATURATION CALCULATE ---------------------------------
+                                    // ask the sizes of memory
+                                    QueueState ocupation_buffer = sdcard.get_size_queues();
+                                    int data_on_buffer[5]={0};
+                                    data_on_buffer[0]=ocupation_buffer.p1;
+                                    data_on_buffer[1]=ocupation_buffer.p2;
+                                    data_on_buffer[2]=ocupation_buffer.p3;
+                                    data_on_buffer[3]=ocupation_buffer.p4;
+                                    data_on_buffer[4]=ocupation_buffer.p5;
+
+                                    for(int n=0; n<5; n++){
+
+                                        int saturation = data_on_buffer[n] + static_inputBuff;
+
+                                        if(saturation > 2000){
+                                            packet_lost_saturation_buffer+= saturation-2000;
+                                        }
+                                    }
+
+                                    emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                    //-----------------------------------------------------------------------------------
 
                                     //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                     EV_INFO << "NEW GPS time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
@@ -1366,6 +1390,27 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                  //emit(inputBufferSignal, static_inputBuff);
 
                                  if (state_buff) {
+                                     //----------------------------- SATURATION CALCULATE ---------------------------------
+                                     // ask the sizes of memory
+                                     QueueState ocupation_buffer = sdcard.get_size_queues();
+                                     int data_on_buffer[5]={0};
+                                     data_on_buffer[0]=ocupation_buffer.p1;
+                                     data_on_buffer[1]=ocupation_buffer.p2;
+                                     data_on_buffer[2]=ocupation_buffer.p3;
+                                     data_on_buffer[3]=ocupation_buffer.p4;
+                                     data_on_buffer[4]=ocupation_buffer.p5;
+
+                                     for(int n=0; n<5; n++){
+
+                                         int saturation = data_on_buffer[n] + static_inputBuff;
+
+                                         if(saturation > 2000){
+                                             packet_lost_saturation_buffer+= saturation-2000;
+                                         }
+                                     }
+
+                                     emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                     //-----------------------------------------------------------------------------------
 
                                      //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                      EV_INFO << "NEW airpollution time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
@@ -1430,6 +1475,28 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                  //emit(inputBufferSignal, static_inputBuff);
 
                                  if (state_buff) {
+
+                                     //----------------------------- SATURATION CALCULATE ---------------------------------
+                                     // ask the sizes of memory
+                                     QueueState ocupation_buffer = sdcard.get_size_queues();
+                                     int data_on_buffer[5]={0};
+                                     data_on_buffer[0]=ocupation_buffer.p1;
+                                     data_on_buffer[1]=ocupation_buffer.p2;
+                                     data_on_buffer[2]=ocupation_buffer.p3;
+                                     data_on_buffer[3]=ocupation_buffer.p4;
+                                     data_on_buffer[4]=ocupation_buffer.p5;
+
+                                     for(int n=0; n<5; n++){
+
+                                         int saturation = data_on_buffer[n] + static_inputBuff;
+
+                                         if(saturation > 2000){
+                                             packet_lost_saturation_buffer+= saturation-2000;
+                                         }
+                                     }
+
+                                     emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                     //-----------------------------------------------------------------------------------
 
                                       //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                       EV_INFO << "NEW traffic time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
@@ -1538,6 +1605,28 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                              if (state_buff) {
 
+                                                 //----------------------------- SATURATION CALCULATE ---------------------------------
+                                                 // ask the sizes of memory
+                                                 QueueState ocupation_buffer = sdcard.get_size_queues();
+                                                 int data_on_buffer[5]={0};
+                                                 data_on_buffer[0]=ocupation_buffer.p1;
+                                                 data_on_buffer[1]=ocupation_buffer.p2;
+                                                 data_on_buffer[2]=ocupation_buffer.p3;
+                                                 data_on_buffer[3]=ocupation_buffer.p4;
+                                                 data_on_buffer[4]=ocupation_buffer.p5;
+
+                                                 for(int n=0; n<5; n++){
+
+                                                     int saturation = data_on_buffer[n] + static_inputBuff;
+
+                                                     if(saturation > 2000){
+                                                         packet_lost_saturation_buffer+= saturation-2000;
+                                                     }
+                                                 }
+
+                                                 emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                                 //-----------------------------------------------------------------------------------
+
                                                  //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
 
                                                  // save buffer en SDCARD
@@ -1628,6 +1717,28 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                      bool state_buff = inputBuffer.add(data, Priority_1, deadline_on_SERVER);// deadline 5minutes.
 
                                      static_inputBuff = inputBuffer.size();
+
+                                     //----------------------------- SATURATION CALCULATE ---------------------------------
+                                     // ask the sizes of memory
+                                     QueueState ocupation_buffer = sdcard.get_size_queues();
+                                     int data_on_buffer[5]={0};
+                                     data_on_buffer[0]=ocupation_buffer.p1;
+                                     data_on_buffer[1]=ocupation_buffer.p2;
+                                     data_on_buffer[2]=ocupation_buffer.p3;
+                                     data_on_buffer[3]=ocupation_buffer.p4;
+                                     data_on_buffer[4]=ocupation_buffer.p5;
+
+                                     for(int n=0; n<5; n++){
+
+                                         int saturation = data_on_buffer[n] + static_inputBuff;
+
+                                         if(saturation > 2000){
+                                             packet_lost_saturation_buffer+= saturation-2000;
+                                         }
+                                     }
+
+                                     emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                     //-----------------------------------------------------------------------------------
 
                                      // -------- save buffer immediately --------
 
@@ -2065,8 +2176,8 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                              emit(outputBytes_wifi, long_Bytes_wifi);
                              emit(outputBytes_lte, long_Bytes_LTE);
 
-                             emit(Packet_lose_deadline, number_packet_lose);
-                             emit(Byte_lose_deadline, number_bytes_lose);
+                             //emit(Packet_lose_deadline, number_packet_lose);
+                             //emit(Byte_lose_deadline, number_bytes_lose);
 
                              //-------------- Coomunication Cost ---------------------------
 
@@ -3173,7 +3284,7 @@ void AppBusTCP_R_StateM_B::socketDeleted(inet::TcpSocket *socket) {
 
 
 
-int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
+/*int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
     EV_ERROR << "calculation fuction." << endl;
 
     range_start_strategy_5 = simTime().dbl();
@@ -3396,5 +3507,164 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
     return best_decision;
 
 
-}
+}*/
 
+int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
+    EV_ERROR << "calculation fuction." << endl;
+
+    range_start_strategy_5 = simTime().dbl();
+    range_stop_strategy_5 = windows;
+
+    double data_on_buffer[5]={0};
+    QueueState datos_en_cola = sdcard.get_size_queues();
+    data_on_buffer[0] = datos_en_cola.p1;
+    data_on_buffer[1] = datos_en_cola.p2;
+    data_on_buffer[2] = datos_en_cola.p3;
+    data_on_buffer[3] = datos_en_cola.p4;
+    data_on_buffer[4] = datos_en_cola.p5;
+
+    RangeStats val = sdcard.getStatsByDeadline(range_start_strategy_5, range_stop_strategy_5);
+
+    // 1. SEGURIDAD MATEMÁTICA PARA LA PENALIDAD (URGENCIA)
+    double P_t = 0.0;
+    double max_Pt = 900.0 - 10.0;// es el valor del deadline mas viejo en este caso 15min
+
+    if (val.D_t > 0) {
+
+        double remainign_time_on_old_data = (sdcard.remaining_time(simTime()));
+        P_t = 100.0 - (((remainign_time_on_old_data - coefficient)*100)/max_Pt);//
+
+    }
+
+
+    // 2. CÁLCULOS DE ENERGÍA Y COSTO FINANCIERO
+    double windows_ms = windows*1000;// ventana en ms
+
+    double Tx_phase = 0.0, Rx_phase = 0.0, Normal_phase = 0.0, time_on_sleep = windows_ms;
+    double Tx_phaseW = 0.0, Rx_phaseW = 0.0, Normal_phaseW = 0.0, time_on_sleepW = windows_ms;
+    if (val.D_t > 0) {// si tenemos almenos un dato
+
+        Tx_phase = val.D_t*5;
+        Rx_phase = val.D_t*2;
+        Normal_phase = (val.D_t*93) + 2500;// + 2500; // tiempo para entrar en sleep
+        time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
+
+        Tx_phaseW = val.D_t*2;
+        Rx_phaseW = val.D_t*1;
+        Normal_phaseW = (val.D_t*97) + 500;// + 500; // tiempo para entrar en sleep
+        time_on_sleepW = ((windows_ms) - (Tx_phaseW + Rx_phaseW + Normal_phaseW ));// restamos el timepo de Tx y Rx y un tiempo
+
+    }
+
+    double Consumption_GW_lte = (((Tx_phase)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                (((Rx_phase)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                (((Normal_phase)/3600000.0) * (116.081 + 0.8 + 80))+
+                                (((time_on_sleep)/3600000.0) * (116.081 + 0.8 + 13.14));
+
+    double Consumption_GW_wifi = (((Tx_phaseW)/3600000.0) * (116.081 + 247 + 13.14)) +
+                                 (((Rx_phaseW)/3600000.0) * (116.081 + 180 + 13.14)) +
+                                 (((Normal_phaseW)/3600000.0) * (116.081 + 80 + 13.14))+
+                                 (((time_on_sleepW)/3600000.0) * (116.081 + 0.8 + 13.14));
+
+    double Consumption_GW_sleep = ((windows_ms)/3600000.0) * (116.081 + 0.8 + 13.14);
+
+    double lte_financial_cost = (val.Bytes_total_on_range) * 0.0000000954;
+
+    // 3. NORMALIZACIÓN (Ajusta estos valores MÁXIMOS según la física de tu simulación)
+
+    // values maximum for windows, dipend of sampling rate data collectet
+    // we use 2 variable to 1[s] sampling, and 1 variable to 5[s] sampling.
+    double packets_max = ((windows_ms/100)*2)+((windows_ms/100)*0.2);
+    double bytes_max = packets_max*100;// considering each packet size has 100B maximum
+
+    // Esto asegura que Cost, Energy y Memory estén siempre entre 0.0 y 1.0
+    double MAX_FINANCIAL_COST = (bytes_max) * 0.0000000954; // asumimos que en la ventana que usamos de 5min y que cada paquete puede tener 100B max
+
+    // here "(windows_ms/100)" is right, because GW can tx just 100ms each packet
+    double MAX_ENERGY_CONSUMPTION_LTE = (windows_ms/100)*((((5)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                                     (((2)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                                     (((93)/3600000.0) * (116.081 + 0.8 + 80))); // Ajusta al pico máximo de Ah que podría gastar LTE en 300s
+
+
+//    // ENCONTRAR EL MAXIMO
+//    long max_buffer_fill = 0;
+//
+//    for(int n=0; n<=2; n++){
+//        if(data_on_buffer[n] > max_buffer_fill){
+//            max_buffer_fill = data_on_buffer[n];
+//        }
+//    }
+
+
+    double MAX_PENALTY_SCORE = (100) * (packets_max); // Urgencia max * Max datos posibles on windows (2 muestras cada [s], 1 muestra cada 5[s]);
+
+
+    double model[3];
+
+    // --- MODELO 0: ESPERAR POR AP ---
+    double mem_norm_0 = (P_t * val.D_t) / MAX_PENALTY_SCORE;
+    if(mem_norm_0 > 1.0)
+        mem_norm_0 = 1.0;
+
+    model[0] = (gamma_w * mem_norm_0);
+
+    // --- MODELO 1: TRANSMITIR POR LTE ---
+    double cost_norm_1 = lte_financial_cost / MAX_FINANCIAL_COST;
+    if(cost_norm_1 > 1.0)
+        cost_norm_1 = 1.0;
+    double energy_norm_1 = Consumption_GW_lte / MAX_ENERGY_CONSUMPTION_LTE;
+    if(energy_norm_1 > 1.0)
+        energy_norm_1 = 1.0;
+
+    model[1] = (alpha * cost_norm_1) + (beta * energy_norm_1);
+
+    // --- MODELO 2: TRANSMITIR POR WIFI ---
+    double cost_norm_w = 0.0;
+    double energy_norm_w = 0.0;
+
+    if (!ConnectionToAP) {
+        cost_norm_w = 1.0;
+        energy_norm_w = 1.0;
+    }
+
+    model[2] = (alpha * cost_norm_w) + (beta * energy_norm_w);
+
+//    EV_ERROR << "ESPERAR POR AP: " << model[0] << endl;
+//    EV_ERROR << "TRANSMITIR for LTE: " << model[1] << endl;
+//    EV_ERROR << "TRANSMITIR WIFI: " << model[2] << endl;
+
+    emit(model_cost_wait_ap, model[0]);
+    emit(model_cost_offloading_lte, model[1]);
+    emit(model_cost_offloading_wifi, model[2]);
+
+    // ENCONTRAR EL MÍNIMO
+    double min = 99999999.9;
+    int best_decision = 10; // error
+
+    for(int n=0; n<=2; n++){
+        if(model[n] < min){
+            min = model[n];
+            best_decision = n;
+        }
+    }
+
+    if((best_decision>0)&&(model[1] == model[2])){// tecnologia WIFI gana siempre en igualdad porque el objetivo es Tx.
+        if (ConnectionToAP) {
+            best_decision = 2;
+        }else{
+            best_decision = 1;
+        }
+    }
+
+    if((best_decision==0)&&(model[0] == model[2])){// tecnologia WIFI gana siempre en igualdad porque el objetivo es Tx.
+        if (ConnectionToAP) {
+            best_decision = 2;
+        }else{
+            best_decision = 0;
+        }
+    }
+
+    return best_decision;
+
+
+}

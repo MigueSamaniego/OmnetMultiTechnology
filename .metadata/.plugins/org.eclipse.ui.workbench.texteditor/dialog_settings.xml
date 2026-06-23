@@ -13,20 +13,20 @@
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
 			<item value="FuctionMultiObjetive"/>
-			<item value="onsumo financiero"/>
-			<item value="coefficient"/>
-			<item value="threshold_memmory"/>
-			<item value="LteMacEnb"/>
-			<item value="sendDataToCloud"/>
-			<item value="range_stop_strategy_5"/>
-			<item value="deadline_start"/>
-			<item value="P_t_1"/>
+			<item value="vectorlast"/>
+			<item value="Consumption_WIFI"/>
+			<item value="Consumption_WIFI_Battery"/>
+			<item value="number_bytes_lose"/>
+			<item value="Byte_lose_deadline"/>
+			<item value="Byte_lose_deadline_signal"/>
+			<item value="Packet_lose_deadline"/>
+			<item value="number_packet_lose"/>
+			<item value="Packet_lose_deadline_signal"/>
+			<item value="cost_offloading_lte"/>
+			<item value="cost_offloading_lte_signal"/>
+			<item value="get_size_queues"/>
 			<item value="cost_wait_ap"/>
-			<item value="P_t"/>
-			<item value="SELECT LTE"/>
-			<item value="Function Result"/>
-			<item value="max costo financiero"/>
-			<item value="RangeStats"/>
+			<item value="onsumo financiero"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MyDelayLink"/>

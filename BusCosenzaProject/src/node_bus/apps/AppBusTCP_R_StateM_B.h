@@ -129,9 +129,11 @@ private:
     simtime_t nextEmissionTime;
     simtime_t nextControlTask;
 
-    simsignal_t cost_wait_ap;
-    simsignal_t cost_offloading_lte;
-    simsignal_t cost_offloading_wifi;
+    simsignal_t model_cost_wait_ap;
+    simsignal_t model_cost_offloading_lte;
+    simsignal_t model_cost_offloading_wifi;
+
+    simsignal_t Packet_lost_for_saturation;
 
     int min_time_check;
     simtime_t deadline_start;
@@ -139,6 +141,8 @@ private:
 
     long number_packet_lose = 0;
     long number_bytes_lose = 0;
+
+    long packet_lost_saturation_buffer = 0;
 
     // deadline to control on server
     double deadline_on_SERVER;
