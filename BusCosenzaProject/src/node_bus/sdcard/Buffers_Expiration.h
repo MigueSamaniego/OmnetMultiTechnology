@@ -211,6 +211,36 @@ public:
         return result;
     }
 
+    // Extrae datos basados puramente en la caducidad (EDF)
+    std::vector<std::string> popBatch_Strategy_5(int n, int buffer_penaly, int empty_buffer_percent) {
+        std::vector<std::string> result;
+
+        int umbral_max = MAX_PER_PRIO - ((int)((empty_buffer_percent*MAX_PER_PRIO)/100));
+
+        bool foundAny = true;
+        while (result.size() < n && foundAny) {
+            foundAny = false;
+
+            // ************** Vaciar el buffer un  % ******************************************
+            if(count[buffer_penaly] >= umbral_max){
+
+
+                result.push_back(buffer[buffer_penaly][tail[buffer_penaly]].content);
+                tail[buffer_penaly] = (tail[buffer_penaly] + 1) % MAX_PER_PRIO;
+                count[buffer_penaly]--;
+                foundAny = true;
+                if (result.size() >= n) return result;
+
+
+            }
+
+
+
+
+        }
+        return result;
+    }
+
     int totalSize() const {
         int total = 0;
         for(int i=0; i<NUM_PRIORITIES; i++) total += count[i];

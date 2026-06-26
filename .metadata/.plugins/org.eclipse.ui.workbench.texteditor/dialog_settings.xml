@@ -5,14 +5,21 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="FuctionMultiObjetive"/>
+		<item key="selection" value="accident"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="ACCIDENT"/>
+			<item value="TTD"/>
 			<item value="FuctionMultiObjetive"/>
+			<item value="sendDataToCloud"/>
+			<item value="sendDataToCloud_Strategy_5"/>
+			<item value="buffer_penalty"/>
+			<item value="ttd"/>
+			<item value="popBatch"/>
 			<item value="vectorlast"/>
 			<item value="Consumption_WIFI"/>
 			<item value="Consumption_WIFI_Battery"/>
@@ -20,15 +27,9 @@
 			<item value="Byte_lose_deadline"/>
 			<item value="Byte_lose_deadline_signal"/>
 			<item value="Packet_lose_deadline"/>
-			<item value="number_packet_lose"/>
-			<item value="Packet_lose_deadline_signal"/>
-			<item value="cost_offloading_lte"/>
-			<item value="cost_offloading_lte_signal"/>
-			<item value="get_size_queues"/>
-			<item value="cost_wait_ap"/>
-			<item value="onsumo financiero"/>
 		</list>
 		<list key="replacehistory">
+			<item value="popBatch_Strategy_5"/>
 			<item value="MyDelayLink"/>
 			<item value=""/>
 			<item value="record=vector,last,min,max,stddev"/>
@@ -43,7 +44,6 @@
 			<item value="AoI"/>
 			<item value="TTD"/>
 			<item value="//std::string vehicle = mobility-&gt;getExternalId();"/>
-			<item value="vehicle"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

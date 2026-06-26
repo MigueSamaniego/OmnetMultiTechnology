@@ -278,6 +278,9 @@ private:
     long static_outputBuff_lte = 0;
 
 
+    int buffer_penalty = 0;
+
+
 
 
 
@@ -291,6 +294,7 @@ protected:
     virtual void processPacket(std::shared_ptr<inet::Packet> pk) override;
     //virtual void sendDataToCloud();
     virtual void sendDataToCloud(const std::string& interface_output);
+    virtual void sendDataToCloud_Strategy_5(const std::string& interface_output);
     virtual void handleMessage(cMessage *msg) override;
 
 
