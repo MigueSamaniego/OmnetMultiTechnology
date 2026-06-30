@@ -1299,6 +1299,30 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                 std::vector<double> gps = {(double)Priority_3, deadline_on_SERVER,lat, lon};
                                 std::string data = buildDataString(gps);
                                 // --------------------------------------------
+                                //----------------------------- SATURATION CALCULATE ---------------------------------
+                                  // ask the sizes of memory
+                                  QueueState ocupation_buffer = sdcard.get_size_queues();
+                                  int data_on_buffer[5]={0};
+                                  //data_on_buffer[0]=ocupation_buffer.p1;//emergencia
+                                  //data_on_buffer[1]=ocupation_buffer.p2;//traffic
+                                  data_on_buffer[2]=ocupation_buffer.p3;//airpo
+                                  //data_on_buffer[3]=ocupation_buffer.p4;// freeeeeeeeee
+                                  //data_on_buffer[4]=ocupation_buffer.p5;// wifi
+
+                                  //for(int n=0; n<5; n++){
+
+                                      int saturation = data_on_buffer[2] + (static_inputBuff+1);
+
+                                      if(saturation >= 2000){
+                                          packet_lost_saturation_buffer++;
+                                      }
+
+                                      EV_INFO << "buffer: " << 3 << " memmoria:" << data_on_buffer[2] << " saturacion data:" << saturation << " lost by saturation" << packet_lost_saturation_buffer << endl;
+                                  //}
+
+                                  emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                  //-----------------------------------------------------------------------------
+
                                 counter_msg++;
                                 EV_INFO << "NEW GPS, msg_num" << data << " " << counter_msg << endl;
                                 //2026-06-07-17-01-31/8.24000/39.35595/16.22719/$
@@ -1308,27 +1332,6 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                 static_inputBuff = inputBuffer.size();
 
                                 if (state_buff) {
-                                    //----------------------------- SATURATION CALCULATE ---------------------------------
-                                    // ask the sizes of memory
-                                    QueueState ocupation_buffer = sdcard.get_size_queues();
-                                    int data_on_buffer[5]={0};
-                                    data_on_buffer[0]=ocupation_buffer.p1;
-                                    data_on_buffer[1]=ocupation_buffer.p2;
-                                    data_on_buffer[2]=ocupation_buffer.p3;
-                                    data_on_buffer[3]=ocupation_buffer.p4;
-                                    data_on_buffer[4]=ocupation_buffer.p5;
-
-                                    for(int n=0; n<5; n++){
-
-                                        int saturation = data_on_buffer[n] + static_inputBuff;
-
-                                        if(saturation > 2000){
-                                            packet_lost_saturation_buffer+= saturation-2000;
-                                        }
-                                    }
-
-                                    emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
-                                    //-----------------------------------------------------------------------------------
 
                                     //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                     EV_INFO << "NEW GPS time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
@@ -1381,6 +1384,31 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                  flag_Rx_XBee++;
                                  timer_TxRx_XBee += (data.size()*282.45)/79.0;// time on ms
 
+                                 //----------------------------- SATURATION CALCULATE ---------------------------------
+                                   // ask the sizes of memory
+                                   QueueState ocupation_buffer = sdcard.get_size_queues();
+                                   int data_on_buffer[5]={0};
+                                   //data_on_buffer[0]=ocupation_buffer.p1;
+                                   //data_on_buffer[1]=ocupation_buffer.p2;
+                                   data_on_buffer[2]=ocupation_buffer.p3;
+                                   //data_on_buffer[3]=ocupation_buffer.p4;
+                                   //data_on_buffer[4]=ocupation_buffer.p5;
+
+                                   //for(int n=0; n<5; n++){
+
+                                       int saturation = data_on_buffer[2] + (static_inputBuff+1);
+
+
+                                       if(saturation >= 2000){
+                                           packet_lost_saturation_buffer++;
+                                       }
+
+                                       EV_INFO << "buffer: " << 3 << " memmoria:" << data_on_buffer[2] << " saturacion data:" << saturation << " lost by saturation" << packet_lost_saturation_buffer << endl;
+
+                                   //}
+
+                                   emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                   //-----------------------------------------------------------------------------
 
                                  counter_msg++;
                                  EV_INFO << "NEW POLLUTION, msg_num" << data<< " " << counter_msg  << endl;
@@ -1392,27 +1420,6 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                  //emit(inputBufferSignal, static_inputBuff);
 
                                  if (state_buff) {
-                                     //----------------------------- SATURATION CALCULATE ---------------------------------
-                                     // ask the sizes of memory
-                                     QueueState ocupation_buffer = sdcard.get_size_queues();
-                                     int data_on_buffer[5]={0};
-                                     data_on_buffer[0]=ocupation_buffer.p1;
-                                     data_on_buffer[1]=ocupation_buffer.p2;
-                                     data_on_buffer[2]=ocupation_buffer.p3;
-                                     data_on_buffer[3]=ocupation_buffer.p4;
-                                     data_on_buffer[4]=ocupation_buffer.p5;
-
-                                     for(int n=0; n<5; n++){
-
-                                         int saturation = data_on_buffer[n] + static_inputBuff;
-
-                                         if(saturation > 2000){
-                                             packet_lost_saturation_buffer+= saturation-2000;
-                                         }
-                                     }
-
-                                     emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
-                                     //-----------------------------------------------------------------------------------
 
                                      //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                      EV_INFO << "NEW airpollution time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
@@ -1466,6 +1473,30 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                  timer_TxRx_BLE += (data.size()*289.22)/79.0;// time on ms
                                  Packets_Machine_BLE += data.size() / 20;
 
+                                 //----------------------------- SATURATION CALCULATE ---------------------------------
+                                   // ask the sizes of memory
+                                   QueueState ocupation_buffer = sdcard.get_size_queues();
+                                   int data_on_buffer[5]={0};
+                                   //data_on_buffer[0]=ocupation_buffer.p1;
+                                   //data_on_buffer[1]=ocupation_buffer.p2;
+                                   //data_on_buffer[2]=ocupation_buffer.p3;
+                                   //data_on_buffer[3]=ocupation_buffer.p4;
+                                   data_on_buffer[4]=ocupation_buffer.p5;
+
+                                   //for(int n=0; n<5; n++){
+
+                                       int saturation = data_on_buffer[4] + (static_inputBuff+1);
+
+                                       if(saturation >= 2000){
+                                           packet_lost_saturation_buffer++;
+                                       }
+
+                                       EV_INFO << "buffer: " << 5 << " memmoria:" << data_on_buffer[4] << " saturacion data:" << saturation << " lost by saturation" << packet_lost_saturation_buffer << endl;
+
+                                   //}
+
+                                   emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                   //-----------------------------------------------------------------------------
 
                                  counter_msg++;
                                  EV_INFO << "NEW VEHICLE, msg_num : " << data<< " " << counter_msg << endl;
@@ -1477,28 +1508,6 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                  //emit(inputBufferSignal, static_inputBuff);
 
                                  if (state_buff) {
-
-                                     //----------------------------- SATURATION CALCULATE ---------------------------------
-                                     // ask the sizes of memory
-                                     QueueState ocupation_buffer = sdcard.get_size_queues();
-                                     int data_on_buffer[5]={0};
-                                     data_on_buffer[0]=ocupation_buffer.p1;
-                                     data_on_buffer[1]=ocupation_buffer.p2;
-                                     data_on_buffer[2]=ocupation_buffer.p3;
-                                     data_on_buffer[3]=ocupation_buffer.p4;
-                                     data_on_buffer[4]=ocupation_buffer.p5;
-
-                                     for(int n=0; n<5; n++){
-
-                                         int saturation = data_on_buffer[n] + static_inputBuff;
-
-                                         if(saturation > 2000){
-                                             packet_lost_saturation_buffer+= saturation-2000;
-                                         }
-                                     }
-
-                                     emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
-                                     //-----------------------------------------------------------------------------------
 
                                       //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
                                       EV_INFO << "NEW traffic time, mgs : " << delay_sdcard << " ms" << " " << counter_msg << endl;
@@ -1597,6 +1606,31 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                              std::string data = buildDataString(event_traffic);
                                              // --------------------------------------------
+                                             //----------------------------- SATURATION CALCULATE ---------------------------------
+                                               // ask the sizes of memory
+                                               QueueState ocupation_buffer = sdcard.get_size_queues();
+                                               int data_on_buffer[5]={0};
+                                               //data_on_buffer[0]=ocupation_buffer.p1;
+                                               data_on_buffer[1]=ocupation_buffer.p2;
+                                               //data_on_buffer[2]=ocupation_buffer.p3;
+                                               //data_on_buffer[3]=ocupation_buffer.p4;
+                                               //data_on_buffer[4]=ocupation_buffer.p5;
+
+                                               //for(int n=0; n<5; n++){
+
+                                                   int saturation = data_on_buffer[1] + (static_inputBuff+1);
+
+                                                   if(saturation >= 2000){
+                                                       packet_lost_saturation_buffer++;
+                                                   }
+
+                                                   EV_INFO << "buffer: " << 2 << " memmoria:" << data_on_buffer[1] << " saturacion data:" << saturation << " lost by saturation" << packet_lost_saturation_buffer << endl;
+
+
+                                               //}
+
+                                               emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                               //-----------------------------------------------------------------------------
                                              counter_msg++;
 
                                              bool state_buff = inputBuffer.add(data, Priority_2, deadline_on_SERVER);// deadline 5minutes.
@@ -1606,28 +1640,6 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                              //emit(inputBufferSignal, static_inputBuff);
 
                                              if (state_buff) {
-
-                                                 //----------------------------- SATURATION CALCULATE ---------------------------------
-                                                 // ask the sizes of memory
-                                                 QueueState ocupation_buffer = sdcard.get_size_queues();
-                                                 int data_on_buffer[5]={0};
-                                                 data_on_buffer[0]=ocupation_buffer.p1;
-                                                 data_on_buffer[1]=ocupation_buffer.p2;
-                                                 data_on_buffer[2]=ocupation_buffer.p3;
-                                                 data_on_buffer[3]=ocupation_buffer.p4;
-                                                 data_on_buffer[4]=ocupation_buffer.p5;
-
-                                                 for(int n=0; n<5; n++){
-
-                                                     int saturation = data_on_buffer[n] + static_inputBuff;
-
-                                                     if(saturation > 2000){
-                                                         packet_lost_saturation_buffer+= saturation-2000;
-                                                     }
-                                                 }
-
-                                                 emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
-                                                 //-----------------------------------------------------------------------------------
 
                                                  //delay_sdcard = ((inputBuffer.size()) * 30) / 20;
 
@@ -1714,33 +1726,39 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                      std::string data = buildDataString(accident_traffic);
                                      // --------------------------------------------
+
+                                     //----------------------------- SATURATION CALCULATE ---------------------------------
+                                       // ask the sizes of memory
+                                       QueueState ocupation_buffer = sdcard.get_size_queues();
+                                       int data_on_buffer[5]={0};
+                                       data_on_buffer[0]=ocupation_buffer.p1;
+                                       //data_on_buffer[1]=ocupation_buffer.p2;
+                                       //data_on_buffer[2]=ocupation_buffer.p3;
+                                       //data_on_buffer[3]=ocupation_buffer.p4;
+                                       //data_on_buffer[4]=ocupation_buffer.p5;
+
+                                       //for(int n=0; n<5; n++){
+
+                                           int saturation = data_on_buffer[0] + (static_inputBuff+1);
+
+                                           if(saturation >= 2000){
+                                               packet_lost_saturation_buffer++;
+                                           }
+
+                                           EV_INFO << "buffer: " << 1 << " memmoria:" << data_on_buffer[0] << " saturacion data:" << saturation << " lost by saturation" << packet_lost_saturation_buffer << endl;
+
+                                       //}
+
+                                       emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
+                                       //-----------------------------------------------------------------------------
+
                                      counter_msg++;
 
                                      bool state_buff = inputBuffer.add(data, Priority_1, deadline_on_SERVER);// deadline 5minutes.
 
                                      static_inputBuff = inputBuffer.size();
 
-                                     //----------------------------- SATURATION CALCULATE ---------------------------------
-                                     // ask the sizes of memory
-                                     QueueState ocupation_buffer = sdcard.get_size_queues();
-                                     int data_on_buffer[5]={0};
-                                     data_on_buffer[0]=ocupation_buffer.p1;
-                                     data_on_buffer[1]=ocupation_buffer.p2;
-                                     data_on_buffer[2]=ocupation_buffer.p3;
-                                     data_on_buffer[3]=ocupation_buffer.p4;
-                                     data_on_buffer[4]=ocupation_buffer.p5;
 
-                                     for(int n=0; n<5; n++){
-
-                                         int saturation = data_on_buffer[n] + static_inputBuff;
-
-                                         if(saturation > 2000){
-                                             packet_lost_saturation_buffer+= saturation-2000;
-                                         }
-                                     }
-
-                                     emit(Packet_lost_for_saturation, packet_lost_saturation_buffer);
-                                     //-----------------------------------------------------------------------------------
 
                                      // -------- save buffer immediately --------
 
@@ -1996,16 +2014,17 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                         //alpha
                                         //beta
                                         //gamma
-                                        //threshold deadline min
-                                        //free memory by penalty [%]
+                                        //threshold deadline minimo 5s
+                                        //free memory by penalty [%], al quedar 5% liberar 25%
                                         //Time of windows
-                                        if(TTD==0){
-                                            Function_State = FuctionMultiObjetive(0.0, 0.0, 1.0, 5, 5, 900.0);// mando el maximo
-                                        }else{
-                                            Function_State = FuctionMultiObjetive(0.0, 0.0, 1.0, 5, 5, TTD);
-                                        }
 
-                                        //Function_State = FuctionMultiObjetive(0.0, 1.0, 0.0, 5, 5, 300.0); // 5min
+//                                        if(TTD==0){
+//                                            Function_State = FuctionMultiObjetive(0.0, 0.0, 1.0, 5, 5, 900.0);// mando el maximo
+//                                        }else{
+//                                            Function_State = FuctionMultiObjetive(0.0, 0.0, 1.0, 5, 5, TTD);
+//                                        }
+
+                                        Function_State = FuctionMultiObjetive(0.9, 0.1, 0.0, 5, 5, 300.0); // 5min
 
 
                                         // Function_Multi_Objetive_State = 0 --> Waiting for AP
