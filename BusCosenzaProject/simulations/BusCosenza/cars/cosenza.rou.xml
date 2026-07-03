@@ -181,11 +181,11 @@
 	
 	
 	<flow id="buses_cosenza" type="CONSORZIO_AUTOLINEE_DUE" begin="0.00" end="1000" period="1200.00" route="LINEA_N_138_RENDE-COSENZA_(Autostazione)"/>
-	<!-- Dense Traffic-->
+	<!-- Dense Traffic
 	<flow id="cars_9" type="car_private" begin="80.00" end="250.00" period="5.00" from="518769704" to="858257969#1"/>
 	<flow id="cars_10" type="car_private" begin="320.00" end="400.00" period="2.00" from="-1159480147#1" to="-479000717"/>
 	<flow id="cars_11" type="car_private" begin="321.00" end="400.00" period="2.00" from="44290792" to="1157743484#0"/>
-	 
+	 -->
 	
 	<!-- Light Traffic 
 	<flow id="cars_9" type="car_private" begin="10.00" end="250.00" period="10.00" from="518769704" to="813233242#0"/>

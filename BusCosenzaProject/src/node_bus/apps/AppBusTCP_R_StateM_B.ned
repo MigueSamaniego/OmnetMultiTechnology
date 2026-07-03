@@ -34,6 +34,11 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
         int GW_Battery_Level_Start = default(100);
         bool event_accident = default(false);
         
+        double Strategy5_alpha = default(0.0);
+        double Strategy5_beta = default(0.0);
+        double Strategy5_gamma = default(0.0);
+        bool Use_Model = default(false);
+        
         @display("i=block/app");
         @class(AppBusTCP_R_StateM_B);
         

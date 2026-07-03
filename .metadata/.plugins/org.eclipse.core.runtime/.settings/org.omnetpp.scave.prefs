@@ -5,6 +5,7 @@ DataTable.PARAMETERS.Name.width=171
 DataTable.PARAMETERS.Value.width=137
 DataTable.SCALARS.Experiment.width=158
 DataTable.SCALARS.Folder.width=78
+DataTable.SCALARS.Measurement.width=125
 DataTable.SCALARS.Module.width=270
 DataTable.SCALARS.Name.width=236
 DataTable.VECTORS.Experiment.visible=false

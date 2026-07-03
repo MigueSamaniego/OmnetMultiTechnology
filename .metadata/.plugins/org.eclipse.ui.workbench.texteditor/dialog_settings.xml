@@ -5,28 +5,28 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="SATURATION"/>
+		<item key="selection" value="sendDataToCloud"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="saturation"/>
-			<item value=" saturacion data"/>
-			<item value="saturacion data"/>
-			<item value="ACCIDENT"/>
-			<item value="TTD"/>
-			<item value="FuctionMultiObjetive"/>
 			<item value="sendDataToCloud"/>
-			<item value="sendDataToCloud_Strategy_5"/>
-			<item value="buffer_penalty"/>
-			<item value="ttd"/>
-			<item value="popBatch"/>
-			<item value="vectorlast"/>
-			<item value="Consumption_WIFI"/>
-			<item value="Consumption_WIFI_Battery"/>
-			<item value="number_bytes_lose"/>
+			<item value="deadline_until"/>
+			<item value="300"/>
+			<item value="timeoutMsg"/>
+			<item value="count_reTX"/>
+			<item value="Strategy_Switching"/>
+			<item value="FuctionMultiObjetive"/>
+			<item value="socket_state_close"/>
+			<item value="socket error 3"/>
+			<item value="val reTX"/>
+			<item value="socket_ready"/>
+			<item value="ESTADO DEL SOCKET LTE"/>
+			<item value="EV_"/>
+			<item value="lastDataTime"/>
+			<item value="timerExpired"/>
 		</list>
 		<list key="replacehistory">
 			<item value="popBatch_Strategy_5"/>
@@ -47,8 +47,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1252"/>
-		<item key="DIALOG_Y_ORIGIN" value="523"/>
+		<item key="DIALOG_X_ORIGIN" value="48"/>
+		<item key="DIALOG_Y_ORIGIN" value="273"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

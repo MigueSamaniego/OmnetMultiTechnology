@@ -229,6 +229,11 @@ void AppBusTCP_R_StateM_B::initialize(int stage)
             GW_Battery_Level_Start = 0;
         }
 
+        this->Strategy5_alpha = par("Strategy5_alpha").doubleValue();
+        this->Strategy5_beta = par("Strategy5_beta").doubleValue();
+        this->Strategy5_gamma = par("Strategy5_gamma").doubleValue();
+        this->Use_Model = par("Use_Model").boolValue();
+
         GW_Battery_Capacity_mAh = (GW_Battery_Capacity_mAh*GW_Battery_Level_Start)/100;
         Battery_Available = GW_Battery_Capacity_mAh;
 
@@ -523,14 +528,19 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                         measure_stage = false;
 
                         windows_fix = true; // i sent 5min of data
-                        Strategy_Switching = 5;
-                        //Strategy_Switching = 0 --> no strategy
-                        //Strategy_Switching = 1 --> WIFI
-                        //Strategy_Switching = 2 --> LTE
-                        //Strategy_Switching = 3 --> Deadline (wifi and LTE)
-                        //Strategy_Switching = 4 --> wifi and LTE (without deadline)
-                        //Strategy_Switching = 5 --> wifi and LTE (function multi-objetivo)
 
+                        if(Use_Model){
+                            Strategy_Switching = 5;// we use the model
+                        }else{
+
+                            Strategy_Switching = 5;
+                            //Strategy_Switching = 0 --> no strategy
+                            //Strategy_Switching = 1 --> WIFI
+                            //Strategy_Switching = 2 --> LTE
+                            //Strategy_Switching = 3 --> Deadline (wifi and LTE)
+                            //Strategy_Switching = 4 --> wifi and LTE (without deadline)
+                            //Strategy_Switching = 5 --> wifi and LTE (function multi-objetivo)
+                        }
 
                         // ------------------ available event accident -------------------------------------
                         state_of_accident = 0; // not accident state
@@ -616,8 +626,8 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                             Coord pos = mobility->getCurrentPosition();
 
                             Coord apUnical(3543.52, 5712.03);
-                            //Coord apCosenza(5850.89, 11486.75);
-                            Coord apCosenza(3132.72, 6220.97);
+                            Coord apCosenza(5850.89, 11486.75);
+                            //Coord apCosenza(3132.72, 6220.97);
 
                             double distance_to_AP1 = pos.distance(apUnical);
                             double distance_to_AP2 = pos.distance(apCosenza);
@@ -700,9 +710,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                             double alpha = 0.0001;// slow reaction 0.0001, 0.005
                             if(!ConnectionToAP){// when WIFI is not found
 
-
-
-                                EV_WARN << "SPEED: " << current_speed << " DISTANCE: " << distance_trip_curruntly << endl;
+                                EV_WARN << "SPEED: " << current_speed << " DISTANCE: " << distance_trip_curruntly << " TIME_TO_D: " << TTD << endl;
 
                                 if(distance_trip_curruntly > 0){
 
@@ -723,6 +731,8 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                             TTD = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
                                             TTD_pass = TTD;
 
+                                            EV_WARN << "EMA_LTE1: " << emaSpeed << " TIME TO D: " << TTD << endl;
+
 
                                         }else if(!detected_traffic_state){
                                             if (!emaInit) {
@@ -738,11 +748,12 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                                 TTD_pass = TTD;
 
                                             }
+                                            EV_WARN << "EMA_LTE2: " << emaSpeed << " TIME TO D: " << TTD << " DISTANS USED: " << distance_trip_section[bus_station_section] << " VECTOR: " << bus_station_section << " DISTA_CURR: " << distance_trip_curruntly << endl;
                                         }
 
                                     if(TTD > 0){
 
-                                        EV_INFO << "ESTIMATION TIME ARRIVE: "<< TTD << " speed: " << current_speed <<endl;
+                                        EV_INFO << "ESTIMATION TIME ARRIVE LTE: "<< TTD << " speed: " << current_speed <<endl;
                                         emit(Time_TTD,TTD);
                                     }
                                 }
@@ -766,7 +777,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                         emaSpeed = (alpha * current_speed/3.6) + ((1 - alpha) * emaSpeed);
                                         TTD = (distance_trip_section[bus_station_section] - distance_trip_curruntly) / sqrt((emaSpeed * emaSpeed) + (emaSpeed_to_seep_low * emaSpeed_to_seep_low));
                                         TTD_pass = TTD;
-
+                                        EV_WARN << "EMA_WIFI1: " << emaSpeed << " TIME TO D: " << TTD << endl;
 
                                     }else if(!detected_traffic_state){
                                         if (!emaInit) {
@@ -782,10 +793,11 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                             TTD_pass = TTD;
 
                                         }
+                                        EV_WARN << "EMA_WIFI2: " << emaSpeed << " TIME TO D: " << TTD << endl;
                                     }
                                 }else{
                                     TTD = 0.0;
-
+                                    EV_WARN << "ENCERADO" << endl;
                                 }
 
 
@@ -1186,7 +1198,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                             // ******************* Detect an anomaly on socket, start timeOut reestablish/new socket ********************
                             if(socket_state_close){
-                                EV_INFO << "val reTX: " << count_reTX << "socket state: " << socket_ready << "socket get: " << socket.getState() << endl;
+                                EV_ERROR << "val reTX: " << count_reTX << "socket state: " << socket_ready << "socket get: " << socket.getState() << endl;
                                 count_reTX++;
                                 if(count_reTX % 100 == 0) {
                                     EV_INFO << "Cooldown... " << (count_reTX/100) << " Seconds." << endl;
@@ -1196,6 +1208,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                 timer_Control_Send_Data = 0;
 
                                 // **************************** waiting for reestablish network *********************************************
+                                //if((count_reTX >= (waiting_changing_x_10ms + 1))&&(socket.getState() != inet::TcpSocket::CONNECTED)){
                                 if(count_reTX >= (waiting_changing_x_10ms + 1)){
 
                                     if(count_reTX == (waiting_changing_x_10ms + 1)){
@@ -1271,6 +1284,8 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                     time_threshold_send_data = 5; // this is the time after stablish the link, so GW wait 50ms before to send
                                     timer_Control_Send_Data = 0;
                                 }
+
+
 
                             }
 
@@ -2018,20 +2033,28 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                         //free memory by penalty [%], al quedar 5% liberar 25%
                                         //Time of windows
 
-//                                        if(TTD==0){
-//                                            Function_State = FuctionMultiObjetive(0.0, 0.0, 1.0, 5, 5, 900.0);// mando el maximo
-//                                        }else{
-//                                            Function_State = FuctionMultiObjetive(0.0, 0.0, 1.0, 5, 5, TTD);
-//                                        }
+                                        if(Use_Model){
+                                            if(TTD==0){
+                                                EV_ERROR<< "USING WIFI TO OFF-LOADING" <<endl;
+                                                Function_State = FuctionMultiObjetive(Strategy5_alpha, Strategy5_beta, Strategy5_gamma, 10, 5, 36000.0);// mando el maximo
+                                            }else{
+                                                Function_State = FuctionMultiObjetive(Strategy5_alpha, Strategy5_beta, Strategy5_gamma, 10, 5, TTD); // if find deadline offloading a windows of time calculate
+                                            }
+                                        }else{
 
-                                        Function_State = FuctionMultiObjetive(0.9, 0.1, 0.0, 5, 5, 300.0); // 5min
+                                            Function_State = FuctionMultiObjetive(Strategy5_alpha, Strategy5_beta, Strategy5_gamma, 5, 5, deadline_until); // if find deadline offloading a windows of 10min
 
+                                        }
 
                                         // Function_Multi_Objetive_State = 0 --> Waiting for AP
                                         // Function_Multi_Objetive_State = 1 --> offloading LTE
                                         // Function_Multi_Objetive_State = 2 --> offloading WIFI
 
                                         EV_ERROR <<" Function Result: " << Function_State << endl;
+                                        //----- reste de la variable, es fundamental ------------------------
+                                        timer_fuction_multi_objetive = 0;
+                                        timer_Control_Send_Data = 0;
+                                        //--------------------------------------------------------------------
 
                                         if(Function_State == 10)// error
                                             Function_State = 0;
@@ -2048,15 +2071,14 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                             EV_ERROR <<" SELECT WIFI"<< endl;
                                         }
 
-                                        timer_fuction_multi_objetive = 0;
-                                        timer_Control_Send_Data = 0;
+
 
                                     }
 
                                     timer_fuction_multi_objetive++;
 
                                 }else if(Function_State == 1){// offloading LTE
-
+                                    EV_ERROR <<" ESTADO DEL SOCKET LTE" << ConnectionToAP << " - " <<  take_time_when_find_expired_data << " - " << socket_ready << endl;
                                     if(!ConnectionToAP){
 
                                         if(take_time_when_find_expired_data){
@@ -2102,7 +2124,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                     }
 
                                 }else if(Function_State == 2){// offloading WIFI
-
+                                    EV_ERROR <<" ESTADO DEL SOCKET WIFI" << ConnectionToAP << " - " <<  take_time_when_find_expired_data << " - " << socket_ready << endl;
                                     if(ConnectionToAP){
 
                                         if(socket_ready){
@@ -2127,7 +2149,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                                    if(!take_time_when_find_expired_data){
                                                       // FINISH THE COMMUNICATION
-                                                      Function_State = 0;
+                                                      //Function_State = 0;
                                                       timer_fuction_multi_objetive = 0;
                                                   }
 
@@ -2554,7 +2576,7 @@ void AppBusTCP_R_StateM_B::sendDataToCloud_Strategy_5(const std::string& interfa
 
 
             long data_priority_on_sd = sdcard.data_priority_on_sdcard();
-            int empty_buffer_percent = 25;
+            int empty_buffer_percent = 25;// este es el poncentaje a vaciar de la memoria elegida.
 
             if(data_priority_on_sd >= 20){
                 if(Strategy_Switching == 5){
@@ -3032,23 +3054,28 @@ void AppBusTCP_R_StateM_B::socketEstablished(inet::TcpSocket *socket) {
 
 void AppBusTCP_R_StateM_B::socketPeerClosed(inet::TcpSocket *socket) {
     EV_INFO << "socket error 5" << endl;
+
     if (socket->getState() == inet::TcpSocket::CONNECTED) socket->close();
+
     socket_ready = false;
     socket_state_close = true; // start cooldown
-    count_reTX = 0;
+    count_reTX = 600;
     fix_interface = true;
 }
 
 void AppBusTCP_R_StateM_B::socketClosed(inet::TcpSocket *socket) {
     EV_INFO << "socket error 4" << endl;
+
+    //if (socket->getState() == inet::TcpSocket::CLOSED) socket->close();
+
     socket_ready = false;
     socket_state_close = true; // start cooldown
-    count_reTX = 0;
+    count_reTX = 600;// DEBE ABRIR EL NUEVO SOCKET. REPRESENTA 7s con 100 ms para re-abrir
     fix_interface = true;
 }
 
 void AppBusTCP_R_StateM_B::socketFailure(inet::TcpSocket *socket, int code) {
-    EV_INFO << "socket error 3" << endl;
+    EV_INFO << "socket error 3: " << endl;
 
     if (!socket) return;
 
@@ -3085,7 +3112,7 @@ void AppBusTCP_R_StateM_B::socketFailure(inet::TcpSocket *socket, int code) {
 
     socket_ready = false;
     socket_state_close = true; // start cooldown
-    count_reTX = 0;
+    count_reTX = 600;
     fix_interface = true;
 }
 
@@ -3951,10 +3978,19 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
     model[0] = (gamma_w * mem_norm_0);
 
     // --- MODELO 1: TRANSMITIR POR LTE ---
-    double cost_norm_1 = lte_financial_cost / MAX_FINANCIAL_COST;
+    double cost_norm_1 = 0.0;
+    if(MAX_FINANCIAL_COST > 0.0)
+        cost_norm_1 = lte_financial_cost / MAX_FINANCIAL_COST;
+
+    EV_ERROR << "COST LTE : " << lte_financial_cost << MAX_FINANCIAL_COST << endl;
     if(cost_norm_1 > 1.0)
         cost_norm_1 = 1.0;
-    double energy_norm_1 = Consumption_GW_lte / MAX_ENERGY_CONSUMPTION_LTE;
+
+    double energy_norm_1 = 0.0;
+    if(MAX_ENERGY_CONSUMPTION_LTE > 0.0)
+        energy_norm_1 = Consumption_GW_lte / MAX_ENERGY_CONSUMPTION_LTE;
+
+    EV_ERROR << "COST ENERGIA : " << Consumption_GW_lte << MAX_ENERGY_CONSUMPTION_LTE << endl;
     if(energy_norm_1 > 1.0)
         energy_norm_1 = 1.0;
 
@@ -3969,11 +4005,17 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
         energy_norm_w = 1.0;
     }
 
+//    if ((ConnectionToAP)&&(socket_ready)) {
+//        cost_norm_w = 0.0;
+//        energy_norm_w = 0.0;
+//    }
+
+
     model[2] = (alpha * cost_norm_w) + (beta * energy_norm_w);
 
-    //EV_ERROR << "ESPERAR POR AP: " << model[0] << endl;
-    //EV_ERROR << "TRANSMITIR for LTE: " << model[1] << endl;
-    //EV_ERROR << "TRANSMITIR WIFI: " << model[2] << endl;
+    EV_ERROR << "ESPERAR POR AP: " << model[0] << endl;
+    EV_ERROR << "TRANSMITIR for LTE: " << model[1] << endl;
+    EV_ERROR << "TRANSMITIR WIFI: " << model[2] << endl;
 
     emit(model_cost_wait_ap, model[0]);
     emit(model_cost_offloading_lte, model[1]);
@@ -3991,6 +4033,7 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
     }
 
     if((best_decision>0)&&(model[1] == model[2])){// tecnologia WIFI gana siempre en igualdad porque el objetivo es Tx.
+        //if ((ConnectionToAP)&&(socket_ready)) {
         if (ConnectionToAP) {
             best_decision = 2;
         }else{

@@ -156,7 +156,7 @@ private:
     simtime_t time_trip_Return = 0;
     bool measure_stage = false;
     bool flag_time_start_trip_return = false;
-    uint8_t bus_station_section = 0;
+    int bus_station_section = 0;
     double distance_trip_section[2] = {9954.38,(9954.38+11860.3)};// distance on meters
     double TTD = 0.0;
     double TTD_pass = 0.0;
@@ -266,6 +266,11 @@ private:
     uint8_t detected_traffic_state = 0;
     int timer_congestion_state = 0;
     int timer_congestion_state_out = 0;
+
+    double Strategy5_alpha;
+    double Strategy5_beta;
+    double Strategy5_gamma;
+    bool Use_Model;
 
 
     // ack tcp
