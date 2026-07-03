@@ -2013,7 +2013,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                 }
 
-                            }else if(Strategy_Switching == 5){
+                            }/*else if(Strategy_Switching == 5){
 
 
                                 // -------------------------------------------------------------------------------------------------------------------
@@ -2088,14 +2088,14 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                                 if (timer_Control_Send_Data >= time_threshold_send_data){
                                                     EV_ERROR <<" Send data por LTE"<< endl;
-                                                       /****** Sent Message to Cloud *********************/
+                                                       //****** Sent Message to Cloud *********************
                                                        if(buffer_penalty != -1){
                                                            sendDataToCloud_Strategy_5("lte");
                                                        }else{
                                                            sendDataToCloud("lte"); // prepare and send message
                                                        }
                                                        flag_tx_lte = true;
-                                                       /**************************************************/
+                                                       //**************************************************
 
                                                        time_threshold_send_data = 10; // 150ms to retry
 
@@ -2136,14 +2136,14 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                                     deadline_start = simTime(); // offloading all data
                                                     deadline_until = 600.0;
 
-                                                    /****** Sent Message to Cloud *********************/
+                                                    //****** Sent Message to Cloud *********************
                                                     if(buffer_penalty != -1){
                                                         sendDataToCloud_Strategy_5("wifi");
                                                     }else{
                                                         sendDataToCloud("wifi"); // prepare and send message
                                                     }
                                                     flag_tx_wifi = true;
-                                                   /**************************************************/
+                                                   //**************************************************
 
                                                    time_threshold_send_data = 10; // 100ms to retry
 
@@ -2177,7 +2177,152 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
 
 
+                            }*/
+                            else if(Strategy_Switching == 5){
+                                // -------------------------------------------------------------------------------------------------------------------
+                                // -------------------------------------------------------------------------------------------------------------------
+                                // -------------------------------------- Function Multi-Objetive -----------------------------------------------------
+                                // -------------------------------------------------------------------------------------------------------------------
+
+                                if(ConnectionToAP){ // WIFI available
+
+                                    if(socket_ready){
+
+                                        if (timer_Control_Send_Data >= time_threshold_send_data){
+
+                                                deadline_start = simTime(); // update this time each call function is sufficient to empty data from SDCARD
+                                                deadline_until = 6000;// debe ser grande
+
+                                                /****** Sent Message to Cloud *********************/
+                                                sendDataToCloud("wifi"); // prepare and send message
+                                                flag_tx_wifi = true;
+                                               /**************************************************/
+
+                                               time_threshold_send_data = 10; // 100ms to retry
+
+                                           timer_Control_Send_Data = 0;
+                                           emit(model_cost_offloading_wifi, 0);// actualiza estado de salida del modelo 2
+                                       }
+
+                                       timer_Control_Send_Data++;
+
+                                    }
+
+                                    //check_timers_expired = 105; // USED TO CHECK IN THE NEXT CYCLE WHEN WIFY IS LOSE
+                                    take_time_when_find_expired_data = false; // reset this variable while it has WIFI, in this case i must sento all data
+                                    Function_State = 0; //indica que debe calcular el modelo antes de actuar
+                                    timer_fuction_multi_objetive = timer_Control_Send_Data; //continua con el conteo para el timer del calculo del modelo
+
+
+
+                                }// quie es mi verdadero problema, TX por LTE o mantener en memoria, cual me combiene?
+                                else{
+
+                                    if(Function_State == 0){// waiting
+
+                                        if(timer_fuction_multi_objetive >= 100){ // 1segundo
+                                            // 10 en s representa el tiempo de activacion en anticipacion, 1% el activador de la memoria casi llena
+                                            //alpha
+                                            //beta
+                                            //gamma
+                                            //threshold deadline minimo 5s
+                                            //free memory by penalty [%], al quedar 5% liberar 25%
+                                            //Time of windows
+
+                                            if(Use_Model){
+                                                if(TTD==0){
+                                                    EV_ERROR<< "USING WIFI TO OFF-LOADING" <<endl;
+                                                    Function_State = FuctionMultiObjetive(Strategy5_alpha, Strategy5_beta, Strategy5_gamma, 10, 5, 36000.0);// mando el maximo
+                                                }else{
+                                                    Function_State = FuctionMultiObjetive(Strategy5_alpha, Strategy5_beta, Strategy5_gamma, 10, 5, TTD); // if find deadline offloading a windows of time calculate
+                                                }
+                                            }else{
+
+                                                Function_State = FuctionMultiObjetive(Strategy5_alpha, Strategy5_beta, Strategy5_gamma, 5, 5, deadline_until); // if find deadline offloading a windows of 10min
+
+                                            }
+
+                                            // Function_Multi_Objetive_State = 0 --> Waiting for AP
+                                            // Function_Multi_Objetive_State = 1 --> offloading LTE
+                                            // Function_Multi_Objetive_State = 2 --> offloading WIFI
+
+                                            EV_ERROR <<" Function Result: " << Function_State << endl;
+
+
+                                            if(Function_State == 10)// error
+                                                Function_State = 0;
+
+                                            if(Function_State == 1){// lte
+                                                take_time_when_find_expired_data = true;
+                                                deadline_start = simTime();
+                                                deadline_until = range_stop_strategy_5;
+                                                EV_ERROR <<" SELECT LTE"<< " start: " << deadline_start << " stop: " << deadline_until <<endl;
+                                            }
+
+//                                            if(Function_State == 2){// wifi
+//                                                take_time_when_find_expired_data = true;
+//                                                EV_ERROR <<" SELECT WIFI"<< endl;
+//                                            }
+
+                                            //----- reste de la variable, es fundamental ------------------------
+                                            timer_fuction_multi_objetive = 0;
+                                            timer_Control_Send_Data = 0;
+                                            //--------------------------------------------------------------------
+
+                                        }
+
+                                        timer_fuction_multi_objetive++;
+
+                                    }else if(Function_State == 1){// offloading LTE
+                                        EV_ERROR <<" ESTADO DEL SOCKET LTE" << ConnectionToAP << " - " <<  take_time_when_find_expired_data << " - " << socket_ready << endl;
+
+                                        if(take_time_when_find_expired_data){
+
+                                            if(socket_ready){
+
+                                                if (timer_Control_Send_Data >= time_threshold_send_data){
+                                                    EV_ERROR <<" Send data por LTE"<< endl;
+                                                       /****** Sent Message to Cloud *********************/
+                                                       if(buffer_penalty != -1){
+                                                           sendDataToCloud_Strategy_5("lte");// usado para penalizacion descargar memoria por saturarse
+                                                       }else{
+                                                           sendDataToCloud("lte"); // prepare and send message
+                                                       }
+                                                       flag_tx_lte = true;
+                                                       /**************************************************/
+
+                                                       time_threshold_send_data = 10; // 150ms to retry
+
+                                                       if(!take_time_when_find_expired_data){
+                                                           // FINISH THE COMMUNICATION
+                                                           Function_State = 0;
+                                                           timer_fuction_multi_objetive = 0;
+                                                       }
+
+                                                    timer_Control_Send_Data = 0;
+
+                                                }
+
+                                                timer_Control_Send_Data++;
+
+                                            }
+
+                                        }
+
+
+                                    }
+
+
+
+                                }
+
                             }
+
+
+
+
+
+
 
 
 
@@ -3863,7 +4008,7 @@ void AppBusTCP_R_StateM_B::socketDeleted(inet::TcpSocket *socket) {
 
 }*/
 
-int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
+/*int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
     EV_ERROR << "calculation fuction." << endl;
 
     range_start_strategy_5 = simTime().dbl();
@@ -4048,6 +4193,185 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
 //            best_decision = 0;
 //        }
 //    }
+
+
+    return best_decision;
+
+
+}*/
+
+
+int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
+    EV_ERROR << "calculation fuction." << endl;
+
+    range_start_strategy_5 = simTime().dbl();
+    range_stop_strategy_5 = windows;
+
+    double data_on_buffer[5]={0};
+    QueueState datos_en_cola = sdcard.get_size_queues();
+    data_on_buffer[0] = datos_en_cola.p1;
+    data_on_buffer[1] = datos_en_cola.p2;
+    data_on_buffer[2] = datos_en_cola.p3;
+    data_on_buffer[3] = datos_en_cola.p4;
+    data_on_buffer[4] = datos_en_cola.p5;
+    //EV_WARN << "cola 1: " << datos_en_cola.p1 << " cola 2: " << datos_en_cola.p2 << " cola 3: " << datos_en_cola.p3 << " cola 4: " << datos_en_cola.p4 << " cola 5: " << datos_en_cola.p5 << endl;
+
+
+    RangeStats val = sdcard.getStatsByDeadline(range_start_strategy_5, range_stop_strategy_5);
+
+    // 1. SEGURIDAD MATEMÁTICA PARA LA PENALIDAD (URGENCIA)
+    bool P_t = false;
+    //double max_Pt = 900.0 - 10.0;// es el valor del deadline mas viejo en este caso 15min
+
+    // activate penaly for urgency
+    if (val.D_t > 0) {
+
+        double remainign_time_on_old_data = (sdcard.remaining_time(simTime()));
+        double penaly_urg = remainign_time_on_old_data - coefficient;//
+        //EV_ERROR << "urgencia: " << penaly_urg << endl;
+        //EV_ERROR << "tiempo restante: " << remainign_time_on_old_data << endl;
+
+        if(penaly_urg <= 0.0)
+            P_t = true;
+    }
+
+     //activate penaly for saturation
+    long max_buffer_fill = 2000;
+    buffer_penalty = -1;
+
+    for(int n=0; n<=4; n++){
+
+        double penaly_saturation = (100.0 - ((data_on_buffer[n]*100)/max_buffer_fill));
+        //EV_ERROR << "saturacion: " << penaly_saturation << endl;
+        //EV_ERROR << "ocupacion: " << data_on_buffer[n] << endl;
+
+        if(penaly_saturation <= threshold_memmory){
+            buffer_penalty = n;
+            P_t = true;
+        }
+    }
+
+
+
+    // 2. CÁLCULOS DE ENERGÍA Y COSTO FINANCIERO
+    double windows_ms = windows*1000;// ventana en ms
+
+    double Tx_phase = 0.0, Rx_phase = 0.0, Normal_phase = 0.0, time_on_sleep = windows_ms;
+    double Tx_phaseW = 0.0, Rx_phaseW = 0.0, Normal_phaseW = 0.0, time_on_sleepW = windows_ms;
+    if (val.D_t > 0) {// si tenemos almenos un dato
+
+        Tx_phase = val.D_t*5;
+        Rx_phase = val.D_t*2;
+        Normal_phase = (val.D_t*93) + 2500;// + 2500; // tiempo para entrar en sleep
+        time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
+
+    }/*else{
+        Normal_phase = 2500;// + 2500; // tiempo para entrar en sleep
+        time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
+    }*/
+
+    double Consumption_GW_lte = (((Tx_phase)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                (((Rx_phase)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                (((Normal_phase)/3600000.0) * (116.081 + 0.8 + 80))+
+                                (((time_on_sleep)/3600000.0) * (116.081 + 0.8 + 13.14));
+
+    double Consumption_GW_sleep = ((windows_ms)/3600000.0) * (116.081 + 0.8 + 13.14);
+
+    double lte_financial_cost = (val.Bytes_total_on_range) * 0.0000000954;
+
+    // 3. NORMALIZACIÓN (Ajusta estos valores MÁXIMOS según la física de tu simulación)
+
+    // values maximum for windows, dipend of sampling rate data collectet
+    // we use 2 variable to 1[s] sampling, and 1 variable to 5[s] sampling.
+    double packets_max = ((windows_ms/100)*2)+((windows_ms/100)*0.2);
+    double bytes_max = packets_max*100;// considering each packet size has 100B maximum
+
+    // Esto asegura que Cost, Energy y Memory estén siempre entre 0.0 y 1.0
+    double MAX_FINANCIAL_COST = (bytes_max) * 0.0000000954; // asumimos que en la ventana que usamos de 5min y que cada paquete puede tener 100B max
+
+    // here "(windows_ms/100)" is right, because GW can tx just 100ms each packet
+    double MAX_ENERGY_CONSUMPTION_LTE = (windows_ms/100)*((((5)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                                     (((2)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                                     (((93)/3600000.0) * (116.081 + 0.8 + 80))); // Ajusta al pico máximo de Ah que podría gastar LTE en 300s
+
+
+
+
+
+    //double MAX_PENALTY_SCORE = (100) * (packets_max); // Urgencia max * Max datos posibles on windows (2 muestras cada [s], 1 muestra cada 5[s]);
+
+
+    double model[3];
+
+    // --- MODELO 0: keep ON SDCARD ---
+    double energy_norm_0 = 0.0;
+
+
+    if(MAX_ENERGY_CONSUMPTION_LTE > 0.0)
+       energy_norm_0 = Consumption_GW_sleep / MAX_ENERGY_CONSUMPTION_LTE;
+
+    if(energy_norm_0 > 1.0)
+       energy_norm_0 = 1.0;
+
+    model[0] = (beta * energy_norm_0) + (gamma_w * (int)P_t);
+
+    // --- MODELO 1: TRANSMITIR POR LTE ---
+    double cost_norm_1 = 0.0;
+    if(MAX_FINANCIAL_COST > 0.0)
+        cost_norm_1 = lte_financial_cost / MAX_FINANCIAL_COST;
+
+    //EV_ERROR << "COST LTE : " << lte_financial_cost << MAX_FINANCIAL_COST << endl;
+    if(cost_norm_1 > 1.0)
+        cost_norm_1 = 1.0;
+
+    double energy_norm_1 = 0.0;
+    if(MAX_ENERGY_CONSUMPTION_LTE > 0.0)
+        energy_norm_1 = Consumption_GW_lte / MAX_ENERGY_CONSUMPTION_LTE;
+
+    //EV_ERROR << "COST ENERGIA : " << Consumption_GW_lte << MAX_ENERGY_CONSUMPTION_LTE << endl;
+    if(energy_norm_1 > 1.0)
+        energy_norm_1 = 1.0;
+
+    model[1] = (alpha * cost_norm_1) + (beta * energy_norm_1);
+
+
+    // --- MODELO 2: TX using WIFI---
+    //bool mem_norm_2 = P_t;
+
+    model[2] = 1;// si estamos dentro de esta funcion quiere decir que WIFI is DISCONNECT
+
+
+
+
+//    EV_ERROR << "MAX ENERGY lte: " << MAX_ENERGY_CONSUMPTION_LTE << " gw sleep: " << Consumption_GW_sleep << " gw lte" << Consumption_GW_lte << endl;
+//    EV_ERROR << "ESPERAR POR AP: " << model[0] << endl;
+//    EV_ERROR << "TRANSMITIR for LTE: " << model[1] << endl;
+//    EV_ERROR << "TRANSMITIR WIFI: " << model[2] << endl;
+
+    emit(model_cost_wait_ap, model[0]);
+    emit(model_cost_offloading_lte, model[1]);
+    emit(model_cost_offloading_wifi, model[2]);
+
+    // ENCONTRAR EL MÍNIMO
+    double min = 99999999.9;
+    int best_decision = 10; // error
+
+    for(int n=0; n<2; n++){
+        if(model[n] < min){
+            min = model[n];
+            best_decision = n;
+        }
+    }
+
+//    if((best_decision>0)&&(model[1] == model[2])){// tecnologia WIFI gana siempre en igualdad porque el objetivo es Tx.
+//        //if ((ConnectionToAP)&&(socket_ready)) {
+//        if (ConnectionToAP) {
+//            best_decision = 2;
+//        }else{
+//            best_decision = 1;
+//        }
+//    }
+//
 
 
     return best_decision;
