@@ -39,6 +39,8 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
         double Strategy5_gamma = default(0.0);
         bool Use_Model = default(false);
         
+        int Strategy_Switching = default(1);
+        
         @display("i=block/app");
         @class(AppBusTCP_R_StateM_B);
         

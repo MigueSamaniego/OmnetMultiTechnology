@@ -1,0 +1,553 @@
+                                                                
+version 3
+run General-0-20260709-01:32:20-70831
+attr configname General
+attr datetime 20260709-01:32:20
+attr datetimef 20260709-013220
+attr experiment General
+attr inifile omnetppTCP.ini
+attr iterationvars "$0=00_10_00, $1=00_10_00"
+attr iterationvarsd 00#_10#_00/00#_10#_00
+attr iterationvarsf 00#_10#_00,00#_10#_00-
+attr measurement "$0=00_10_00, $1=00_10_00"
+attr network simulations.BusCosenza.cars.HighwayTCP
+attr processid 70831
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config image-path ../../../images:../../../../inet4.4/images:../../../../simu5G/images:../../../../veins_inet/images:../../../../veins-veins-5.2/images
+config cmdenv-express-mode true
+config cmdenv-autoflush true
+config image-path ../../images
+config network simulations.BusCosenza.cars.HighwayTCP
+config debug-on-errors true
+config record-eventlog false
+config print-undisposed false
+config sim-time-limit 4000s
+config **.scalar-recording true
+config **.vector-recording true
+config **.app.*.vector-recording true
+config **.routingRecorder.enabled false
+config **.app[*].inputBufferSize.result-recording-modes +vector
+config **.app[*].outputBufferSize.result-recording-modes +vector
+config **.app[*].sdcardBufferSize.result-recording-modes +vector
+config *.playgroundSizeX 10989m
+config *.playgroundSizeY 19063m
+config *.playgroundSizeZ 50m
+config *.annotations.draw true
+config *.obstacles.obstacles "xmldoc(\"./config.xml\", \"//AnalogueModel[@type='SimpleObstacleShadowing']/obstacles\")"
+config *.veinsManager.host "\"localhost\""
+config *.veinsManager.moduleType "\"CONSORZIO_AUTOLINEE_DUE=src.node_bus.cars.BusGW car_private=src.node_bus.cars.BusGW car_private2=src.node_bus.cars.BusGW\""
+config *.veinsManager.moduleName "\"CONSORZIO_AUTOLINEE_DUE=bus car_private=trafficCar car_private2=trafficCar\""
+config *.veinsManager.moduleDisplayString "\"\""
+config *.veinsManager.launchConfig "xmldoc(\"cosenza.launchd.xml\")"
+config *.veinsManager.updateInterval 0.1s
+config *.bus[*].mobility.typename src.node_bus.apps.VeinsInetMobility
+config *.configurator.config "xmldoc(\"./demo.xml\")"
+config *.configurator.dumpAddresses true
+config *.configurator.dumpRoutes true
+config *.configurator.verbose true
+config *.bus[*].ipv4.configurator.typename HostAutoConfiguratorM
+config *.bus[*].ipv4.configurator.interfaces "\"cellular lo0 wlan0\""
+config *.bus[*].ipv4.configurator.addressBase "\"10.0.0.1\""
+config *.bus[*].ipv4.configurator.netmask "\"255.255.0.0\""
+config *.bus[*].ipv4.configurator.addressBaseWlan "\"192.168.0.1\""
+config *.bus[*].ipv4.configurator.netmaskWlan "\"255.255.0.0\""
+config *.bus[*].numWlanInterfaces 1
+config *.bus[*].numApps 1
+config *.bus[*].app[0].typename src.node_bus.apps.AppBusTCP_R_StateM_B
+config *.bus[*].app[0].interface "\"wlan0\""
+config *.bus[*].hasTcp true
+config *.trafficCar[*].numWlanInterfaces 0
+config *.trafficCar[*].hasTcp false
+config *.trafficCar[*].cellularNic.typename ""
+config *.trafficCar[*].numApps 1
+config *.trafficCar[*].app[0].typename inet.applications.pingapp.PingApp
+config *.trafficCar[*].masterId 0
+config *.trafficCar[*].mobility.typename src.node_bus.apps.VeinsInetMobility
+config *.bus[*].wlan[*].opMode "\"n(mixed-2.4Ghz)\""
+config *.bus[*].wlan[*].radio.typename Ieee80211DimensionalRadio
+config *.bus[*].wlan[*].radio.bandName "\"2.4 GHz\""
+config *.bus[*].wlan[*].radio.channelNumber 3
+config *.bus[*].wlan[*].radio.transmitter.power 0.20mW
+config *.bus[*].wlan[*].radio.receiver.sensitivity -89dBm
+config *.bus[*].wlan[*].radio.receiver.snirThreshold 4dB
+config *.bus[*].wlan[*].radio.bandwidth "2 MHz"
+config *.bus[*].wlan[*].radio.antenna.mobility.typename AttachedMobility
+config *.bus[*].wlan[*].radio.antenna.mobility.mobilityModule "\"^.^.^.^.mobility\""
+config *.bus[*].wlan[*].radio.antenna.mobility.offsetX -2.5m
+config *.bus[*].wlan[*].radio.antenna.mobility.offsetZ 1.5m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinX 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxX 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinY 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxY 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMinZ 0m
+config *.bus[*].wlan[*].radio.antenna.mobility.constraintAreaMaxZ 0m
+config *.bus[*].wlan[*].mgmt.typename Ieee80211MgmtSta
+config *.bus[*].wlan[*].mac.typename Ieee80211MacM
+config *.bus[*].wlan[*].agent.typename Ieee80211AgentSta
+config *.bus[*].wlan[*].agent.defaultSsid "\"Spintel\""
+config *.bus[*].wlan[*].agent.activeScan true
+config *.bus[*].wlan[*].agent.channelsToScan "\"3\""
+config *.bus[*].cellularNic.channelModel[*].tolerateMaxDistViolation true
+config *.bus[0].app[0].accident_start 4200s
+config *.bus[0].app[0].accidentDuration 300s
+config *.bus[0].app[0].event_accident false
+config *.bus[0].app[0].GW_Battery_Capacity_mAh 500mAh
+config *.bus[0].app[0].GW_Battery_Level_Start 100
+config *.bus[0].app[0].Use_Model false
+config *.bus[0].app[0].Strategy_Switching 5
+config *.bus[0].app[0].Strategy5_alpha 0.0
+config *.bus[0].app[0].Strategy5_beta 0.94
+config *.bus[0].app[0].Strategy5_gamma 0.06
+config output-vector-file results/model/00_10_00_5_5_1min/General-0.vec
+config output-scalar-file results/model/00_10_00_5_5_1min/General-0.sca
+config *.ap[*].wlan[*].opMode "\"n(mixed-2.4Ghz)\""
+config *.ap[*].wlan[*].radio.typename Ieee80211DimensionalRadio
+config *.ap[*].wlan[*].radio.bandName "\"2.4 GHz\""
+config *.ap[*].wlan[*].radio.channelNumber 3
+config *.ap[*].wlan[*].radio.transmitter.power 0.20mW
+config *.ap[*].wlan[*].radio.receiver.sensitivity -89dBm
+config *.ap[*].wlan[*].radio.receiver.snirThreshold 4dB
+config *.ap[*].wlan[*].radio.bandwidth "10 MHz"
+config *.ap[*].wlan[*].radio.antenna.mobility.typename AttachedMobility
+config *.ap[*].wlan[*].radio.antenna.mobility.mobilityModule "\"^.^.^.^.mobility\""
+config *.ap[*].wlan[*].radio.antenna.mobility.offsetX -2.5m
+config *.ap[*].wlan[*].radio.antenna.mobility.offsetZ 1.5m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinX 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxX 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinY 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxY 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMinZ 0m
+config *.ap[*].wlan[*].radio.antenna.mobility.constraintAreaMaxZ 0m
+config *.ap[*].wlan[*].mgmt.typename Ieee80211MgmtAp
+config *.ap[*].wlan[*].mac.typename Ieee80211Mac
+config *.ap[*].wlan[*].agent.typename ""
+config *.ap[*].wlan[*].mgmt.ssid "\"Spintel\""
+config *.ap[*].wlan[*].mgmt.beaconInterval 0.1s
+config *.ap[*].mobility.typename StationaryMobility
+config *.ap[*].mobility.initFromDisplayString false
+config *.ap[*].numWlanInterfaces 1
+config **.tcp.typename Tcp
+config **.tcp.mss 1452
+config **.tcp.advertisedWindow 65535
+config **.bus[*].tcp.typename Tcp
+config **.bus[*].tcp.tcpAlgorithmClass "\"TcpNewReno\""
+config **.bus[*].tcp.mss 1460
+config **.bus[*].tcp.advertisedWindow 2920
+config **.server.tcp.typename Tcp
+config **.server.tcp.tcpAlgorithmClass "\"TcpNewReno\""
+config **.server.tcp.mss 1460
+config **.server.tcp.advertisedWindow 65535
+config *.numAPs 2
+config *.ap[0].mobility.initialX 3543.52m
+config *.ap[0].mobility.initialY 5712.03m
+config *.ap[0].mobility.initialZ 2m
+config *.ap[1].mobility.initialX 5850.89m
+config *.ap[1].mobility.initialY 11486.75m
+config *.ap[1].mobility.initialZ 2m
+config *.eNodeB1.mobility.initFromDisplayString false
+config *.eNodeB1.mobility.initialX 3734m
+config *.eNodeB1.mobility.initialY 5300m
+config *.eNodeB1.mobility.initialZ 25m
+config *.eNodeB2.mobility.initFromDisplayString false
+config *.eNodeB2.mobility.initialX 4334m
+config *.eNodeB2.mobility.initialY 6900m
+config *.eNodeB2.mobility.initialZ 25m
+config *.eNodeB3.mobility.initFromDisplayString false
+config *.eNodeB3.mobility.initialX 5500m
+config *.eNodeB3.mobility.initialY 7662m
+config *.eNodeB3.mobility.initialZ 25m
+config *.eNodeB4.mobility.initFromDisplayString false
+config *.eNodeB4.mobility.initialX 4500m
+config *.eNodeB4.mobility.initialY 9562m
+config *.eNodeB4.mobility.initialZ 25m
+config *.eNodeB5.mobility.initFromDisplayString false
+config *.eNodeB5.mobility.initialX 5500m
+config *.eNodeB5.mobility.initialY 11562m
+config *.eNodeB5.mobility.initialZ 25m
+config *.server.numApps 1
+config *.server.app[0].typename TcpServerBusApp
+config *.server.app[0].localPort 3000
+config *.configurator.assignAddresses true
+config *.configurator.addStaticRoutes true
+config *.configurator.addDefaultRoutes true
+config *.configurator.optimizeRoutes false
+config **.wlan[*].radio.antenna.mobilityModule "\"^.^.^.mobility\""
+config **.numBands 25
+config **.ueTxPower 41
+config **.eNodeBTxPower 61
+config *.bus[*].cellularNic.phy.dynamicCellAssociation true
+config **.bus[*].masterId 1
+config **.bus[*].macCellId 1
+config **.eNodeB1.macCellId 1
+config **.eNodeB1.macNodeId 1
+config **.eNodeB2.macCellId 2
+config **.eNodeB2.macNodeId 2
+config **.eNodeB3.macCellId 3
+config **.eNodeB3.macNodeId 3
+config **.eNodeB4.macCellId 4
+config **.eNodeB4.macNodeId 4
+config **.eNodeB5.macCellId 5
+config **.eNodeB5.macNodeId 5
+config *.bus[*].cellularNic.phy.enableHandover true
+config *.eNodeB*.cellularNic.phy.enableHandover true
+config *.eNodeB*.cellularNic.phy.handoverLatency 50ms
+config *.eNodeB*.cellInfo.broadcastMessageInterval 1s
+config *.eNodeB*.numX2Apps 4
+config *.eNodeB*.x2App[*].server.localPort "5000 + ancestorIndex(1)"
+config *.eNodeB1.x2App[0].client.connectAddress "\"eNodeB2%x2ppp0\""
+config *.eNodeB1.x2App[1].client.connectAddress "\"eNodeB3%x2ppp0\""
+config *.eNodeB1.x2App[2].client.connectAddress "\"eNodeB4%x2ppp0\""
+config *.eNodeB1.x2App[3].client.connectAddress "\"eNodeB5%x2ppp0\""
+config *.eNodeB2.x2App[0].client.connectAddress "\"eNodeB1%x2ppp0\""
+config *.eNodeB2.x2App[1].client.connectAddress "\"eNodeB3%x2ppp0\""
+config *.eNodeB2.x2App[2].client.connectAddress "\"eNodeB4%x2ppp0\""
+config *.eNodeB2.x2App[3].client.connectAddress "\"eNodeB5%x2ppp0\""
+config *.eNodeB3.x2App[0].client.connectAddress "\"eNodeB1%x2ppp0\""
+config *.eNodeB3.x2App[1].client.connectAddress "\"eNodeB2%x2ppp0\""
+config *.eNodeB3.x2App[2].client.connectAddress "\"eNodeB4%x2ppp0\""
+config *.eNodeB3.x2App[3].client.connectAddress "\"eNodeB5%x2ppp0\""
+config *.eNodeB4.x2App[0].client.connectAddress "\"eNodeB1%x2ppp0\""
+config *.eNodeB4.x2App[1].client.connectAddress "\"eNodeB2%x2ppp0\""
+config *.eNodeB4.x2App[2].client.connectAddress "\"eNodeB3%x2ppp0\""
+config *.eNodeB4.x2App[3].client.connectAddress "\"eNodeB5%x2ppp0\""
+config *.eNodeB5.x2App[0].client.connectAddress "\"eNodeB1%x2ppp0\""
+config *.eNodeB5.x2App[1].client.connectAddress "\"eNodeB2%x2ppp0\""
+config *.eNodeB5.x2App[2].client.connectAddress "\"eNodeB3%x2ppp0\""
+config *.eNodeB5.x2App[3].client.connectAddress "\"eNodeB4%x2ppp0\""
+config **.sctp.nagleEnabled false
+config **.sctp.enableHeartbeats true
+config *.visualizer.mediumVisualizer.displayCommunicationRanges true
+config *.visualizer.mediumVisualizer.displayInterferenceRanges false
+config *.channelControl.propagationModel "\"RuralMacrocell\""
+config *.radioMedium.pathLoss.typename LogNormalShadowing
+config *.radioMedium.backgroundNoise.power -110dBm
+config *.router.pppg[*].channel.length 400km
+config *.router.ethg[*].channel.length 800km
+
+vector 0 HighwayTCP.server.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 1 HighwayTCP.server.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 2 HighwayTCP.server.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 3 HighwayTCP.server.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 4 HighwayTCP.router.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 5 HighwayTCP.router.ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 6 HighwayTCP.pgw.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 7 HighwayTCP.pgw.ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 8 HighwayTCP.pgw.ppp[2].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 9 HighwayTCP.pgw.ppp[3].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 10 HighwayTCP.pgw.ppp[4].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 11 HighwayTCP.pgw.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 12 HighwayTCP.pgw.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 13 HighwayTCP.pgw.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 14 HighwayTCP.pgw.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 15 HighwayTCP.eNodeB1.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 16 HighwayTCP.eNodeB1.x2ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 17 HighwayTCP.eNodeB1.x2ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 18 HighwayTCP.eNodeB1.x2ppp[2].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 19 HighwayTCP.eNodeB1.x2ppp[3].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 20 HighwayTCP.eNodeB1.pppMEHostIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 21 HighwayTCP.eNodeB1.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 22 HighwayTCP.eNodeB1.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 23 HighwayTCP.eNodeB1.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 24 HighwayTCP.eNodeB2.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 25 HighwayTCP.eNodeB2.x2ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 26 HighwayTCP.eNodeB2.x2ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 27 HighwayTCP.eNodeB2.x2ppp[2].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 28 HighwayTCP.eNodeB2.x2ppp[3].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 29 HighwayTCP.eNodeB2.pppMEHostIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 30 HighwayTCP.eNodeB2.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 31 HighwayTCP.eNodeB2.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 32 HighwayTCP.eNodeB2.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 33 HighwayTCP.eNodeB3.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 34 HighwayTCP.eNodeB3.x2ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 35 HighwayTCP.eNodeB3.x2ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 36 HighwayTCP.eNodeB3.x2ppp[2].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 37 HighwayTCP.eNodeB3.x2ppp[3].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 38 HighwayTCP.eNodeB3.pppMEHostIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 39 HighwayTCP.eNodeB3.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 40 HighwayTCP.eNodeB3.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 41 HighwayTCP.eNodeB3.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 42 HighwayTCP.eNodeB4.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 43 HighwayTCP.eNodeB4.x2ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 44 HighwayTCP.eNodeB4.x2ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 45 HighwayTCP.eNodeB4.x2ppp[2].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 46 HighwayTCP.eNodeB4.x2ppp[3].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 47 HighwayTCP.eNodeB4.pppMEHostIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 48 HighwayTCP.eNodeB4.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 49 HighwayTCP.eNodeB4.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 50 HighwayTCP.eNodeB4.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 51 HighwayTCP.eNodeB5.pppIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 52 HighwayTCP.eNodeB5.x2ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 53 HighwayTCP.eNodeB5.x2ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 54 HighwayTCP.eNodeB5.x2ppp[2].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 55 HighwayTCP.eNodeB5.x2ppp[3].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 56 HighwayTCP.eNodeB5.pppMEHostIf.ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source transmissionStateChanged
+attr title "tx state"
+vector 57 HighwayTCP.eNodeB5.udp passedUpPk:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetSentToUpper
+attr title "packets passed up, count"
+vector 58 HighwayTCP.eNodeB5.udp droppedPkWrongPort:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+vector 59 HighwayTCP.eNodeB5.udp droppedPkBadChecksum:vector(count) ETV
+attr interpolationmode none
+attr recordingmode vector(count)
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+vector 60 HighwayTCP.ap[0].wlan[0].mac.dcf frameSequenceActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
+attr title "frame sequence active"
+vector 61 HighwayTCP.ap[0].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
+attr title "queue length"
+vector 62 HighwayTCP.ap[0].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(backoffStarted)-count(backoffStopped))
+attr title "backoff active"
+vector 63 HighwayTCP.ap[1].wlan[0].mac.dcf frameSequenceActive:vector ETV
+attr autoWarmupFilter false
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr source warmup(count(frameSequenceStarted)-count(frameSe

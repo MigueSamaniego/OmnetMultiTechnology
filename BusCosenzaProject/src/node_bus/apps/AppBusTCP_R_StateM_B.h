@@ -226,7 +226,7 @@ private:
     double Cost_WiFi = 0;
 
     bool windows_fix = true;
-    uint8_t Strategy_Switching = 0;
+    int Strategy_Switching;
 
     double range_start_strategy_5 = 0.0;
     double range_stop_strategy_5 = 0.0;
