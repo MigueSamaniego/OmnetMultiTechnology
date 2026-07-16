@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<analysis version="2">
-    <inputs>
-        <input pattern="/BusCosenzaProject/simulations/BusCosenza/cars/results/model/00_00_02_5_5_1min/General-*.vec"/>
-        <input pattern="/BusCosenzaProject/simulations/BusCosenza/cars/results/model/00_00_02_5_5_1min/General-*.sca"/>
-    </inputs>
-    <charts/>
-</analysis>

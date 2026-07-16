@@ -35,6 +35,10 @@ struct RangeStats {
     std::array<int, 5> inside_range_priority;
 };
 
+struct GetOld {
+    std::array<double, 5> old_in_priority;
+};
+
 // --- Clase SDCardBuffer (Gestión de Almacenamiento y Caducidad) ---
 
 class SDCardBuffer {
@@ -143,6 +147,19 @@ public:
         return {countInRange, sumChars, count_to_priority};
     }
 
+    GetOld Get_Old_Data() const {
+        std::array<double, 5> priorities = {0};
+
+        for (int p = 0; p < NUM_PRIORITIES; p++) {
+            int currentIndex = tail[p];
+
+            priorities[p] = (buffer[p][currentIndex].arrivalTime + maxWaitTime[p]).dbl();
+
+        }
+
+        return {priorities};
+    }
+
     // Extrae datos basados puramente en la caducidad (EDF)
     std::vector<std::string> popBatch(int n, simtime_t currentTime, double time_until_next_AP, bool isWifi) {
         std::vector<std::string> result;
@@ -208,6 +225,38 @@ public:
                 }
             }
         }
+        return result;
+    }
+
+    // Extrae datos basados puramente en la caducidad (EDF)
+        std::vector<std::string> popBatch_Not_Deadline(int n, simtime_t currentTime, double time_until_next_AP, bool isWifi) {
+        std::vector<std::string> result;
+        simtime_t horizon = currentTime + time_until_next_AP;
+
+        bool foundAny = true;
+        while (result.size() < n && foundAny) {
+            foundAny = false;
+
+                // ********************** recovery only data with priority ***********************
+                int p = NUM_PRIORITIES-1;// vacia solo cola no prioridad.
+
+                if (count[p] > 0) {
+                    simtime_t expirationTime = buffer[p][tail[p]].arrivalTime + maxWaitTime[p];
+
+                    // Criterio de extracción: P1, WiFi activo o Caducidad inminente
+                    bool mustSend =  (expirationTime <= horizon);
+
+                    if (mustSend) {
+                        result.push_back(buffer[p][tail[p]].content);
+                        tail[p] = (tail[p] + 1) % MAX_PER_PRIO;
+                        count[p]--;
+                        foundAny = true;
+                        if (result.size() >= n) return result;
+                    }
+                }
+
+        }
+
         return result;
     }
 

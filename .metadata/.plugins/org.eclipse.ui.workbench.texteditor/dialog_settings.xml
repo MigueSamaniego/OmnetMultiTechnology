@@ -5,33 +5,33 @@
 		<item key="DIALOG_Y_ORIGIN" value="167"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="accident_start"/>
+		<item key="selection" value="sendDataToCloud"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="sendDataToCloud"/>
+			<item value="sendDataToCloud_Strategy_5"/>
+			<item value="socket WIFI OK4"/>
+			<item value="estado actual del Socket :"/>
+			<item value="cambio realizado"/>
+			<item value="estado actual del Socket"/>
+			<item value="estate of wifi by strategy"/>
+			<item value="val reTX"/>
+			<item value="NUM DATA RECOVERY: num, delay, tiempo"/>
+			<item value="FuctionMultiObjetive"/>
+			<item value="getStatsByDeadline"/>
+			<item value="popBatch_Strategy_5"/>
+			<item value="buffer_penalty"/>
 			<item value="accident_start"/>
 			<item value="Use_Model"/>
-			<item value="Strategy_Switching"/>
-			<item value="deadline_until"/>
-			<item value="FuctionMultiObjetive"/>
-			<item value="update_timer"/>
-			<item value="P_t"/>
-			<item value="flag_tx_wifi"/>
-			<item value="sendDataToCloud"/>
-			<item value="300"/>
-			<item value="timeoutMsg"/>
-			<item value="count_reTX"/>
-			<item value="socket_state_close"/>
-			<item value="socket error 3"/>
-			<item value="val reTX"/>
 		</list>
 		<list key="replacehistory">
+			<item value=""/>
 			<item value="popBatch_Strategy_5"/>
 			<item value="MyDelayLink"/>
-			<item value=""/>
 			<item value="record=vector,last,min,max,stddev"/>
 			<item value="(content.size())+61; // considering headers MQTT,TCP,WIFI aproximate traffic data"/>
 			<item value="expired"/>
@@ -47,8 +47,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="48"/>
-		<item key="DIALOG_Y_ORIGIN" value="273"/>
+		<item key="DIALOG_X_ORIGIN" value="5"/>
+		<item key="DIALOG_Y_ORIGIN" value="261"/>
 		<item key="DIALOG_WIDTH" value="482"/>
 		<item key="DIALOG_HEIGHT" value="409"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>

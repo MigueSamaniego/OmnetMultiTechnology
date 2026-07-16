@@ -41,6 +41,8 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
         
         int Strategy_Switching = default(1);
         
+        int Limit_Data @unit(B) = default(1000B);
+        
         @display("i=block/app");
         @class(AppBusTCP_R_StateM_B);
         
@@ -122,7 +124,7 @@ simple AppBusTCP_R_StateM_B extends VeinsInetApplicationBase
 		@statistic[Packet_lose_deadline_signal](title="Number Packet Lose"; source="Packet_lose_deadline_signal"; record=vector,last);
 		@statistic[Byte_lose_deadline_signal](title="Bytes Lose [B]"; source="Byte_lose_deadline_signal"; record=vector,last);
 		
-		@statistic[GW_Battery_level](title="Battery Level mA/h"; source="GW_Battery_level"; record=last);
+		@statistic[GW_Battery_level](title="Battery Level mA/h"; source="GW_Battery_level"; record=vector,last);
 		
 		@statistic[Consumption_WIFI_Battery](title="Current mA/h"; source="Consumption_WIFI_Battery"; record=vector,last);
 		@statistic[Consumption_LTE_Battery](title="Current mA/h"; source="Consumption_LTE_Battery"; record=vector,last);

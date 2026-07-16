@@ -21,7 +21,7 @@
     <stringAttribute key="org.omnetpp.launch.INI_FILES" value="omnetppTCP.ini"/>
     <stringAttribute key="org.omnetpp.launch.NED_PACKAGE_EXCLUSIONS" value="${opp_ned_package_exclusions:/BusCosenzaProject/simulations/BusCosenza/cars}"/>
     <stringAttribute key="org.omnetpp.launch.NED_PATH" value="${opp_ned_path:/BusCosenzaProject/simulations/BusCosenza/cars}"/>
-    <intAttribute key="org.omnetpp.launch.NUM_CONCURRENT_PROCESSES" value="1"/>
+    <intAttribute key="org.omnetpp.launch.NUM_CONCURRENT_PROCESSES" value="6"/>
     <stringAttribute key="org.omnetpp.launch.OPP_CPU_TIME_LIMIT" value=""/>
     <stringAttribute key="org.omnetpp.launch.OPP_DEBUGMODE_DEBUG_ON_ERRORS" value="true"/>
     <stringAttribute key="org.omnetpp.launch.OPP_SIM_TIME_LIMIT" value=""/>

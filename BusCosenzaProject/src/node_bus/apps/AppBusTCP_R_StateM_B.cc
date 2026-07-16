@@ -239,6 +239,10 @@ void AppBusTCP_R_StateM_B::initialize(int stage)
         GW_Battery_Capacity_mAh = (GW_Battery_Capacity_mAh*GW_Battery_Level_Start)/100;
         Battery_Available = GW_Battery_Capacity_mAh;
 
+        EV_INFO << "iniciando con bateria: " << Battery_Available << " capacidad: " << GW_Battery_Capacity_mAh << " start level:" << GW_Battery_Level_Start <<endl;
+
+        this->Limit_Data = par("Limit_Data").intValue();
+
 
     }
 
@@ -957,7 +961,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                             //}
                             //timer_esp_module++; // here it is in sleep mode not count timer
                         }
-                        emit(Consumption_WIFI,Esp_Consumption_temp);
+                        //emit(Consumption_WIFI,Esp_Consumption_temp);
                         Esp_Consumption += Esp_Consumption_temp;
 
                         // ---------------------------------------------------------------------
@@ -1026,7 +1030,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                             }
 
                         }
-                        emit(Consumption_LTE,LTE_Consuption_temp);
+                        //emit(Consumption_LTE,LTE_Consuption_temp);
                         LTE_Consuption += LTE_Consuption_temp;
 
 
@@ -1079,6 +1083,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                             }
 
                             emit(GW_Battery_signal, Battery_Available);
+                            EV_ERROR << "bateria disposnible calculada: " << Battery_Available << endl;
 
                             timer_update_GW_Batery = 0;
                         }
@@ -1276,8 +1281,8 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                 //********************************** check if the new socket was created successful **************************************
                                 if ((count_reTX >= (waiting_changing_x_10ms + 2)) && (socket.getState() == inet::TcpSocket::CONNECTED)) {
                                     socket_state_close = false;
+                                    EV_WARN << "Socket ready for send data." << " count_reTX: " << count_reTX << " socket state: " << socket.getState() << " variable state: " << inet::TcpSocket::CONNECTED << endl;
                                     count_reTX = 0;
-                                    EV_WARN << "Socket ready for send data." << endl;
                                     socket_ready = true;
 
                                     //if(Retry_Sent > 0)  //if was detected Socket re-open and the last message it was not delivery
@@ -2193,7 +2198,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                         if (timer_Control_Send_Data >= time_threshold_send_data){
 
                                                 deadline_start = simTime(); // update this time each call function is sufficient to empty data from SDCARD
-                                                //deadline_until = 6000;// debe ser grande
+                                                buffer_penalty = -1; // pay attention this variable is the indicator to saturation buffer
 
                                                 /****** Sent Message to Cloud *********************/
                                                 sendDataToCloud("wifi"); // prepare and send message
@@ -2248,7 +2253,7 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                             // Function_Multi_Objetive_State = 1 --> offloading LTE
                                             // Function_Multi_Objetive_State = 2 --> offloading WIFI
 
-                                            EV_ERROR <<" Function Result: " << Function_State << endl;
+                                            EV_ERROR <<" Function Result: " << Function_State << " penally val: " << buffer_penalty << endl;
 
 
                                             if(Function_State == 10)// error
@@ -2256,10 +2261,11 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
 
                                             if(Function_State == 1){// lte
                                                 take_time_when_find_expired_data = true;
-                                                deadline_start = simTime();
+                                                deadline_start = SimTime(range_start_strategy_5);
                                                 //deadline_until = range_stop_strategy_5;
-                                                EV_ERROR <<" SELECT LTE"<< " start: " << deadline_start << " stop: " << deadline_until <<endl;
+                                                EV_ERROR <<" SELECT LTE" <<endl;
                                             }
+                                            EV_ERROR <<" time start: " << deadline_start << " stop: " << deadline_until <<endl;
 
 //                                            if(Function_State == 2){// wifi
 //                                                take_time_when_find_expired_data = true;
@@ -2285,11 +2291,11 @@ void AppBusTCP_R_StateM_B::handleMessage(cMessage *msg)
                                                 if (timer_Control_Send_Data >= time_threshold_send_data){
                                                     EV_ERROR <<" Send data por LTE"<< endl;
                                                        /****** Sent Message to Cloud *********************/
-                                                       if(buffer_penalty != -1){
-                                                           sendDataToCloud_Strategy_5("lte");// usado para penalizacion descargar memoria por saturarse
-                                                       }else{
+                                                       //if(buffer_penalty == 4){
+                                                       //    sendDataToCloud_Strategy_5("lte");// usado para penalizacion descargar memoria por saturarse
+                                                       //}else{
                                                            sendDataToCloud("lte"); // prepare and send message
-                                                       }
+                                                       //}
                                                        flag_tx_lte = true;
                                                        /**************************************************/
 
@@ -2583,9 +2589,16 @@ void AppBusTCP_R_StateM_B::sendDataToCloud(const std::string& interface_output)
                     if(!batch.empty())
                         outputBuffer.load(batch);
                 }else if(Strategy_Switching == 5){
-                    auto batch = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);// PIDE TODOS LOS DATOS SIN IMPORTAR DEADLINE o tecnologia a usar
-                    if(!batch.empty())
-                        outputBuffer.load(batch);
+
+                    if(buffer_penalty == 4){
+                        auto batch = sdcard.popBatch_Not_Deadline(20, deadline_start, deadline_until, 0);// PIDE TODOS LOS DATOS SIN IMPORTAR DEADLINE o tecnologia a usar
+                        if(!batch.empty())
+                            outputBuffer.load(batch);
+                    }else{
+                        auto batch = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);// PIDE TODOS LOS DATOS SIN IMPORTAR DEADLINE o tecnologia a usar
+                        if(!batch.empty())
+                            outputBuffer.load(batch);
+                    }
                 }
 
 
@@ -2611,9 +2624,18 @@ void AppBusTCP_R_StateM_B::sendDataToCloud(const std::string& interface_output)
                     if(!batch1.empty())
                         outputBuffer.load(batch1);
                 }else if(Strategy_Switching == 5){
-                    auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);// PIDE TODOS LOS DATOS SIN IMPORTAR DEADLINE o tecnologia a usar
-                    if(!batch1.empty())
-                        outputBuffer.load(batch1);
+
+                    if(buffer_penalty == 4){
+                        auto batch1 = sdcard.popBatch_Not_Deadline(20, deadline_start, deadline_until, 0);// PIDE TODOS LOS DATOS SIN IMPORTAR DEADLINE o tecnologia a usar
+                        if(!batch1.empty())
+                            outputBuffer.load(batch1);
+                    }else{
+                        auto batch1 = sdcard.popBatch(20, deadline_start, deadline_until, ConnectionToAP);// PIDE TODOS LOS DATOS SIN IMPORTAR DEADLINE o tecnologia a usar
+                        if(!batch1.empty())
+                            outputBuffer.load(batch1);
+                    }
+
+
                 }
 
 
@@ -2663,7 +2685,7 @@ void AppBusTCP_R_StateM_B::sendDataToCloud(const std::string& interface_output)
             packet->insertAtBack(payload);
             socket.send(packet);
 
-            EV_ERROR << "PACKET SENT to SERVER: "<< data << endl;
+            EV_ERROR << "PACKET SENT to SERVER: "<< data << " calling function with: " << interface_output << endl;
 
             count_msg_TCP_send++;
 
@@ -2711,9 +2733,7 @@ void AppBusTCP_R_StateM_B::sendDataToCloud_Strategy_5(const std::string& interfa
         fix_interface = true;
         // ----------------------------------------------------------
         return;
-    }/*else{
-        EV_ERROR << "estado actual del Socket : " << socket.getState() << endl;
-    }*/
+    }
 
     //EV_ERROR << "socket WIFI OK2: "<< endl;
 
@@ -2833,6 +2853,138 @@ void AppBusTCP_R_StateM_B::sendDataToCloud_Strategy_5(const std::string& interfa
 
 
 }
+
+/*void AppBusTCP_R_StateM_B::sendDataToCloud_Strategy_5(const std::string& interface_output)
+{
+    if (socket.getState() != inet::TcpSocket::CONNECTED) {
+        //EV_ERROR << "No se pueden enviar datos: Socket state : " << socket.getState() << endl;
+        // ------------------- restart socket -----------------------
+        socket_ready = false;
+        socket_state_close = true;
+        count_reTX = 0;
+        fix_interface = true;
+        // ----------------------------------------------------------
+        return;
+    }
+
+    //EV_ERROR << "socket WIFI OK2: "<< endl;
+
+    if(Vehicle_With_Interface){
+        // -------------- fill buffer OUTPUT AGAIN -----------------
+        if (outputBuffer.isEmpty()) {
+
+
+            long data_priority_on_sd = sdcard.data_priority_on_sdcard();
+            int empty_buffer_percent = 25;// este es el poncentaje a vaciar de la memoria elegida.
+
+            if(data_priority_on_sd >= 20){
+                if(Strategy_Switching == 5){
+                    // size buffer de salida = 20;
+                    // numer of buffer penaly = [0,1,2,3,4]?
+                    // percent of buffer to empty = 0;
+                    auto batch = sdcard.popBatch_Strategy_5(20, buffer_penalty, empty_buffer_percent);// PIDE TODOS LOS DATOS SIN IMPORTAR DEADLINE o tecnologia a usar
+                    if(!batch.empty())
+                        outputBuffer.load(batch);
+                }
+
+
+            }else {
+                // save buffer en SDCARD
+                auto batch = inputBuffer.flush();
+                sdcard.pushBatch(batch);
+
+                if(Strategy_Switching == 5){
+                    // size buffer de salida = 20;
+                    // numer of buffer penaly = [0,1,2,3,4]?
+                    // percent of buffer to empty = 0;
+                    auto batch1 = sdcard.popBatch_Strategy_5(20, buffer_penalty, empty_buffer_percent);// PIDE TODOS LOS DATOS SIN IMPORTAR DEADLINE o tecnologia a usar
+                    if(!batch1.empty())
+                        outputBuffer.load(batch1);
+                }
+
+
+            }
+
+            // aqui va el timer SDCARD
+            int data_recovery = outputBuffer.size();
+
+            if(data_recovery > 0){
+                //delay_sdcard = (data_recovery * 30)/20; //(300/10)ms
+                EV_ERROR << "NUM DATA RECOVERY: num, delay, tiempo " << data_recovery << " " << delay_sdcard << " " << time_threshold_send_data << endl;
+
+            }else{
+                take_time_when_find_expired_data = false; // allow get out and continue to check data expired
+                if(ConnectionToAP)
+                    EV_ERROR << "not more data on SDCard "<< endl;
+                else
+                    EV_ERROR << "not more data on Range search next expired data: "<< endl;
+
+            }
+
+              //  update when inputBuffer was empty
+              double currentBytes = (double)sdcard.totalSize();
+              double usagePercent = (currentBytes / SDCARD_MAX_CAPACITY) * 100.0;
+              if (usagePercent > 100.0) usagePercent = 100.0; // limitation visual error
+
+              emit(sdcardBufferSignal, currentBytes);
+              emit(sdcardPercentSignal, usagePercent);
+              // Maintain the last state
+              static_currentBytes = currentBytes;
+              static_usagePercent = usagePercent;
+
+        }else {
+            //EV_ERROR << "socket WIFI OK4: "<< endl;
+            // ------ create the packet -----------------
+            //bool packet_lose = true;
+
+            //while(packet_lose){
+
+            auto packet = new inet::Packet("accident_car_test_TCP");
+            std::string data = outputBuffer.getOne();
+
+            auto payload = inet::makeShared<inet::BytesChunk>(std::vector<uint8_t>(data.begin(), data.end()));
+
+            timestampPayload(payload);
+
+            packet->insertAtBack(payload);
+            socket.send(packet);
+
+            //EV_ERROR << "PACKET SENT to SERVER: "<< data << endl;
+
+            count_msg_TCP_send++;
+
+            if (interface_output == "wifi") {
+                // use wifi
+                long_Bytes_wifi += static_cast<long>(data.size());
+                long_Bytes_wifi_Header = long_Bytes_wifi + 60;
+
+                static_outputBuff_wifi = outputBuffer.size();
+                emit(outputBufferSignal_wifi, static_outputBuff_wifi);
+                static_outputBuff_lte = 0; // LTE regresa a 0 continua wifi
+                emit(outputBufferSignal_lte, static_outputBuff_lte);
+            }
+            else if (interface_output == "lte") {
+                // use lte
+                long_Bytes_LTE += static_cast<long>(data.size());
+                long_Bytes_LTE_Header = long_Bytes_LTE + 60;
+
+                static_outputBuff_lte = outputBuffer.size();
+                emit(outputBufferSignal_lte, static_outputBuff_lte);
+                static_outputBuff_wifi = 0;// wifi regresa a 0 LTE continua
+                emit(outputBufferSignal_wifi, static_outputBuff_wifi);// LTE continue, wifi return to 0
+            }
+
+
+
+        }
+
+        emit(packetSendTCPSignal, count_msg_TCP_send);
+
+    }
+
+
+
+}*/
 
 void AppBusTCP_R_StateM_B::interfaceAvailable(){
 
@@ -4582,7 +4734,7 @@ void AppBusTCP_R_StateM_B::socketDeleted(inet::TcpSocket *socket) {
 
 }*/
 
-int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
+/*int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
 
 
     range_start_strategy_5 = simTime().dbl();
@@ -4662,10 +4814,10 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
         Normal_phase = (val.D_t*93) + 2500;// + 2500; // tiempo para entrar en sleep
         time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
 
-    }/*else{
-        Normal_phase = 2500;// + 2500; // tiempo para entrar en sleep
-        time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
-    }*/
+    }//else{
+     //   Normal_phase = 2500;// + 2500; // tiempo para entrar en sleep
+     //   time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
+    //}
 
     double Consumption_GW_lte = (((Tx_phase)/3600000.0) * (116.081 + 0.8 + 500)) +
                                 (((Rx_phase)/3600000.0) * (116.081 + 0.8 + 300)) +
@@ -4712,9 +4864,9 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
        energy_norm_0 = 1.0;
 
     model[0] = (beta * energy_norm_0) + (gamma_w * P_t);
-    EV_ERROR << "normalizacion sleep: " << Consumption_GW_sleep << " -comsuption lte: " << Consumption_GW_lte << " Max val Current:" <<  MAX_ENERGY_CONSUMPTION_LTE << endl;
-    EV_ERROR << "modelo 0 beta: " << beta << " -energy0: " <<  energy_norm_0 << " gamma: "<< gamma_w << " -penalty: " << P_t << endl;
-    EV_ERROR << "modelo 0 : " << model[0] << " par 1: " << (beta * energy_norm_0) << " par 2: "<< (gamma_w * P_t) << endl;
+    //EV_ERROR << "normalizacion sleep: " << Consumption_GW_sleep << " -comsuption lte: " << Consumption_GW_lte << " Max val Current:" <<  MAX_ENERGY_CONSUMPTION_LTE << endl;
+    //EV_ERROR << "modelo 0 beta: " << beta << " -energy0: " <<  energy_norm_0 << " gamma: "<< gamma_w << " -penalty: " << P_t << endl;
+    //EV_ERROR << "modelo 0 : " << model[0] << " par 1: " << (beta * energy_norm_0) << " par 2: "<< (gamma_w * P_t) << endl;
 
     // --- MODELO 1: TRANSMITIR POR LTE ---
     double cost_norm_1 = 0.0;
@@ -4734,8 +4886,8 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
         energy_norm_1 = 1.0;
 
     model[1] = (alpha * cost_norm_1) + (beta * energy_norm_1);
-    EV_ERROR << "modelo 1 alpha: " << alpha << " -financia1: " <<  cost_norm_1 << " beta: "<< beta << " -energia1: " << energy_norm_1 << endl;
-    EV_ERROR << "modelo 1 : " << model[1] << " par 1: " << (alpha * cost_norm_1) << " par 2: "<< (beta * energy_norm_1) << endl;
+    //EV_ERROR << "modelo 1 alpha: " << alpha << " -financia1: " <<  cost_norm_1 << " beta: "<< beta << " -energia1: " << energy_norm_1 << endl;
+    //EV_ERROR << "modelo 1 : " << model[1] << " par 1: " << (alpha * cost_norm_1) << " par 2: "<< (beta * energy_norm_1) << endl;
 
     // --- MODELO 2: TX using WIFI---
     //bool mem_norm_2 = P_t;
@@ -4765,15 +4917,457 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
         }
     }
 
-//    if((best_decision>0)&&(model[1] == model[2])){// tecnologia WIFI gana siempre en igualdad porque el objetivo es Tx.
-//        //if ((ConnectionToAP)&&(socket_ready)) {
-//        if (ConnectionToAP) {
-//            best_decision = 2;
-//        }else{
-//            best_decision = 1;
-//        }
-//    }
+
+    return best_decision;
+
+
+}*/
+
+/*int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
+
+
+    range_start_strategy_5 = simTime().dbl();
+    range_stop_strategy_5 = windows;
+
+    EV_ERROR << "calculation fuction. desde: " << range_start_strategy_5 << " hasta: " <<  range_stop_strategy_5 << endl;
+
+    double data_on_buffer[5]={0};
+    QueueState datos_en_cola = sdcard.get_size_queues();
+    data_on_buffer[0] = datos_en_cola.p1;
+    data_on_buffer[1] = datos_en_cola.p2;
+    data_on_buffer[2] = datos_en_cola.p3;
+    data_on_buffer[3] = datos_en_cola.p4;
+    data_on_buffer[4] = datos_en_cola.p5;
+    //EV_WARN << "cola 1: " << datos_en_cola.p1 << " cola 2: " << datos_en_cola.p2 << " cola 3: " << datos_en_cola.p3 << " cola 4: " << datos_en_cola.p4 << " cola 5: " << datos_en_cola.p5 << endl;
+
+
+    RangeStats val = sdcard.getStatsByDeadline(range_start_strategy_5, range_stop_strategy_5);
+
+    // 1. SEGURIDAD MATEMÁTICA PARA LA PENALIDAD (URGENCIA)
+    double P_t = 0;
+    //double max_Pt = 900.0 - 10.0;// es el valor del deadline mas viejo en este caso 15min
+    double P_urg = 0.0;
+    double P_sat = 0.0;
+
+    // activate penaly for urgency
+    if (val.D_t > 0) {
+
+        double remainign_time_on_old_data = (sdcard.remaining_time(simTime()));
+        double penaly_urg = remainign_time_on_old_data - coefficient;//
+        //EV_ERROR << "urgencia: " << penaly_urg << endl;
+        //EV_ERROR << "tiempo restante: " << remainign_time_on_old_data << endl;
+
+        if(penaly_urg < 0.0) penaly_urg = 0.0;
+
+        P_urg = 1/((penaly_urg)+1); // esto es correcto porque el max P_urg es 1
+    }
+
+     //activate penaly for saturation
+    long max_buffer_fill = 2000;
+    buffer_penalty = -1;
+
+    for(int n=0; n<=4; n++){
+
+        double available_SD = (100.0 - ((data_on_buffer[n]*100)/max_buffer_fill)) - (threshold_memmory);
+        //EV_ERROR << "saturacion: " << penaly_saturation << endl;
+        //EV_ERROR << "ocupacion: " << data_on_buffer[n] << endl;
+
+        if(available_SD < 0.0) available_SD = 0.0;
+
+        available_SD = 1/(available_SD + 1);
+
+        if(available_SD > P_sat) P_sat = available_SD;
+
+    }
+
+
+    // calculamos penalidad mayor
+    if(P_urg >= P_sat){
+        P_t = P_urg;
+    }else{
+        P_t = P_sat;
+        buffer_penalty = 1;// avisa que fue por saturacion
+    }
+
+
+
+    // 2. CÁLCULOS DE ENERGÍA Y COSTO FINANCIERO
+    double windows_ms = windows*1000;// ventana en ms
+
+    double Tx_phase = 0.0, Rx_phase = 0.0, Normal_phase = 0.0, time_on_sleep = windows_ms;
+    double Tx_phaseW = 0.0, Rx_phaseW = 0.0, Normal_phaseW = 0.0, time_on_sleepW = windows_ms;
+    if (val.D_t > 0) {// si tenemos almenos un dato
+
+        Tx_phase = val.D_t*5;
+        Rx_phase = val.D_t*2;
+        Normal_phase = (val.D_t*93) + 2500;// + 2500; // tiempo para entrar en sleep
+        time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
+
+    }//else{
+      //  Normal_phase = 2500;// + 2500; // tiempo para entrar en sleep
+      //  time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
+    //}
+
+//    double Consumption_GW_lte = (((Tx_phase)/3600000.0) * (116.081 + 0.8 + 500)) +
+//                                (((Rx_phase)/3600000.0) * (116.081 + 0.8 + 300)) +
+//                                (((Normal_phase)/3600000.0) * (116.081 + 0.8 + 80));
 //
+//    double Consumption_GW_sleep = 0.0;
+
+    EV_ERROR << "datos en buffer : " << val.D_t << " bytes en buffer : "<< val.Bytes_total_on_range << endl;
+
+    double Consumption_GW_lte = (((Tx_phase)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                (((Rx_phase)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                (((Normal_phase)/3600000.0) * (116.081 + 0.8 + 80))+
+                                (((time_on_sleep)/3600000.0) * (116.081 + 0.8 + 13.14));
+
+    double Consumption_GW_sleep = ((time_on_sleepW)/3600000.0) * (116.081 + 0.8 + 13.14);
+
+
+    double lte_financial_cost = (val.Bytes_total_on_range) * 0.0000000954;
+
+    // 3. NORMALIZACIÓN (Ajusta estos valores MÁXIMOS según la física de tu simulación)
+
+    // values maximum for windows, dipend of sampling rate data collectet
+    // we use 2 variable to 1[s] sampling, and 1 variable to 5[s] sampling.
+
+    double packets_max = (windows*2)+(windows*0.2);
+    double bytes_max = packets_max*150;// considering each packet size has 100B maximum
+
+    // Esto asegura que Cost, Energy y Memory estén siempre entre 0.0 y 1.0
+    double MAX_FINANCIAL_COST = (bytes_max) * 0.0000000954; // asumimos que en la ventana que usamos de 5min y que cada paquete puede tener 100B max
+
+    // here "(windows_ms/100)" is right, because GW can tx just 100ms each packet
+    // cuantos paquetes puedo tener en mi ventana? si mi ventana es de 1min
+    // para este caso depende de la frecuencia con la que recoje los datos, 2 cada segundo, 1 cada 5s => 132 maximo.
+    double sleep_time = windows_ms - ((packets_max*5)+(packets_max*2)+(packets_max*93)+2500);
+    double MAX_ENERGY_CONSUMPTION_LTE = (((packets_max*5)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                         (((packets_max*2)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                         (((packets_max*93)/3600000.0) * (116.081 + 0.8 + 80))+
+                                         (((sleep_time)/3600000.0) * (116.081 + 0.8 + 13.14)); // Ajusta al pico máximo de Ah que podría gastar LTE en 300s
+
+    EV_ERROR << "GW LTE : " << Consumption_GW_lte << " GW SLEEP : "<< Consumption_GW_sleep << " MAX : "<< MAX_ENERGY_CONSUMPTION_LTE << endl;
+
+    //5*  (616,881) = 3084,405/3600000     = 8,56e-4
+    //2*  (416,881) = 833,762/3600000      = 2,316e-4
+    //93* (196,881) = 18703,695/3600000    = 0,00519547
+    // = 0,00628307 * 132 = 0,82936524
+
+    //0,002167016
+
+    if(Consumption_GW_lte  > MAX_ENERGY_CONSUMPTION_LTE) Consumption_GW_lte = MAX_ENERGY_CONSUMPTION_LTE;
+
+    double energy_norm_0 = 0.0; // PORQUE EN SLEEP ESTA TODO EL TIEMPO (SOLO SE CONSIDERA LA corriente por TX requerida)
+    double energy_norm_1 = 0.0;
+
+    if(MAX_ENERGY_CONSUMPTION_LTE > 0.0){
+        energy_norm_1 = Consumption_GW_lte / MAX_ENERGY_CONSUMPTION_LTE;
+        energy_norm_0 = Consumption_GW_sleep / MAX_ENERGY_CONSUMPTION_LTE;
+    }
+
+
+
+    EV_ERROR << "energia1 : " << energy_norm_1 << " energia0 : "<< energy_norm_0 << endl;
+
+    if(energy_norm_1 > 1.0)
+        energy_norm_1 = 1.0;
+
+    if(energy_norm_0 > 1.0)
+        energy_norm_0 = 1.0;
+    // processo de amplificacion Battery
+
+
+
+    double BR = Battery_Available/GW_Battery_Capacity_mAh;
+    double eta_battery = 0.9;
+
+    double battery_influence = (1 - (eta_battery*(1 - BR)));
+
+    double CCT_lte = std::pow(energy_norm_1, battery_influence);
+
+    double CCT_sleep = std::pow(energy_norm_0, battery_influence);
+
+    //emit(Consumption_WIFI,battery_influence);
+    //emit(Consumption_LTE,CCT_lte);
+
+
+    // processo de aplificacion LTE data
+
+    double cost_norm_1 = 0.0;
+
+    if(MAX_FINANCIAL_COST > 0.0)
+        cost_norm_1 = lte_financial_cost / MAX_FINANCIAL_COST;
+
+    if(cost_norm_1 > 1.0)
+        cost_norm_1 = 1.0;
+
+    double RD = long_Bytes_LTE_Header/Limit_Data;
+
+    if(RD > 1.0)
+        RD = 1.0;
+
+    double eta_data = 0.9;
+
+    double data_influence = (1 - (eta_data*(1 - RD)));
+
+    double FCT_lte = std::pow(cost_norm_1, data_influence);
+
+    emit(Consumption_WIFI,CCT_lte);
+    emit(Consumption_LTE,CCT_sleep);
+
+
+    double model[3];
+
+    // --- MODELO 0: keep ON SDCARD ---
+    //double energy_norm_0 = 0.0; // PORQUE EN SLEEP ESTA TODO EL TIEMPO (SOLO SE CONSIDERA LA corriente por TX requerida)
+
+
+    model[0] = (beta * CCT_sleep) + (gamma_w * P_t);
+    //EV_ERROR << "normalizacion sleep: " << Consumption_GW_sleep << " -comsuption lte: " << Consumption_GW_lte << " Max val Current:" <<  MAX_ENERGY_CONSUMPTION_LTE << endl;
+    //EV_ERROR << "modelo 0 beta: " << beta << " -energy0: " <<  energy_norm_0 << " gamma: "<< gamma_w << " -penalty: " << P_t << endl;
+    //EV_ERROR << "modelo 0 : " << model[0] << " par 1: " << (beta * energy_norm_0) << " par 2: "<< (gamma_w * P_t) << endl;
+
+    // --- MODELO 1: TRANSMITIR POR LTE ---
+    //double cost_norm_1 = 0.0;
+    //if(MAX_FINANCIAL_COST > 0.0)
+    //    cost_norm_1 = lte_financial_cost / MAX_FINANCIAL_COST;
+
+    //EV_ERROR << "COST LTE : " << lte_financial_cost << MAX_FINANCIAL_COST << endl;
+    //if(cost_norm_1 > 1.0)
+    //    cost_norm_1 = 1.0;
+
+    //EV_ERROR << "COST ENERGIA : " << Consumption_GW_lte << MAX_ENERGY_CONSUMPTION_LTE << endl;
+    //if(energy_norm_1 > 1.0)
+    //    energy_norm_1 = 1.0;
+
+    model[1] = (alpha * FCT_lte) + (beta * CCT_lte);
+    //EV_ERROR << "modelo 1 alpha: " << alpha << " -financia1: " <<  cost_norm_1 << " beta: "<< beta << " -energia1: " << energy_norm_1 << endl;
+    //EV_ERROR << "modelo 1 : " << model[1] << " par 1: " << (alpha * cost_norm_1) << " par 2: "<< (beta * energy_norm_1) << endl;
+
+    // --- MODELO 2: TX using WIFI---
+    //bool mem_norm_2 = P_t;
+
+    model[2] = 1;// si estamos dentro de esta funcion quiere decir que WIFI is DISCONNECT
+
+
+
+
+//    EV_ERROR << "MAX ENERGY lte: " << MAX_ENERGY_CONSUMPTION_LTE << " gw sleep: " << Consumption_GW_sleep << " gw lte" << Consumption_GW_lte << endl;
+//    EV_ERROR << "ESPERAR POR AP: " << model[0] << endl;
+//    EV_ERROR << "TRANSMITIR for LTE: " << model[1] << endl;
+//    EV_ERROR << "TRANSMITIR WIFI: " << model[2] << endl;
+
+    emit(model_cost_wait_ap, model[0]);
+    emit(model_cost_offloading_lte, model[1]);
+    emit(model_cost_offloading_wifi, model[2]);
+
+    // ENCONTRAR EL MÍNIMO
+    double min = 99999999.9;
+    int best_decision = 10; // error
+
+    for(int n=0; n<2; n++){
+        if(model[n] < min){
+            min = model[n];
+            best_decision = n;
+        }
+    }
+
+
+    return best_decision;
+
+
+}*/
+
+
+int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
+
+
+    range_start_strategy_5 = simTime().dbl();
+    range_stop_strategy_5 = windows;
+
+    //EV_ERROR << "calculation fuction. desde: " << range_start_strategy_5 << " hasta: " <<  range_stop_strategy_5 << endl;
+
+    double data_on_buffer[5]={0};
+    QueueState datos_en_cola = sdcard.get_size_queues();
+    data_on_buffer[0] = datos_en_cola.p1;
+    data_on_buffer[1] = datos_en_cola.p2;
+    data_on_buffer[2] = datos_en_cola.p3;
+    data_on_buffer[3] = datos_en_cola.p4;
+    data_on_buffer[4] = datos_en_cola.p5;
+    //EV_WARN << "cola 1: " << datos_en_cola.p1 << " cola 2: " << datos_en_cola.p2 << " cola 3: " << datos_en_cola.p3 << " cola 4: " << datos_en_cola.p4 << " cola 5: " << datos_en_cola.p5 << endl;
+
+
+    RangeStats val = sdcard.getStatsByDeadline(range_start_strategy_5, range_stop_strategy_5);
+
+    // 1. SEGURIDAD MATEMÁTICA PARA LA PENALIDAD (URGENCIA)
+    double P_urg = 0.0;
+    double P_sat = 0.0;
+
+    // activate penaly for urgency
+    if (val.D_t > 0) {
+
+        double remainign_time_on_old_data = (sdcard.remaining_time(simTime()));
+        double penaly_urg = remainign_time_on_old_data - coefficient;
+
+        if(penaly_urg < 0.0) penaly_urg = 0.0;
+
+        P_urg = 1/((penaly_urg)+1); // esto es correcto porque el max P_urg es 1
+    }
+
+     //activate penaly for saturation
+    long max_buffer_fill = 2000;
+    double min_available = (threshold_memmory*max_buffer_fill)/100;
+    buffer_penalty = -1;
+
+    double k = 10.0, tau_v = 0.5;
+    double x0 = 0.0;
+    double x1 = 1.0;
+
+    double Sigmoide_x0 = (1.0/(1.0 + exp(-k * (x0 - tau_v))));
+    double Sigmoide_x1 = (1.0/(1.0 + exp(-k * (x1 - tau_v))));
+
+    for(int n=0; n<=4; n++){
+
+//        // calculation buffer lineal
+//        double Ocupation_i = ((data_on_buffer[n] + min_available)/max_buffer_fill);
+//        EV_WARN << "Ocupacion: " << Ocupation_i << " P_sat: " << P_sat << endl;
+//        if(Ocupation_i > P_sat){
+//            P_sat = Ocupation_i;
+//            buffer_penalty = n;
+//            if(buffer_penalty == 4){
+//                GetOld old_deadline = sdcard.Get_Old_Data();
+//                range_start_strategy_5 = old_deadline.old_in_priority[4];// tomamos el valor de
+//
+//            }
+//        }
+
+        // calculation buffer sigmoidal
+        double x = (data_on_buffer[n]/max_buffer_fill);
+
+        double Sigmoide_x = (1.0/(1.0 + exp(-k * (x - tau_v)))); // https://www.desmos.com/calculator/snbwvjmnks?lang=it
+
+        double Ocupation_i = (Sigmoide_x - Sigmoide_x0)/(Sigmoide_x1 - Sigmoide_x0);
+
+
+        if(Ocupation_i > P_sat){
+            P_sat = Ocupation_i;
+            buffer_penalty = n;
+            if(buffer_penalty == 4){
+                GetOld old_deadline = sdcard.Get_Old_Data();
+                range_start_strategy_5 = old_deadline.old_in_priority[4];// tomamos el valor de
+
+            }
+        }
+
+
+        if(P_sat > 1.0) P_sat = 1.0;
+
+    }
+
+    // 2. CÁLCULOS DE ENERGÍA Y COSTO FINANCIERO
+    double windows_ms = windows*1000;// ventana en ms
+
+    double Tx_phase = 0.0, Rx_phase = 0.0, Normal_phase = 0.0, time_on_sleep = windows_ms;
+    double Tx_phaseW = 0.0, Rx_phaseW = 0.0, Normal_phaseW = 0.0, time_on_sleepW = windows_ms;
+    if (val.D_t > 0) {// si tenemos almenos un dato
+
+        Tx_phase = val.D_t*5;
+        Rx_phase = val.D_t*2;
+        Normal_phase = (val.D_t*93) + 2500;// + 2500; // tiempo para entrar en sleep
+        time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
+
+    }
+
+
+    double Consumption_GW_lte = (((Tx_phase)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                (((Rx_phase)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                (((Normal_phase)/3600000.0) * (116.081 + 0.8 + 80));//+
+                                //(((time_on_sleep)/3600000.0) * (116.081 + 0.8 + 13.14));
+
+    double Consumption_GW_sleep = 0.0;//((time_on_sleepW)/3600000.0) * (116.081 + 0.8 + 13.14);
+
+
+    double lte_financial_cost = (val.Bytes_total_on_range) * 0.0000000954;
+
+    // 3. NORMALIZACIÓN (Ajusta estos valores MÁXIMOS según la física de tu simulación)
+
+    // values maximum for windows, dipend of sampling rate data collectet
+    // we use 2 variable to 1[s] sampling, and 1 variable to 5[s] sampling. => 132 maximo.
+    double packets_max = (windows*2)+(windows*0.2);
+    double bytes_max = packets_max*150;// considering each packet size has 100B maximum
+
+    // Esto asegura que Cost, Energy y Memory estén siempre entre 0.0 y 1.0
+    double MAX_FINANCIAL_COST = (bytes_max) * 0.0000000954; // asumimos que en la ventana que usamos de 5min y que cada paquete puede tener 100B max
+
+    double sleep_time = windows_ms - ((packets_max*5)+(packets_max*2)+(packets_max*93)+2500);
+
+    double MAX_ENERGY_CONSUMPTION_LTE = (((packets_max*5)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                         (((packets_max*2)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                         (((packets_max*93)/3600000.0) * (116.081 + 0.8 + 80));//+
+                                         //(((sleep_time)/3600000.0) * (116.081 + 0.8 + 13.14));
+
+    // ----------- AVOID the overflow -----------------
+    if(Consumption_GW_lte > MAX_ENERGY_CONSUMPTION_LTE) Consumption_GW_lte = MAX_ENERGY_CONSUMPTION_LTE;
+
+    if(lte_financial_cost > MAX_FINANCIAL_COST) lte_financial_cost = MAX_FINANCIAL_COST;
+
+
+    double energy_norm_0 = Consumption_GW_sleep / MAX_ENERGY_CONSUMPTION_LTE;
+    double energy_norm_1 = Consumption_GW_lte / MAX_ENERGY_CONSUMPTION_LTE;
+
+
+    // ---------- llimitation new variables nomalizated
+    if(energy_norm_1 > 1.0)
+        energy_norm_1 = 1.0;
+
+    if(energy_norm_0 > 1.0)
+        energy_norm_0 = 1.0;
+
+
+    double BR = Battery_Available/GW_Battery_Capacity_mAh;
+    double eta_battery = 0.9;
+
+    double battery_influence = (1 - (eta_battery*(1 - BR)));
+
+    double CCT_lte = std::pow(energy_norm_1, battery_influence);
+
+
+    // processo de aplificacion LTE data
+
+    double cost_norm_1 = lte_financial_cost / MAX_FINANCIAL_COST;
+
+    if(cost_norm_1 > 1.0)
+        cost_norm_1 = 1.0;
+
+    //emit(Consumption_WIFI,CCT_lte);
+    //emit(Consumption_LTE,CCT_sleep);
+
+
+    double model[3];
+
+    // --- MODELO 0: keep ON SDCARD ---
+    model[0] = (alpha * P_sat) + (beta * energy_norm_0) + (gamma_w * P_urg);
+
+    // --- MODELO 1: TRANSMITIR POR LTE ---
+    model[1] = (alpha * cost_norm_1) + (beta * CCT_lte);
+
+    // --- MODELO 2: TX using WIFI---
+    model[2] = 1;// si estamos dentro de esta funcion quiere decir que WIFI is DISCONNECT
+
+    emit(model_cost_wait_ap, model[0]);
+    emit(model_cost_offloading_lte, model[1]);
+    emit(model_cost_offloading_wifi, model[2]);
+
+    // ENCONTRAR EL MÍNIMO
+    double min = 99999999.9;
+    int best_decision = 10; // error
+
+    for(int n=0; n<2; n++){
+        if(model[n] < min){
+            min = model[n];
+            best_decision = n;
+        }
+    }
 
 
     return best_decision;

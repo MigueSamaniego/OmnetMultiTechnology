@@ -272,6 +272,8 @@ private:
     double Strategy5_gamma;
     bool Use_Model;
 
+    long Limit_Data;
+
 
     // ack tcp
     //simsignal_t tcpDataAckedSignal;
