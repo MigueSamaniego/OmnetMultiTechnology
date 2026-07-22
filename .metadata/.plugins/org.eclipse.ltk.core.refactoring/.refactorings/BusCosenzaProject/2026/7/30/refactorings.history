@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;BusCosenzaProject/simulations/BusCosenza/cars/results/model/01_05_04_NoTraffic/General-0.sca&apos; to &apos;NoTraffic=0.1,0.5,0.4-NoTraffic-0.sca&apos;" description="Rename resource &apos;General-0.sca&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="simulations/BusCosenza/cars/results/model/01_05_04_NoTraffic/General-0.sca" name="NoTraffic=0.1,0.5,0.4-NoTraffic-0.sca" stamp="1784564483298" updateReferences="true"/>
+</session>

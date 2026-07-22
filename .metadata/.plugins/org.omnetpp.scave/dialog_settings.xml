@@ -17,11 +17,11 @@
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
 	</section>
 	<section name="ChartEditForm">
-		<item key="active-tab" value="Lines"/>
+		<item key="active-tab" value="Export"/>
 	</section>
 	<section name="org.omnetpp.scave.editors.ui.ConfigureChartDialog">
-		<item key="DIALOG_X_ORIGIN" value="13"/>
-		<item key="DIALOG_Y_ORIGIN" value="131"/>
+		<item key="DIALOG_X_ORIGIN" value="551"/>
+		<item key="DIALOG_Y_ORIGIN" value="190"/>
 		<item key="DIALOG_WIDTH" value="827"/>
 		<item key="DIALOG_HEIGHT" value="711"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
@@ -29,14 +29,14 @@
 	<section name="org.omnetpp.scave.editors.ui.EditChartPagesDialog">
 		<item key="mainSash.weights" value="200 800"/>
 		<item key="contentSash.weights" value="500 500"/>
-		<item key="DIALOG_X_ORIGIN" value="237"/>
-		<item key="DIALOG_Y_ORIGIN" value="58"/>
+		<item key="DIALOG_X_ORIGIN" value="285"/>
+		<item key="DIALOG_Y_ORIGIN" value="9"/>
 		<item key="DIALOG_WIDTH" value="613"/>
 		<item key="DIALOG_HEIGHT" value="403"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
 	</section>
 	<section name="org.omnetpp.scave.editors.ui.ExportChartsDialog">
-		<item key="charts" value="1356017574"/>
+		<item key="charts" value="866815490"/>
 		<item key="export_images" value="true"/>
 		<item key="image_target_folder%/BusCosenzaProject/simulations/BusCosenza/cars/results/Test_Strategies/heavy_traffic_Strategy/General.anf" value="/BusCosenzaProject/simulations/BusCosenza/cars/results/Test_Strategies/heavy_traffic_Strategy"/>
 		<item key="image_format" value="png (Portable Network Graphics)"/>
@@ -50,5 +50,7 @@
 		<item key="DIALOG_WIDTH" value="927"/>
 		<item key="DIALOG_HEIGHT" value="733"/>
 		<item key="DIALOG_FONT_NAME" value="1|Ubuntu|11.0|0|GTK|1|"/>
+		<item key="image_target_folder%/BusCosenzaProject/simulations/BusCosenza/cars/results/model/NoTraffic=0.0,0.1,0.9-NoTraffic.anf" value="/BusCosenzaProject/simulations/BusCosenza/cars/results/model"/>
+		<item key="data_target_folder%/BusCosenzaProject/simulations/BusCosenza/cars/results/model/NoTraffic=0.0,0.1,0.9-NoTraffic.anf" value="/BusCosenzaProject/simulations/BusCosenza/cars/results/model"/>
 	</section>
 </section>

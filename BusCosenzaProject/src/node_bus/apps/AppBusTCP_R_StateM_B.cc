@@ -5178,6 +5178,15 @@ void AppBusTCP_R_StateM_B::socketDeleted(inet::TcpSocket *socket) {
 
 }*/
 
+// --------------------------------------------------------------------------------------------------------------------------------
+// ------------------------------------- MODEL PROPOUSE TO PROFERSORS -------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------
+// min┬(𝑑_( 𝑙𝑡𝑒),  𝑑_(𝑤𝑖𝑓𝑖 ) )⁡  𝐽=[𝑶𝒑𝒆𝒓𝒂𝒕𝒊𝒐𝒏𝒂𝒍 𝑪𝒐𝒔𝒕+𝒄𝒖𝒓𝒓𝒆𝒏𝒕 𝒄𝒐𝒏𝒔𝒖𝒎𝒑𝒕𝒊𝒐𝒏 𝒄𝒐𝒔𝒕+𝒑𝒆𝒏𝒂𝒍𝒕𝒚]
+// min┬(𝑑_𝑙𝑡𝑒,𝑑_𝑆𝐷 )⁡  𝐽=[𝛼∙(〖𝐶𝑇𝑥〗_𝑙𝑡𝑒 (𝑊)∙𝑑_𝑙𝑡𝑒+〖𝐶𝑆〗_𝑆𝐷 (𝑊)∙𝑑_𝑆𝐷 )+𝛽∙(〖𝐸𝐶𝐵〗_𝑙𝑡𝑒 (𝑊)∙𝑑_𝑙𝑡𝑒+〖𝐸𝐶〗_𝑆𝐷 (𝑊)∙𝑑_𝑆𝐷 )+ 𝛾_ ∙ (〖𝑃_𝑢𝑟𝑔 (𝑊)〗_ ∙𝑑_𝑆𝐷)]
+// --------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
 
@@ -5374,3 +5383,210 @@ int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double
 
 
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------------------
+// ------------------------------------- MODEL TO ME  -------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------
+// min┬(𝑑_( 𝑙𝑡𝑒),  𝑑_(𝑤𝑖𝑓𝑖 ) )⁡  𝐽=[𝑶𝒑𝒆𝒓𝒂𝒕𝒊𝒐𝒏𝒂𝒍 𝑪𝒐𝒔𝒕+𝒄𝒖𝒓𝒓𝒆𝒏𝒕 𝒄𝒐𝒏𝒔𝒖𝒎𝒑𝒕𝒊𝒐𝒏 𝒄𝒐𝒔𝒕+𝒑𝒆𝒏𝒂𝒍𝒕𝒚]
+// min┬(𝑑_𝑙𝑡𝑒,𝑑_𝑆𝐷 )⁡  𝐽=[𝛼∙(〖𝐶𝑇𝑥〗_𝑙𝑡𝑒 (𝑊)∙𝑑_𝑙𝑡𝑒+〖𝐶𝑆〗_𝑆𝐷 (𝑊)∙𝑑_𝑆𝐷 )+𝛽∙(〖𝐸𝐶𝐵〗_𝑙𝑡𝑒 (𝑊)∙𝑑_𝑙𝑡𝑒+〖𝐸𝐶〗_𝑆𝐷 (𝑊)∙𝑑_𝑆𝐷 )+ 𝛾_ ∙ (〖𝑃_𝑢𝑟𝑔 (𝑊)〗_ ∙𝑑_𝑆𝐷)]
+// --------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------
+
+/*int AppBusTCP_R_StateM_B::FuctionMultiObjetive(double alpha, double beta, double gamma_w, int coefficient, int threshold_memmory, double windows) {
+
+
+    range_start_strategy_5 = simTime().dbl();
+    range_stop_strategy_5 = windows;
+
+    //EV_ERROR << "calculation fuction. desde: " << range_start_strategy_5 << " hasta: " <<  range_stop_strategy_5 << endl;
+
+    double data_on_buffer[5]={0};
+    QueueState datos_en_cola = sdcard.get_size_queues();
+    data_on_buffer[0] = datos_en_cola.p1;
+    data_on_buffer[1] = datos_en_cola.p2;
+    data_on_buffer[2] = datos_en_cola.p3;
+    data_on_buffer[3] = datos_en_cola.p4;
+    data_on_buffer[4] = datos_en_cola.p5;
+    //EV_WARN << "cola 1: " << datos_en_cola.p1 << " cola 2: " << datos_en_cola.p2 << " cola 3: " << datos_en_cola.p3 << " cola 4: " << datos_en_cola.p4 << " cola 5: " << datos_en_cola.p5 << endl;
+
+
+    RangeStats val = sdcard.getStatsByDeadline(range_start_strategy_5, range_stop_strategy_5);
+
+    // 1. SEGURIDAD MATEMÁTICA PARA LA PENALIDAD (URGENCIA)
+    double P_urg = 0.0;
+    double P_sat = 0.0;
+
+    // activate penaly for urgency
+    if (val.D_t > 0) {
+
+        double remainign_time_on_old_data = (sdcard.remaining_time(simTime()));
+        double penaly_urg = remainign_time_on_old_data - coefficient;
+
+        if(penaly_urg < 0.0) penaly_urg = 0.0;
+
+        P_urg = 1/((penaly_urg)+1); // esto es correcto porque el max P_urg es 1
+    }
+
+     //activate penaly for saturation
+    long max_buffer_fill = 2000;
+    double min_available = (threshold_memmory*max_buffer_fill)/100;
+    buffer_penalty = -1;
+
+    double k = 10.0, tau_v = 0.5;
+    double x0 = 0.0;
+    double x1 = 1.0;
+
+    double Sigmoide_x0 = (1.0/(1.0 + exp(-k * (x0 - tau_v))));
+    double Sigmoide_x1 = (1.0/(1.0 + exp(-k * (x1 - tau_v))));
+
+    for(int n=0; n<=4; n++){
+
+//        // calculation buffer lineal
+//        double Ocupation_i = ((data_on_buffer[n] + min_available)/max_buffer_fill);
+//        EV_WARN << "Ocupacion: " << Ocupation_i << " P_sat: " << P_sat << endl;
+//        if(Ocupation_i > P_sat){
+//            P_sat = Ocupation_i;
+//            buffer_penalty = n;
+//            if(buffer_penalty == 4){
+//                GetOld old_deadline = sdcard.Get_Old_Data();
+//                range_start_strategy_5 = old_deadline.old_in_priority[4];// tomamos el valor de
+//
+//            }
+//        }
+
+        // calculation buffer sigmoidal
+        double x = (data_on_buffer[n]/max_buffer_fill);
+
+        double Sigmoide_x = (1.0/(1.0 + exp(-k * (x - tau_v)))); // https://www.desmos.com/calculator/snbwvjmnks?lang=it
+
+        double Ocupation_i = (Sigmoide_x - Sigmoide_x0)/(Sigmoide_x1 - Sigmoide_x0);
+
+
+        if(Ocupation_i > P_sat){
+            P_sat = Ocupation_i;
+            buffer_penalty = n;
+            if(buffer_penalty == 4){
+                GetOld old_deadline = sdcard.Get_Old_Data();
+                range_start_strategy_5 = old_deadline.old_in_priority[4];// tomamos el valor de
+
+            }
+        }
+
+
+        if(P_sat > 1.0) P_sat = 1.0;
+
+    }
+
+    // 2. CÁLCULOS DE ENERGÍA Y COSTO FINANCIERO
+    double windows_ms = windows*1000;// ventana en ms
+
+    double Tx_phase = 0.0, Rx_phase = 0.0, Normal_phase = 0.0, time_on_sleep = windows_ms;
+    double Tx_phaseW = 0.0, Rx_phaseW = 0.0, Normal_phaseW = 0.0, time_on_sleepW = windows_ms;
+    if (val.D_t > 0) {// si tenemos almenos un dato
+
+        Tx_phase = val.D_t*5;
+        Rx_phase = val.D_t*2;
+        Normal_phase = (val.D_t*93) + 2500;// + 2500; // tiempo para entrar en sleep
+        time_on_sleep = ((windows_ms) - (Tx_phase + Rx_phase + Normal_phase ));// restamos el timepo de Tx y Rx y un tiempo
+
+    }
+
+
+    double Consumption_GW_lte = (((Tx_phase)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                (((Rx_phase)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                (((Normal_phase)/3600000.0) * (116.081 + 0.8 + 80));//+
+                                //(((time_on_sleep)/3600000.0) * (116.081 + 0.8 + 13.14));
+
+    double Consumption_GW_sleep = 0.0;//((time_on_sleepW)/3600000.0) * (116.081 + 0.8 + 13.14);
+
+
+    double lte_financial_cost = (val.Bytes_total_on_range) * 0.0000000954;
+
+    // 3. NORMALIZACIÓN (Ajusta estos valores MÁXIMOS según la física de tu simulación)
+
+    // values maximum for windows, dipend of sampling rate data collectet
+    // we use 2 variable to 1[s] sampling, and 1 variable to 5[s] sampling. => 132 maximo.
+    double packets_max = (windows*2)+(windows*0.2);
+    double bytes_max = packets_max*150;// considering each packet size has 100B maximum
+
+    // Esto asegura que Cost, Energy y Memory estén siempre entre 0.0 y 1.0
+    double MAX_FINANCIAL_COST = (bytes_max) * 0.0000000954; // asumimos que en la ventana que usamos de 5min y que cada paquete puede tener 100B max
+
+    double sleep_time = windows_ms - ((packets_max*5)+(packets_max*2)+(packets_max*93)+2500);
+
+    double MAX_ENERGY_CONSUMPTION_LTE = (((packets_max*5)/3600000.0) * (116.081 + 0.8 + 500)) +
+                                         (((packets_max*2)/3600000.0) * (116.081 + 0.8 + 300)) +
+                                         (((packets_max*93)/3600000.0) * (116.081 + 0.8 + 80));//+
+                                         //(((sleep_time)/3600000.0) * (116.081 + 0.8 + 13.14));
+
+    // ----------- AVOID the overflow -----------------
+    if(Consumption_GW_lte > MAX_ENERGY_CONSUMPTION_LTE) Consumption_GW_lte = MAX_ENERGY_CONSUMPTION_LTE;
+
+    if(lte_financial_cost > MAX_FINANCIAL_COST) lte_financial_cost = MAX_FINANCIAL_COST;
+
+
+    double energy_norm_0 = Consumption_GW_sleep / MAX_ENERGY_CONSUMPTION_LTE;
+    double energy_norm_1 = Consumption_GW_lte / MAX_ENERGY_CONSUMPTION_LTE;
+
+
+    // ---------- llimitation new variables nomalizated
+    if(energy_norm_1 > 1.0)
+        energy_norm_1 = 1.0;
+
+    if(energy_norm_0 > 1.0)
+        energy_norm_0 = 1.0;
+
+
+    double BR = Battery_Available/GW_Battery_Capacity_mAh;
+    double eta_battery = 0.9;
+
+    double battery_influence = (1 - (eta_battery*(1 - BR)));
+
+    double CCT_lte = std::pow(energy_norm_1, battery_influence);
+
+
+    // processo de aplificacion LTE data
+
+    double cost_norm_1 = lte_financial_cost / MAX_FINANCIAL_COST;
+
+    if(cost_norm_1 > 1.0)
+        cost_norm_1 = 1.0;
+
+    //emit(Consumption_WIFI,CCT_lte);
+    //emit(Consumption_LTE,CCT_sleep);
+
+
+    double model[3];
+
+    // --- MODELO 0: keep ON SDCARD ---
+    model[0] = (alpha * P_sat) + (beta * energy_norm_0) + (gamma_w * P_urg);
+
+    // --- MODELO 1: TRANSMITIR POR LTE ---
+    model[1] = (alpha * cost_norm_1) + (beta * CCT_lte);
+
+    // --- MODELO 2: TX using WIFI---
+    model[2] = 1;// si estamos dentro de esta funcion quiere decir que WIFI is DISCONNECT
+
+    emit(model_cost_wait_ap, model[0]);
+    emit(model_cost_offloading_lte, model[1]);
+    emit(model_cost_offloading_wifi, model[2]);
+
+    // ENCONTRAR EL MÍNIMO
+    double min = 99999999.9;
+    int best_decision = 10; // error
+
+    for(int n=0; n<2; n++){
+        if(model[n] < min){
+            min = model[n];
+            best_decision = n;
+        }
+    }
+
+
+    return best_decision;
+
+
+}*/

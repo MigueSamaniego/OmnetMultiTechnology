@@ -1,0 +1,3 @@
+1784210181933	Move 'NoTraffic=0.5,0.1,0.4-NoTraffic.anf' to 'model'
+1784228554080	Rename resource 'WIFI_LTE_1minFix_Traffic'
+1784228629619	Rename resource 'WIFI_1minFix_Traffic'
